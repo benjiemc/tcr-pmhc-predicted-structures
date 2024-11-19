@@ -1,0 +1,26 @@
+# Project Files
+jobs/*
+notebooks/exploratory/
+
+data/raw/*
+!data/raw/.gitkeep
+data/external/*
+!data/external/.gitkeep
+data/interim/*
+!data/interim/.gitkeep
+data/processed/*
+!data/processed/.gitkeep
+
+# Python Files
+**/*.egg-info/*
+**/*.pyc
+**/.ipynb_checkpoints/*
+**/.pytest_cache/*
+**/*.t.err
+
+# Documentation Files
+docs/public/*
+docs/source/*
+
+# Developement Environment Files
+.vscode/*

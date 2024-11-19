@@ -1,0 +1,18 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "tcr_pmhc_predicted_structures"
+version = "0.0.0"
+authors = [
+    { name="Benjamin McMaster", email="benjamin.mcmaster@rdm.ox.ac.uk"}
+]
+requires-python = ">=3.10"
+dependencies = [
+	"pyxdameraulevenshtein",
+	"numpy",
+	"pandas",
+	"scikit-learn",
+	"scipy",
+]

@@ -1,0 +1,6 @@
+[submodule "third_party/tcrmodel2"]
+	path = third_party/tcrmodel2
+	url = git@github.com:benjiemc/tcrmodel2.git
+[submodule "third_party/alphafold3"]
+	path = third_party/alphafold3
+	url = git@github.com:google-deepmind/alphafold3.git
