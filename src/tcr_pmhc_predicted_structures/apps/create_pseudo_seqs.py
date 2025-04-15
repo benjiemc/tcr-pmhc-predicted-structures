@@ -1,3 +1,5 @@
+"""Create pseudo sequences."""
+
 import argparse
 
 import anarci
@@ -17,9 +19,9 @@ def main():
     args = parser.parse_args()
 
     vdjdb = pd.read_csv(args.input_file)
-    
+
     pseudo_seqs = []
-    for i, row in vdjdb.iterrows():
+    for _, row in vdjdb.iterrows():
         print('Working on:', row.complex_id, flush=True)
         pseudo_seq = {}
 
@@ -39,7 +41,7 @@ def main():
                     if res_name == '-':
                         continue
 
-                    elif seq_id in IMGT_CDR1:
+                    if seq_id in IMGT_CDR1:
                         cdr1 += res_name
 
                     elif seq_id in IMGT_CDR2:
@@ -48,8 +50,8 @@ def main():
                     elif seq_id in IMGT_CDR3:
                         cdr3 += res_name
 
-            pseudo_seq[chain] = '-'.join([cdr1, cdr2, cdr3])
-        
+            pseudo_seq[chain] = f'{cdr1}-{cdr2}-{cdr3}'
+
         pseudo_seqs.append('-'.join([pseudo_seq['alpha_chain_sequence'], pseudo_seq['beta_chain_sequence']]))
 
     vdjdb['tcr_pseudo_sequence'] = pseudo_seqs

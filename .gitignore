@@ -17,6 +17,7 @@ data/processed/*
 **/.ipynb_checkpoints/*
 **/.pytest_cache/*
 **/*.t.err
+**/.coverage
 
 # Snakemake Files
 **/.snakemake/*

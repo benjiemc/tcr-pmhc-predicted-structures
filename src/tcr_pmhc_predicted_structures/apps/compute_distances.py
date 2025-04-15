@@ -1,3 +1,5 @@
+"""Compute distances."""
+
 import os
 import sys
 
@@ -7,7 +9,11 @@ from pyxdameraulevenshtein import damerau_levenshtein_distance
 
 
 def levenshtein_distance(token1, token2):
-    '''Replaced by a Cython implementation.'''
+    """Calculate Levenshtein distances.
+
+    WARNING/TODO: Replaced by a Cython implementation.
+
+    """
     distances = np.zeros((len(token1) + 1, len(token2) + 1))
 
     for t1 in range(len(token1) + 1):
@@ -22,16 +28,16 @@ def levenshtein_distance(token1, token2):
 
     for t1 in range(1, len(token1) + 1):
         for t2 in range(1, len(token2) + 1):
-            if (token1[t1-1] == token2[t2-1]):
+            if token1[t1 - 1] == token2[t2 - 1]:
                 distances[t1][t2] = distances[t1 - 1][t2 - 1]
             else:
                 a = distances[t1][t2 - 1]
                 b = distances[t1 - 1][t2]
                 c = distances[t1 - 1][t2 - 1]
 
-                if (a <= b and a <= c):
+                if a <= b and a <= c:
                     distances[t1][t2] = a + 1
-                elif (b <= a and b <= c):
+                elif b <= a and b <= c:
                     distances[t1][t2] = b + 1
                 else:
                     distances[t1][t2] = c + 1

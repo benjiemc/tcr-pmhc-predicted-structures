@@ -4,6 +4,16 @@ envvars:
     "ALPHAFOLD_DATA_DIR",
     "ALPHAFOLD3_WEIGHTS_DIR"
 
+rule lint:
+    shell:
+        """
+        ruff check
+        ruff format --check
+        """
+
+rule test:
+    shell: "pytest --cov=src tests"
+
 rule run_alphafold:
     input:
         json="data/external/af_input"

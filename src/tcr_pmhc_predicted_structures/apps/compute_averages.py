@@ -1,3 +1,5 @@
+"""Compute averages."""
+
 import argparse
 
 import numpy as np
@@ -13,7 +15,7 @@ parser.add_argument('--output', help='path to output csv')
 if __name__ == '__main__':
     args = parser.parse_args()
 
-    print("Loading data...")
+    print('Loading data...')
     clusters = np.loadtxt(args.clusters).astype(int)
     num_points = len(clusters)
 
@@ -35,7 +37,7 @@ if __name__ == '__main__':
     out_avgs = []
 
     for cluster in np.unique(clusters):
-        print("Working on cluster", cluster)
+        print('Working on cluster', cluster)
 
         in_cluster_idx = np.where(cluster == clusters, 1, 0)
         out_cluster_idx = np.where(cluster != clusters, 1, 0)
@@ -53,12 +55,14 @@ if __name__ == '__main__':
             cluster_names.append(cluster)
             distance_names.append(name)
 
-    print("Writing data to file")
-    cluster_distances = pd.DataFrame({
-        'cluster': cluster_names,
-        'distance_name': distance_names,
-        'in_avg_distance': in_avgs,
-        'out_avg_distance': out_avgs,
-    })
+    print('Writing data to file')
+    cluster_distances = pd.DataFrame(
+        {
+            'cluster': cluster_names,
+            'distance_name': distance_names,
+            'in_avg_distance': in_avgs,
+            'out_avg_distance': out_avgs,
+        }
+    )
 
     cluster_distances.to_csv(args.output, index=False)

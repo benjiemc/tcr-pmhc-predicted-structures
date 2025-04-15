@@ -1,9 +1,11 @@
+"""Cluster TCR:pMHC sequences."""
+
 import argparse
 from warnings import simplefilter
 
 import numpy as np
-from sklearn.cluster import AgglomerativeClustering
 from scipy.cluster.hierarchy import ClusterWarning
+from sklearn.cluster import AgglomerativeClustering
 
 parser = argparse.ArgumentParser(prog='ClusterSequences')
 
@@ -22,15 +24,17 @@ def main():
 
     for layer in data:
         if args.normalize:
-            layer = (layer - layer.mean()) / layer.std()
+            layer_norm = (layer - layer.mean()) / layer.std()
+            composite += layer_norm
 
-        composite += layer
+        else:
+            composite += layer
 
-    simplefilter("ignore", ClusterWarning)
+    simplefilter('ignore', ClusterWarning)
 
-    clusters = AgglomerativeClustering(n_clusters=args.number_of_clusters,
-                                       linkage='complete',
-                                       affinity='precomputed').fit_predict(composite)
+    clusters = AgglomerativeClustering(
+        n_clusters=args.number_of_clusters, linkage='complete', affinity='precomputed'
+    ).fit_predict(composite)
 
     np.savetxt(args.output, clusters.astype(int), fmt='%i')
 
