@@ -2,6 +2,7 @@ import os
 
 envvars:
     "ALPHAFOLD_DATA_DIR",
+    "TCRMODEL2_ALPHAFOLD_DATA_DIR",
     "ALPHAFOLD3_WEIGHTS_DIR"
 
 rule lint:
@@ -49,3 +50,14 @@ rule run_alphafold:
                 --model_dir=/models \
                 --output_dir=/tmp/af_output
         """
+
+
+rule predict_tcr_structures_using_tcrmodel2:
+    input: "data/interim/sampled_vdjdb_norm.csv"
+    output: directory("data/interim/tcrmodel2_output/tcrs")
+    script: "scripts/predict_tcr_structures.py"
+
+rule predict_tcr_pmhc_I_structures_using_tcrmodel2:
+    input: "data/interim/sampled_vdjdb_norm.csv"
+    output: directory("data/interim/tcrmodel2_output/tcr-pmhc-Is")
+    script: "scripts/predict_tcr_mhcI_structures.py"

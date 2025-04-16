@@ -5,12 +5,13 @@ import csv
 import os
 import subprocess
 
-ALPHAFOLD_DATA_DIR = os.environ['ALPHAFOLD_DATA_DIR']
+TCRMODEL2_ALPHAFOLD_DATA_DIR = os.environ['TCRMODEL2_ALPHAFOLD_DATA_DIR']
 
-os.chdir('/home/imm/lina4096/code/tcrmodel2')
+root_dir = os.getcwd()
+os.chdir('third_party/tcrmodel2')
 
-input_data = '/home/imm/lina4096/projects/tcr-pmhc-interface-analysis/data/sampled_vdjdb_norm.csv'
-output_dir = '/home/imm/lina4096/projects/tcr-pmhc-interface-analysis/data/predicted-structures/tcr'
+input_data = os.path.join(root_dir, 'data/interim/sampled_vdjdb_norm.csv')
+output_dir = os.path.join(root_dir, 'data/interim/tcrmodel2_output/tcrs')
 
 with open(input_data, 'r') as fh:
     reader = csv.reader(fh)
@@ -33,7 +34,7 @@ for i, (_, complex_id, alpha_chain_seq, beta_chain_seq, _, _) in enumerate(data,
         f'--tcra_seq={alpha_chain_seq} '
         f'--tcrb_seq={beta_chain_seq} '
         '--relax_structures '
-        f'--ori_db={ALPHAFOLD_DATA_DIR}'
+        f'--ori_db={TCRMODEL2_ALPHAFOLD_DATA_DIR}'
     )
 
     subprocess.run(cmd, shell=True)  # noqa: S602, PLW1510
