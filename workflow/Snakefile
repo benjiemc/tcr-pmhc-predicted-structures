@@ -15,6 +15,20 @@ rule lint:
 rule test:
     shell: "pytest --cov=src tests"
 
+rule sample_sequences:
+    input: "data/raw/sequences.csv"
+    output: "data/interim/sequences_sample.csv"
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.apps.sample_sequences \
+            --log-level info \
+            --seed 123 \
+            --sample-size 20 \
+            --generate-background \
+            -o {output} \
+            {input}
+        """
+
 rule run_alphafold:
     input:
         json="data/external/af_input"
