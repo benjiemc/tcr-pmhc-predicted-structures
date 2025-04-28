@@ -1,3 +1,4 @@
+import csv
 import os
 
 envvars:
@@ -30,7 +31,9 @@ rule sample_sequences:
         """
 
 def _get_json_names(path: str) -> list[str]:
-    import csv
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
 
     with open(path, 'r') as fh:
         reader = csv.DictReader(fh)
@@ -64,22 +67,21 @@ rule create_af3_jsons:
         """
 
 rule run_alphafold:
-    input:
-        json="data/external/af_input"
-    output:
-        directory("data/interim/af_output")
+    input: "data/interim/sequences-af3/{name}.json"
+    output: directory("data/interim/structures-af3/{name}")
     params:
         alphafold_data_dir=os.environ['ALPHAFOLD_DATA_DIR'],
         alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
     shell:
         """
-        mkdir -p {output}
+        input_file_name="$(basename {input})"
+        input_dir_abs="$(pwd)/$(dirname {input})"
+        output_dir_abs="$(pwd)/$(dirname {output})"
 
-        input_abs="$(pwd)/{input}"
-        output_abs="$(pwd)/{output}"
+        mkdir -p $output_dir_abs
 
         docker run -it \
-            --volume $output_abs:/tmp/af_output \
+            --volume $output_dir_abs:/tmp/af_output \
             --entrypoint bash \
             alphafold3 \
             -c "chown -R $(id -u):$(id -g) /tmp/af_output"
@@ -87,18 +89,28 @@ rule run_alphafold:
 
         docker run -it \
             --user $(id -u):$(id -g) \
-            --volume $input_abs:/tmp/af_input \
-            --volume $output_abs:/tmp/af_output \
+            --volume $input_dir_abs:/tmp/af_input \
+            --volume $output_dir_abs:/tmp/af_output \
             --volume {params.alphafold3_weights_dir}:/models \
             --volume {params.alphafold_data_dir}:/public_databases \
             --gpus all \
             alphafold3 \
             python run_alphafold.py \
-                --json_path=/tmp/af_input/fold_input.json \
+                --json_path=/tmp/af_input/$input_file_name \
                 --model_dir=/models \
                 --output_dir=/tmp/af_output
         """
 
+def _get_af3_names(path: str) -> list[str]:
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
+
+    with open(path, 'r') as fh:
+        return [f"data/interim/structures-af3/{entry['id']}" for entry in csv.DictReader(fh)]
+
+rule create_af3_structures:
+    input: _get_af3_names("data/interim/sequences_sample.csv")
 
 rule predict_tcr_structures_using_tcrmodel2:
     input: "data/interim/sampled_vdjdb_norm.csv"
