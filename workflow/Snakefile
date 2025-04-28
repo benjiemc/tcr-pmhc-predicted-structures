@@ -29,6 +29,40 @@ rule sample_sequences:
             {input}
         """
 
+def _get_json_names(path: str) -> list[str]:
+    import csv
+
+    with open(path, 'r') as fh:
+        reader = csv.DictReader(fh)
+
+        return [f"data/interim/sequences-af3/{entry['id']}.json" for entry in reader]
+
+rule create_af3_jsons:
+    input:
+        sequences="data/interim/sequences_sample.csv",
+        mhc_sequences=expand("data/external/hla_sequences/{mhc}.json", mhc=[
+            'h2_d',
+            'h2_k',
+            'h2_l',
+            'hla_a',
+            'hla_b',
+            'hla_c',
+            'hla_e',
+            'hla_f',
+            'hla_g',
+        ])
+    output: _get_json_names("data/interim/sequences_sample.csv")
+    shell:
+        """
+        out_dir_name=$(dirname {output[0]})
+
+        python -m tcr_pmhc_predicted_structures.apps.create_af3_json \
+            --log-level info \
+            --mhc-sequences {input.mhc_sequences} \
+            -o $out_dir_name \
+            {input.sequences}
+        """
+
 rule run_alphafold:
     input:
         json="data/external/af_input"

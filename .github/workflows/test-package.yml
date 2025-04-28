@@ -17,6 +17,8 @@ jobs:
             echo "TCRMODEL2_ALPHAFOLD_DATA_DIR=''" >> $GITHUB_ENV
             echo "ALPHAFOLD3_WEIGHTS_DIR=''" >> $GITHUB_ENV
             mamba run -n tcr-pmhc-predicted-structures pip install '.[develop]'
+            mamba run -n tcr-pmhc-predicted-structures stitchrdl -s human
+            mamba run -n tcr-pmhc-predicted-structures stitchrdl -s mouse
             eval $(ssh-agent -s)
             mkdir -p ~/.ssh
             echo "${{ secrets.ANARCI_TCR_PMHC_SSH_KEY }}" > ~/.ssh/anarci_tcr_pmhc
