@@ -9,3 +9,8 @@ dependencies:
   - pip
   - python=3.11
   - snakemake
+  - pip:
+      - matplotlib
+      - numpy
+      - pandas
+      - python-pdb

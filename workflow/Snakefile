@@ -112,6 +112,17 @@ def _get_af3_names(path: str) -> list[str]:
 rule create_af3_structures:
     input: _get_af3_names("data/interim/sequences_sample.csv")
 
+rule create_distance_restraints:
+    input:
+        "data/raw/structures_summary.csv",
+        "data/raw/structures"
+
+    output: "data/processed/tcr_pmhc_distance_restaints.csv"
+    shell:
+        """
+        jupyter nbconvert --to notebook --execute --inplace notebooks/measure_constraint_distances.ipynb
+        """
+
 rule predict_tcr_structures_using_tcrmodel2:
     input: "data/interim/sampled_vdjdb_norm.csv"
     output: directory("data/interim/tcrmodel2_output/tcrs")
