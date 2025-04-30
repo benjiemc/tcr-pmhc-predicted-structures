@@ -1,0 +1,10 @@
+name: tcr-pmhc-predicted-structures
+channels:
+  - bioconda
+  - conda-forge
+  - nodefaults
+dependencies:
+  - jupyter
+  - pip
+  - python=3.11
+  - snakemake
