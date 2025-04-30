@@ -1,0 +1,23 @@
+name: Test package
+
+on: [push, pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: mamba-org/setup-micromamba@v2
+      - name: Create Mamba Symlink
+        run: ln -s $(which micromamba) /usr/local/bin/mamba
+      - name: Setup environment
+        run: |
+            mamba create -f environment.yml
+            echo "ALPHAFOLD_DATA_DIR=''" >> $GITHUB_ENV
+            echo "TCRMODEL2_ALPHAFOLD_DATA_DIR=''" >> $GITHUB_ENV
+            echo "ALPHAFOLD3_WEIGHTS_DIR=''" >> $GITHUB_ENV
+            mamba run -n tcr-pmhc-predicted-structures pip install '.[develop]'
+      - name: Lint package
+        run: mamba run -n tcr-pmhc-predicted-structures snakemake lint  --cores 1 --quiet all
+      - name: Test package
+        run: mamba run -n tcr-pmhc-predicted-structures snakemake test --cores 1 --quiet all
