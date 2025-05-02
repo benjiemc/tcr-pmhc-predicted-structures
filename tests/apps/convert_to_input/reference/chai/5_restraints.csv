@@ -1,0 +1,11 @@
+restraint_id,chainA,res_idxA,chainB,res_idxB,connection_type,confidence,min_distance_angstrom,max_distance_angstrom,comment
+CDR1beta_start_beta_72A,E,T26,B,G162,contact,1.0,0.0,50.14728444292871,blank
+CDR2alpha_end_alpha_79,D,N57,A,G79,contact,1.0,0.0,46.60637846904648,blank
+CDR3beta_start_beta_67,E,C91,B,L156,contact,1.0,0.0,50.68618834554439,blank
+CDR1alpha_start_beta_58,D,T26,B,K146,contact,1.0,0.0,45.79929842257411,blank
+CDR2alpha_end_alpha_75,D,N57,A,R75,contact,1.0,0.0,41.09931989704939,blank
+CDR3beta_end_beta_70,E,F103,B,Y159,contact,1.0,0.0,48.19847851333069,blank
+CDR1alpha_end_alpha_73,D,F33,A,T73,contact,1.0,0.0,39.18972203269628,blank
+CDR1beta_start_beta_76,E,T26,B,E166,contact,1.0,0.0,45.64648219742678,blank
+CDR1beta_start_beta_77,E,T26,B,W167,contact,1.0,0.0,45.70590597504879,blank
+CDR1beta_end_beta_72A,E,M32,B,G162,contact,1.0,0.0,39.88003717400474,blank
