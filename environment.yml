@@ -6,10 +6,12 @@ channels:
 dependencies:
   - hmmer
   - jupyter
+  - kalign3
   - pip
   - python=3.11
   - snakemake
   - pip:
+      - chai_lab==0.6.1
       - matplotlib
       - numpy
       - pandas
