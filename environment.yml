@@ -4,6 +4,7 @@ channels:
   - conda-forge
   - nodefaults
 dependencies:
+  - hmmer
   - jupyter
   - pip
   - python=3.11
