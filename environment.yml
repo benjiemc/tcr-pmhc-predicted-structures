@@ -7,8 +7,13 @@ dependencies:
   - hmmer
   - jupyter
   - kalign3
+  - matplotlib
+  - numpy
+  - pandas
   - pip
   - python=3.11
+  - scikit-learn
+  - seaborn
   - snakemake
   - pip:
       - chai_lab==0.6.1
