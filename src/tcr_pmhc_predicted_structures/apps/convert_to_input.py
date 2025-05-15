@@ -2,6 +2,7 @@
 
 import argparse
 import csv
+import json
 import logging
 import os
 import re
@@ -34,7 +35,10 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('input', help='path to input csv')
 parser.add_argument('--output', '-o', required=True, help='')
-parser.add_argument('--format', required=True, choices=['chai'], help='')
+parser.add_argument('--format', required=True, choices=['alphafold3', 'chai'], help='Model to generate input files for')
+parser.add_argument(
+    '--alphafold3-model-seeds', nargs='+', type=int, default=[1], help='Seeds for alphafold3 (Default: [1])'
+)
 parser.add_argument(
     '--mhc-sequences',
     nargs='+',
@@ -54,7 +58,7 @@ B2M_SEQUENCES = {
 }
 '''B2M sequences downloaded from UniProt.'''
 
-CHAIN_ORDER = ['mhc_chain_1', 'mhc_chain_2', 'peptide', 'tcr_alpha_chain', 'tcr_beta_chain']
+CHAI_CHAIN_ORDER = ['mhc_chain_1', 'mhc_chain_2', 'peptide', 'tcr_alpha_chain', 'tcr_beta_chain']
 
 
 def create_full_length_sequences(sequences: list[dict], mhc_sequences: pd.DataFrame) -> list[dict]:
@@ -155,13 +159,13 @@ def create_restraints(sequence_info: dict, restraints: pd.DataFrame) -> pd.DataF
     if sequence_info['mhc_type'] == 'MH1':
         numbered_sequences = {
             name: anarci.number(sequence_info[name])[0]
-            for name in CHAIN_ORDER
+            for name in CHAI_CHAIN_ORDER
             if name not in {'peptide', 'mhc_chain_2'}
         }
 
     else:
         numbered_sequences = {
-            name: anarci.number(sequence_info[name])[0] for name in CHAIN_ORDER if name not in {'peptide'}
+            name: anarci.number(sequence_info[name])[0] for name in CHAI_CHAIN_ORDER if name not in {'peptide'}
         }
 
     numbered_sequences = {
@@ -264,10 +268,34 @@ def format_sequences_for_chai(sequences: list[dict], output_dir: str, restraints
 
         logger.debug('Writing fasta for %s', sequence_info['id'])
         with open(os.path.join(output_dir, sequence_info['id'] + '.fasta'), 'w') as fh:
-            for name in CHAIN_ORDER:
+            for name in CHAI_CHAIN_ORDER:
                 fh.write(f'>protein|name={name}\n')
                 fh.write(sequence_info[name])
                 fh.write('\n')
+
+
+def format_sequences_for_af3(sequences: list[dict], output_dir: str, model_seeds: list[int]) -> None:
+    for sequence_info in sequences:
+        logger.debug('Writing json for %s', sequence_info['id'])
+        output_name = os.path.join(output_dir, f"{sequence_info['id']}.json")
+        with open(output_name, 'w') as output_fh:
+            logger.debug('Writing to %s', output_name)
+            json.dump(
+                {
+                    'name': sequence_info['id'],
+                    'modelSeeds': model_seeds,
+                    'sequences': [
+                        {'protein': {'id': 'D', 'sequence': sequence_info['tcr_alpha_chain']}},
+                        {'protein': {'id': 'E', 'sequence': sequence_info['tcr_beta_chain']}},
+                        {'protein': {'id': 'C', 'sequence': sequence_info['peptide']}},
+                        {'protein': {'id': 'A', 'sequence': sequence_info['mhc_chain_1']}},
+                        {'protein': {'id': 'B', 'sequence': sequence_info['mhc_chain_2']}},
+                    ],
+                    'dialect': 'alphafold3',
+                    'version': 1,
+                },
+                output_fh,
+            )
 
 
 def main() -> None:
@@ -300,6 +328,10 @@ def main() -> None:
         os.mkdir(args.output)
 
     match args.format:
+        case 'alphafold3':
+            logger.info('Formatting sequences for Alphafold3 and outputting to %s', args.output)
+            format_sequences_for_af3(full_sequences, args.output, args.alphafold3_model_seeds)
+
         case 'chai':
             logger.info('Formatting sequences for chai and outputting to %s', args.output)
 
