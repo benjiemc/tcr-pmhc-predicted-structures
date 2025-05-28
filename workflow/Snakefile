@@ -71,11 +71,53 @@ rule create_af3_jsons:
             {input.sequences}
         """
 
-rule run_alphafold:
+rule run_alphafold_msas:
     input: "data/interim/sequences-af3/{name}.json"
-    output: directory("data/interim/structures-af3/{name}")
+    output: directory("data/interim/msas-af3/{name}")
     params:
         alphafold_data_dir=os.environ['ALPHAFOLD_DATA_DIR'],
+    shell:
+        """
+        input_file_name="$(basename {input})"
+        input_dir_abs="$(pwd)/$(dirname {input})"
+        output_dir_abs="$(pwd)/$(dirname {output})"
+
+        mkdir -p $output_dir_abs
+
+        docker run -it \
+            --volume $output_dir_abs:/tmp/af_output \
+            --entrypoint bash \
+            alphafold3 \
+            -c "chown -R $(id -u):$(id -g) /tmp/af_output"
+
+
+        docker run -it \
+            --user $(id -u):$(id -g) \
+            --volume $input_dir_abs:/tmp/af_input \
+            --volume $output_dir_abs:/tmp/af_output \
+            --volume {params.alphafold_data_dir}:/public_databases \
+            alphafold3 \
+            python run_alphafold.py \
+                --norun_inference \
+                --json_path=/tmp/af_input/$input_file_name \
+                --output_dir=/tmp/af_output
+        """
+
+def _get_af3_msa_names(path: str) -> list[str]:
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
+
+    with open(path, 'r') as fh:
+        return [f"data/interim/msas-af3/{entry['index']}" for entry in csv.DictReader(fh)]
+
+rule create_af3_msas:
+    input: _get_af3_msa_names("data/interim/sequences_sample.csv")
+
+rule run_alphafold_predictions:
+    input: "data/interim/msas-af3/{name}/{name}_data.json"
+    output: directory("data/interim/structures-af3/{name}")
+    params:
         alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
     shell:
         """
@@ -97,10 +139,10 @@ rule run_alphafold:
             --volume $input_dir_abs:/tmp/af_input \
             --volume $output_dir_abs:/tmp/af_output \
             --volume {params.alphafold3_weights_dir}:/models \
-            --volume {params.alphafold_data_dir}:/public_databases \
             --gpus all \
             alphafold3 \
             python run_alphafold.py \
+                --norun_data_pipeline \
                 --json_path=/tmp/af_input/$input_file_name \
                 --model_dir=/models \
                 --output_dir=/tmp/af_output
