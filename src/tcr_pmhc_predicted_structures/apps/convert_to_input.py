@@ -66,18 +66,20 @@ def create_full_length_sequences(sequences: list[dict], mhc_sequences: pd.DataFr
     sequences_full = []
 
     for sequence in sequences:
-        logger.debug('Working on %s', sequence['id'])
+        logger.debug('Working on %s', sequence['index'])
         sequence['v_alpha'] = sequence['v_alpha'].split(';')[0]
         sequence['j_alpha'] = sequence['j_alpha'].split(';')[0]
         sequence['v_beta'] = sequence['v_beta'].split(';')[0]
         sequence['j_beta'] = sequence['j_beta'].split(';')[0]
 
         logger.debug('Stitching TCR alpha chain')
-        tcr_alpha_seq = stitch_sequence(
-            sequence['v_alpha'], sequence['j_alpha'], sequence['cdr3_alpha'], sequence['tcr_species']
-        )
+        for species in sequence['species'].split('/'):
+            tcr_alpha_seq = stitch_sequence(sequence['v_alpha'], sequence['j_alpha'], sequence['cdr3_alpha'], species)
 
-        if tcr_alpha_seq is None:
+            if tcr_alpha_seq is not None:
+                break
+
+        else:
             logger.warning(
                 'Unable to stitch: %s-%s-%s, %s. Skipping...',
                 sequence['v_alpha'],
@@ -88,11 +90,13 @@ def create_full_length_sequences(sequences: list[dict], mhc_sequences: pd.DataFr
             continue
 
         logger.debug('Stitching TCR beta chain')
-        tcr_beta_seq = stitch_sequence(
-            sequence['v_beta'], sequence['j_beta'], sequence['cdr3_beta'], sequence['tcr_species']
-        )
+        for species in sequence['species'].split('/'):
+            tcr_beta_seq = stitch_sequence(sequence['v_beta'], sequence['j_beta'], sequence['cdr3_beta'], species)
 
-        if tcr_beta_seq is None:
+            if tcr_beta_seq is not None:
+                break
+
+        else:
             logger.warning(
                 'Unable to stitch: %s-%s-%s, %s. Skipping...',
                 sequence['v_beta'],
@@ -104,17 +108,18 @@ def create_full_length_sequences(sequences: list[dict], mhc_sequences: pd.DataFr
 
         logger.debug('Looking up MHC chain 1 sequence')
         mhc_1_seq = mhc_sequences[mhc_sequences['mhc_code'] == sequence['mhc1']].iloc[0]['canonical_sequence']
+        mhc_species = mhc_sequences[mhc_sequences['mhc_code'] == sequence['mhc1']].iloc[0]['species']
 
         logger.debug('Looking up MHC chain 2 sequence')
         mhc_2_seq = (
-            B2M_SEQUENCES[sequence['pmhc_species']]
+            B2M_SEQUENCES[mhc_species]
             if sequence['mhc2'] == 'B2M'
             else mhc_sequences[mhc_sequences['mhc_code'] == sequence['mhc2']].iloc[0]['canonical_sequence']
         )
 
         sequences_full.append(
             {
-                'id': sequence['id'],
+                'id': sequence['index'],
                 'tcr_alpha_chain': tcr_alpha_seq,
                 'tcr_beta_chain': tcr_beta_seq,
                 'peptide': sequence['peptide'],

@@ -17,18 +17,22 @@ rule test:
     shell: "pytest --cov=src tests"
 
 rule sample_sequences:
-    input: "data/raw/sequences.csv"
+    input: "data/raw/sequences_pMHC_split.csv"
     output: "data/interim/sequences_sample.csv"
-    shell:
-        """
-        python -m tcr_pmhc_predicted_structures.apps.sample_sequences \
-            --log-level info \
-            --seed 123 \
-            --sample-size 20 \
-            --generate-background \
-            -o {output} \
-            {input}
-        """
+    params:
+        seed=123,
+        sample_size=50
+    run:
+        import pandas as pd
+
+        sequences = pd.read_csv(input[0], index_col='index')
+
+        num_folds = len(sequences['fold'].unique())
+        folds_sample_size = params.sample_size // num_folds
+        group_sample_size = folds_sample_size // 2
+
+        sequences_sample = sequences.groupby(['fold', 'label']).sample(group_sample_size, random_state=params.seed)
+        sequences_sample.to_csv(output[0])
 
 def _get_json_names(path: str) -> list[str]:
     if not os.path.exists(path):
@@ -38,7 +42,7 @@ def _get_json_names(path: str) -> list[str]:
     with open(path, 'r') as fh:
         reader = csv.DictReader(fh)
 
-        return [f"data/interim/sequences-af3/{entry['id']}.json" for entry in reader]
+        return [f"data/interim/sequences-af3/{entry['index']}.json" for entry in reader]
 
 rule create_af3_jsons:
     input:
@@ -108,7 +112,7 @@ def _get_af3_names(path: str) -> list[str]:
         return []
 
     with open(path, 'r') as fh:
-        return [f"data/interim/structures-af3/{entry['id']}" for entry in csv.DictReader(fh)]
+        return [f"data/interim/structures-af3/{entry['index']}" for entry in csv.DictReader(fh)]
 
 rule create_af3_structures:
     input: _get_af3_names("data/interim/sequences_sample.csv")
@@ -133,7 +137,7 @@ def _get_chai_names(path: str) -> list[str]:
         reader = csv.DictReader(fh)
 
         return [
-            f"data/interim/sequences-and-restraints-chai/{entry['id']}{extension}"
+            f"data/interim/sequences-and-restraints-chai/{entry['index']}{extension}"
             for entry in reader for extension in ('.fasta', '_restraints.csv')
         ]
 
@@ -259,7 +263,7 @@ def _get_chai_names(path: str) -> list[str]:
         return []
 
     with open(path, 'r') as fh:
-        return [f"data/interim/structures-chai/{entry['id']}" for entry in csv.DictReader(fh)]
+        return [f"data/interim/structures-chai/{entry['index']}" for entry in csv.DictReader(fh)]
 
 rule create_chai_structures:
     input: _get_chai_names("data/interim/sequences_sample.csv")
@@ -270,7 +274,7 @@ def _get_chai_restraints_names(path: str) -> list[str]:
         return []
 
     with open(path, 'r') as fh:
-        return [f"data/interim/structures-chai-restraints/{entry['id']}" for entry in csv.DictReader(fh)]
+        return [f"data/interim/structures-chai-restraints/{entry['index']}" for entry in csv.DictReader(fh)]
 
 rule create_chai_structures_with_restraints:
     input: _get_chai_restraints_names("data/interim/sequences_sample.csv")
