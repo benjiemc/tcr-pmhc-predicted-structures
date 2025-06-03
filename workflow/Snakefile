@@ -159,6 +159,17 @@ def _get_af3_names(path: str) -> list[str]:
 rule create_af3_structures:
     input: _get_af3_names("data/interim/sequences_sample.csv")
 
+rule aggregate_af3_confidence_scores:
+    input: _get_af3_names("data/interim/sequences_sample.csv")
+    output: "data/processed/af3_confidence_scores.csv"
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.apps.extract_confidence_from_af3 \
+            --log-level info \
+            -o {output} \
+            {input}
+        """
+
 rule create_distance_restraints:
     input:
         "data/raw/structures_summary.csv",
