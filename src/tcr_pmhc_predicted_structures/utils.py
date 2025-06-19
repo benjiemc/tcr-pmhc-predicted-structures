@@ -149,7 +149,7 @@ def stitch_sequence(v_gene: str, j_gene: str, cdr3: str, species: str) -> str | 
         'skip_c_checks': False,
         'skip_n_checks': False,
         'suppress_warnings': False,
-        'no_leader': False,
+        'no_leader': True,
     }
 
     (
