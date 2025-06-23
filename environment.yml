@@ -21,3 +21,4 @@ dependencies:
       - numpy
       - pandas
       - python-pdb
+      - stcrpy
