@@ -132,7 +132,7 @@ rule create_af3_structures:
 
 rule aggregate_af3_confidence_scores:
     input: _get_af3_names("data/interim/sequences_sample.csv")
-    output: "data/processed/af3_confidence_scores.csv"
+    output: "data/interim/af3_confidence_scores.csv"
     shell:
         """
         python -m tcr_pmhc_predicted_structures.apps.extract_confidence_from_af3 \
@@ -140,6 +140,91 @@ rule aggregate_af3_confidence_scores:
             -o {output} \
             {input}
         """
+
+rule compute_ipsae_on_af3_structure:
+    input:
+        confidences="data/interim/structures-af3/{name}/seed-{seed}_sample-{sample}/{name}_seed-{seed}_sample-{sample}_confidences.json",
+        summary_confidences="data/interim/structures-af3/{name}/seed-{seed}_sample-{sample}/{name}_seed-{seed}_sample-{sample}_summary_confidences.json",
+        structure="data/interim/structures-af3/{name}/seed-{seed}_sample-{sample}/{name}_seed-{seed}_sample-{sample}_model.cif"
+    output:
+        "data/interim/ipsaes-af3/{name}_seed-{seed}_sample-{sample}_model_{distance_cutoff}_{pae_cutoff}_byres.txt",
+        "data/interim/ipsaes-af3/{name}_seed-{seed}_sample-{sample}_model_{distance_cutoff}_{pae_cutoff}.pml",
+        "data/interim/ipsaes-af3/{name}_seed-{seed}_sample-{sample}_model_{distance_cutoff}_{pae_cutoff}.txt"
+    shell:
+        """
+        output_dir=$(dirname {output[0]})
+        mkdir -p $output_dir
+
+        cp {input.confidences} $TMPDIR/
+        cp {input.summary_confidences} $TMPDIR/
+        cp {input.structure} $TMPDIR/
+
+        python third_party/IPSAE/ipsae.py \
+            $TMPDIR/$(basename {input.confidences}) \
+            $TMPDIR/$(basename {input.structure}) \
+            {wildcards.distance_cutoff} \
+            {wildcards.pae_cutoff}
+
+        mv $TMPDIR/$(basename {output[0]}) $output_dir/
+        mv $TMPDIR/$(basename {output[1]}) $output_dir/
+        mv $TMPDIR/$(basename {output[2]}) $output_dir/
+        """
+
+def _get_ipsaes_names(path: str, seeds: list[int], distance_cutoff: float, pae_cutoff: float) -> list[str]:
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
+
+    template = "data/interim/ipsaes-af3/{{name}}_seed-{{seed}}_sample-{{sample}}_model_{distance_cutoff:02}_{pae_cutoff:02}.txt"
+
+    with open(path, 'r') as fh:
+        indices = [entry['index'] for entry in csv.DictReader(fh)]
+
+    return expand(template.format(distance_cutoff=distance_cutoff, pae_cutoff=pae_cutoff), name=indices, seed=seeds, sample=range(5))
+
+rule add_af3_ipsaes_to_confidence_scores:
+    input:
+        confidence_scores="data/interim/af3_confidence_scores.csv",
+        ipaes=_get_ipsaes_names("data/interim/sequences_sample.csv", seeds=[1], distance_cutoff=10, pae_cutoff=10)
+    output: "data/processed/af3_confidence_scores.csv"
+    run:
+        import pandas as pd
+
+        chain_map = {'A': 'mhc_chain1', 'B': 'mhc_chain2', 'C': 'antigen_chain', 'D': 'alpha_chain', 'E': 'beta_chain'}
+
+        ipsaes = []
+        for path in input.ipaes:
+            name, seed, sample, _, _, _ = os.path.basename(path).replace('.txt', '').rsplit('_', 5)
+            ipsae = pd.read_csv(path, sep='\s+')
+
+            ipsae = ipsae[ipsae['Type'] != 'max'].copy()
+
+            ipsae['chain_type1'] = ipsae['Chn1'].map(chain_map)
+            ipsae['chain_type2'] = ipsae['Chn2'].map(chain_map)
+            index = ipsae['chain_type1'] + '_' + ipsae['chain_type2'] + '_ipsae'
+            ipsae = ipsae.set_index(index)
+
+            ipsae = ipsae[['ipSAE']].T
+
+            ipsae['structure_name'] = name
+            ipsae['seed'] = int(seed.replace('seed-', ''))
+            ipsae['sample'] = int(sample.replace('sample-', ''))
+
+            ipsaes.append(ipsae)
+
+        ipsaes = pd.concat(ipsaes).reset_index(drop=True)
+
+        ipsaes['combined_ipsaes'] = ipsaes.filter(
+            regex=(
+                '((antigen_chain|mhc_chain_1)_(alpha_chain|beta_chain))'
+                '|((alpha_chain|beta_chain)_(antigen_chain|mhc_chain_1))_ipsae'
+            )
+        ).apply('mean', axis=1)
+
+        confidence_scores = pd.read_csv(input.confidence_scores)
+        confidence_scores['structure_name'] = confidence_scores['structure_name'].astype(str)
+        confidence_scores = confidence_scores.merge(ipsaes, how='left', on=['structure_name', 'seed', 'sample'])
+        confidence_scores.to_csv(output[0], index=False)
 
 rule summarise_af3_structural_features:
     input: "data/interim/structures-af3/{name}/seed-{seed}_sample-{sample}/{name}_seed-{seed}_sample-{sample}_model.cif"
