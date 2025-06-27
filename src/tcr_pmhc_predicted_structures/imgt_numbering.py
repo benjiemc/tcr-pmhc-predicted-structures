@@ -23,3 +23,17 @@ IMGT_MH2_ABD: set[int] = set(range(1, 92))
 
 MHC_I_IMGT_BETA_HELIX_START: int = 1000
 '''Start of the beta helix of class I molecules.'''
+
+
+def assign_cdr_number(seq_id: int) -> int | None:
+    """Assign CDR number for a sequence ID or return None if the sequence ID if the ID is not in CDR range."""
+    if seq_id in IMGT_CDR1:
+        return 1
+
+    if seq_id in IMGT_CDR2:
+        return 2
+
+    if seq_id in IMGT_CDR3:
+        return 3
+
+    return None

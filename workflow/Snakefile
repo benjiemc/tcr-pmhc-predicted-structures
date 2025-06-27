@@ -202,6 +202,51 @@ rule aggregate_structural_features:
         df = pd.DataFrame(entries)
         df.to_csv(output[0], index=False)
 
+rule create_contact_map:
+    input: "data/processed/structures-af3/{name}_{seed}_{sample}.pdb"
+    output: temp("data/interim/{name}_{seed}_{sample}_contacts.csv")
+    params:
+        contact_distance=5.0
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.apps.create_contact_map \
+            --log-level info \
+            --cutoff-distance {params.contact_distance} \
+            -o {output} \
+            {input}
+        """
+
+def _get_af3_contact_maps(path: str, seeds: list) -> list[str]:
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
+
+    with open(path, 'r') as fh:
+        indices = [entry['index'] for entry in csv.DictReader(fh)]
+
+    return [f"data/interim/{name}_{seed}_{sample}_contacts.csv" for name in indices for seed in seeds for sample in range(5)]
+
+rule aggregate_contact_maps:
+    input: _get_af3_contact_maps("data/interim/sequences_sample.csv", [1])
+    output: "data/processed/af3_contact_maps.csv"
+    run:
+        import pandas as pd
+
+        contact_maps = []
+        for path in input:
+            contact_map = pd.read_csv(path)
+
+            name, seed, sample = os.path.basename(path).replace('_contacts.csv', '').rsplit('_', 2)
+            contact_map['name'] = name
+            contact_map['seed'] = seed
+            contact_map['sample'] = sample
+
+            contact_maps.append(contact_map)
+
+        contact_maps = pd.concat(contact_maps)
+        contact_maps.to_csv(output[0], index=False)
+
+
 rule create_distance_restraints:
     input:
         "data/raw/structures_summary.csv",
