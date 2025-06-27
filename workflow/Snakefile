@@ -246,6 +246,73 @@ rule aggregate_contact_maps:
         contact_maps = pd.concat(contact_maps)
         contact_maps.to_csv(output[0], index=False)
 
+rule profile_interactions:
+    input: "data/raw/structures/{name}.pdb"
+    output: temp("data/interim/{name}_interactions.csv")
+    script: "scripts/profile_interactions.py"
+
+def _get_interactions(path: str) -> list[str]:
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
+
+    with open(path, 'r') as fh:
+        names = [entry['path'].replace('.pdb', '') for entry in csv.DictReader(fh)]
+
+    return expand("data/interim/{name}_interactions.csv", name=names)
+
+rule aggregate_interactions:
+    input: _get_interactions("data/raw/structures_summary.csv")
+    output: "data/processed/tcr_pmhc_interactions.csv"
+    run:
+        import pandas as pd
+
+        interactions = []
+        for path in input:
+            interaction = pd.read_csv(path)
+
+            name = os.path.basename(path).replace('_interactions.csv', '')
+            interaction['name'] = name
+        
+            interactions.append(interaction)
+
+        interactions = pd.concat(interactions)
+        interactions.to_csv(output[0], index=False)
+
+rule profile_af3_interactions:
+    input: "data/processed/structures-af3/{name}_{seed}_{sample}.pdb"
+    output: temp("data/interim/{name}_{seed}_{sample}_interactions.csv")
+    script: "scripts/profile_interactions.py"
+
+def _get_af3_interactions(path: str, seeds: list) -> list[str]:
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
+
+    with open(path, 'r') as fh:
+        indices = [entry['index'] for entry in csv.DictReader(fh)]
+
+    return [f"data/interim/{name}_{seed}_{sample}_interactions.csv" for name in indices for seed in seeds for sample in range(5)]
+
+rule aggregate_af3_interactions:
+    input: _get_af3_interactions("data/interim/sequences_sample.csv", [1])
+    output: "data/processed/af3_interactions.csv"
+    run:
+        import pandas as pd
+
+        interactions = []
+        for path in input:
+            interaction = pd.read_csv(path)
+
+            name, seed, sample = os.path.basename(path).replace('_interactions.csv', '').rsplit('_', 2)
+            interaction['name'] = name
+            interaction['seed'] = seed
+            interaction['sample'] = sample
+
+            interactions.append(interaction)
+
+        interactions = pd.concat(interactions)
+        interactions.to_csv(output[0], index=False)
 
 rule create_distance_restraints:
     input:
