@@ -141,11 +141,9 @@ rule aggregate_af3_confidence_scores:
             {input}
         """
 
-rule summarise_af_structural_features:
+rule summarise_af3_structural_features:
     input: "data/interim/structures-af3/{name}/seed-{seed}_sample-{sample}/{name}_seed-{seed}_sample-{sample}_model.cif"
-    output:
-        summary=temp("data/interim/{name}_{seed}_{sample}_structural_summary.json"),
-        structure="data/processed/structures-af3/{name}_{seed}_{sample}.pdb"
+    output: temp("data/interim/{name}_{seed}_{sample}_structural_summary.json")
     script: "../scripts/summarise_structural_features.py"
 
 def _get_af3_structural_features_names(path: str, seeds: list) -> list[str]:
@@ -158,7 +156,7 @@ def _get_af3_structural_features_names(path: str, seeds: list) -> list[str]:
 
     return [f"data/interim/{name}_{seed}_{sample}_structural_summary.json" for name in indices for seed in seeds for sample in range(5)]
 
-rule aggregate_structural_features:
+rule aggregate_af3_structural_features:
     input: _get_af3_structural_features_names("data/interim/sequences_sample.csv", [1])
     output: "data/processed/af3_structural_features.csv"
     run:
@@ -168,10 +166,51 @@ rule aggregate_structural_features:
         entries = []
         for path in input:
             with open(path, 'r') as fh:
-                entries.append(json.load(fh))
+                structural_features = json.load(fh)
+
+            name, seed, sample = os.path.basename(path).replace('_structural_summary.json', '').rsplit('_', 2)
+            structural_features['name'] = name
+            structural_features['seed'] = seed
+            structural_features['sample'] = sample
+
+            entries.append(structural_features)
 
         df = pd.DataFrame(entries)
         df.to_csv(output[0], index=False)
+
+rule process_af3_structure:
+    input: "data/interim/structures-af3/{name}/seed-{seed}_sample-{sample}/{name}_seed-{seed}_sample-{sample}_model.cif"
+    output: "data/processed/structures-af3/{name}_{seed}_{sample}.pdb"
+    run:
+        import warnings
+
+        import stcrpy
+
+        with warnings.catch_warnings():
+            warnings.simplefilter('ignore', UserWarning)
+            tcr = stcrpy.load_TCR(input[0])
+
+        tcr.standardise_chain_names()
+        tcr.crop()
+
+        output_dir = os.path.dirname(output[0])
+        if not os.path.exists(output_dir):
+            os.mkdir(output_dir)
+
+        tcr.save(output[0])
+
+def _get_af3_processed_structure_names(path: str, seeds: list) -> list[str]:
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
+
+    with open(path, 'r') as fh:
+        indices = [entry['index'] for entry in csv.DictReader(fh)]
+
+    return expand("data/processed/structures-af3/{name}_{seed}_{sample}.pdb", name=indices, seed=seeds, sample=list(range(5)))
+
+rule process_af3_structures:
+    input: _get_af3_processed_structure_names("data/interim/sequences_sample.csv", [1])
 
 rule create_contact_map:
     input: "data/processed/structures-af3/{name}_{seed}_{sample}.pdb"

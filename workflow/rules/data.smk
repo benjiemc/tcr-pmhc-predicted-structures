@@ -19,23 +19,48 @@ rule sample_sequences:
         sequences_sample = sequences.groupby(['fold', 'label']).sample(group_sample_size, random_state=params.seed)
         sequences_sample.to_csv(output[0])
 
+def create_paths(summary_file: str, path_name: str) -> list[str]:
+    if not os.path.exists(summary_file):
+        print(summary_file, 'does not exist!')
+        return []
+
+    with open(summary_file, 'r') as fh:
+        names = [entry['path'].replace('.pdb', '') for entry in csv.DictReader(fh)]
+
+    return expand(path_name, name=names)
+
+rule summarise_structural_features:
+    input: "data/raw/structures/{name}.pdb"
+    output: temp("data/interim/{name}_structural_summary.json")
+    script: "../scripts/summarise_structural_features.py"
+
+rule aggregate_structural_features:
+    input: create_paths("data/raw/structures_summary.csv", "data/interim/{name}_structural_summary.json")
+    output: "data/processed/tcr_pmhc_structural_features.csv"
+    run:
+        import json
+        import pandas as pd
+
+        entries = []
+        for path in input:
+            with open(path, 'r') as fh:
+                structural_features = json.load(fh)
+
+            name = os.path.basename(path).replace('_structural_summary.json', '')
+            structural_features['name'] = name
+
+            entries.append(structural_features)
+
+        df = pd.DataFrame(entries)
+        df.to_csv(output[0], index=False)
+
 rule profile_interactions:
     input: "data/raw/structures/{name}.pdb"
     output: temp("data/interim/{name}_interactions.csv")
     script: "../scripts/profile_interactions.py"
 
-def _get_interactions(path: str) -> list[str]:
-    if not os.path.exists(path):
-        print(path, 'does not exist!')
-        return []
-
-    with open(path, 'r') as fh:
-        names = [entry['path'].replace('.pdb', '') for entry in csv.DictReader(fh)]
-
-    return expand("data/interim/{name}_interactions.csv", name=names)
-
 rule aggregate_interactions:
-    input: _get_interactions("data/raw/structures_summary.csv")
+    input: create_paths("data/raw/structures_summary.csv", "data/interim/{name}_interactions.csv")
     output: "data/processed/tcr_pmhc_interactions.csv"
     run:
         import pandas as pd
