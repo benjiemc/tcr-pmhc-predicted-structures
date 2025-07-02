@@ -71,7 +71,7 @@ rule aggregate_interactions:
 
             name = os.path.basename(path).replace('_interactions.csv', '')
             interaction['name'] = name
-        
+
             interactions.append(interaction)
 
         interactions = pd.concat(interactions)
