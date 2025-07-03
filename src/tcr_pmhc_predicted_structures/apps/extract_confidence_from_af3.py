@@ -7,9 +7,11 @@ import logging
 import os
 import re
 import sys
+from collections import defaultdict
 
 import numpy as np
 import pandas as pd
+from Bio.SeqUtils import IUPACData
 
 from tcr_pmhc_predicted_structures.apps._log import add_logging_arguments, setup_logger
 from tcr_pmhc_predicted_structures.utils import (
@@ -38,6 +40,31 @@ parser.add_argument('paths', nargs='+', help='paths to the af3 output directorie
 parser.add_argument('--output', '-o', help='paths to the output csv')
 
 add_logging_arguments(parser)
+
+
+RESIDUE_NUMBER_OF_ATOMS = {
+    'ALA': 5,
+    'ARG': 11,
+    'ASN': 8,
+    'ASP': 8,
+    'CYS': 6,
+    'GLN': 9,
+    'GLU': 9,
+    'GLY': 4,
+    'HIS': 10,
+    'ILE': 8,
+    'LEU': 8,
+    'LYS': 9,
+    'MET': 8,
+    'PHE': 11,
+    'PRO': 7,
+    'SER': 6,
+    'THR': 7,
+    'TRP': 14,
+    'TYR': 12,
+    'VAL': 7,
+}
+'''Number of atoms in each amino acid residue.'''
 
 
 def collect_summary_scores(paths: list[str]) -> pd.DataFrame:
@@ -278,6 +305,221 @@ def collect_specific_pae_scores(paths: list[str]) -> pd.DataFrame:
     return pd.DataFrame(specific_pae_scores)
 
 
+def collect_plddt_scores(paths: list[str]) -> pd.DataFrame:
+    plddt_scores = []
+
+    for af3_dir in paths:
+        for path in (
+            path
+            for path in glob.glob(os.path.join(af3_dir, 'seed-*_sample-*/*_confidences.json'))
+            if 'summary' not in os.path.basename(path)
+        ):
+            with open(path, 'r') as fh:
+                confidence = json.load(fh)
+
+            name = re.match(
+                r'(?P<structure_name>\d+(?:_\d+)?)_seed-(?P<seed>\d+)_sample-(?P<sample>\d+)_confidences.json',
+                os.path.basename(path),
+            )
+
+            plddt_score = {**name.groupdict()}
+
+            tcr_pmhc_plddts = np.array(
+                [
+                    plddt
+                    for chain_id, plddt in zip(confidence['atom_chain_ids'], confidence['atom_plddts'], strict=True)
+                    if chain_id in {'A', 'C', 'D', 'E'}
+                ]
+            )
+
+            plddt_score['tcr_pmhc_plddt_score'] = np.mean(tcr_pmhc_plddts)
+
+            plddt_scores.append(plddt_score)
+
+    return pd.DataFrame(plddt_scores)
+
+
+def collect_specific_plddt_scores(paths: list[str]) -> pd.DataFrame:
+    specific_plddt_scores = []
+
+    for af3_dir in paths:
+        for path in (
+            path
+            for path in glob.glob(os.path.join(af3_dir, 'seed-*_sample-*/*_confidences.json'))
+            if 'summary' not in os.path.basename(path)
+        ):
+            # Load raw confidence data
+            with open(path, 'r') as fh:
+                confidence = json.load(fh)
+
+            name = re.match(
+                r'(?P<structure_name>\d+(?:_\d+)?)_seed-(?P<seed>\d+)_sample-(?P<sample>\d+)_confidences.json',
+                os.path.basename(path),
+            )
+
+            plddt_score = {**name.groupdict()}
+
+            # Load sequence information
+            with open(glob.glob(os.path.join(os.path.dirname(os.path.dirname(path)), '*_data.json'))[0], 'r') as fh:
+                input_data = json.load(fh)
+
+            input_sequences = {
+                sequence_info['protein']['id']: sequence_info['protein']['sequence']
+                for sequence_info in input_data['sequences']
+            }
+
+            res_id_grouped_by_chain = defaultdict(list)
+            for chain_id, res_id in zip(confidence['token_chain_ids'], confidence['token_res_ids'], strict=True):
+                res_id_grouped_by_chain[chain_id].append(res_id)
+
+            atom_res_ids = [
+                res_id
+                for chain_id in input_sequences
+                for i, (amino_acid, res_id) in enumerate(
+                    zip(input_sequences[chain_id], res_id_grouped_by_chain[chain_id], strict=True)
+                )
+                for _ in range(
+                    RESIDUE_NUMBER_OF_ATOMS[IUPACData.protein_letters_1to3[amino_acid].upper()]
+                    if i != len(input_sequences[chain_id]) - 1
+                    else RESIDUE_NUMBER_OF_ATOMS[IUPACData.protein_letters_1to3[amino_acid].upper()] + 1
+                )
+            ]
+
+            plddt_numbering = [
+                (idx, (chain_id, res_seq_id))
+                for idx, (chain_id, res_seq_id) in enumerate(
+                    zip(confidence['atom_chain_ids'], atom_res_ids, strict=True)
+                )
+            ]
+
+            # Number sequences using ANARCI
+            numbered_sequences = {}
+            for chain_id, sequence in input_sequences.items():
+                try:
+                    numbered_sequence, _ = anarci.number(sequence)
+
+                except:  # noqa: E722 Anarci throws base exception on B2M
+                    numbered_sequence = None
+
+                if numbered_sequence:
+                    numbered_sequences[chain_id] = [(seq_id, olc) for seq_id, olc in numbered_sequence if olc != '-']
+
+                else:
+                    numbered_sequences[chain_id] = [((res_id, ' '), olc) for res_id, olc in enumerate(sequence, 1)]
+
+            # Calculate offset between anarci sequence and input sequences
+            offsets = {
+                chain_id: sequence.find(''.join([olc for _, olc in numbered_sequences[chain_id]]))
+                for chain_id, sequence in input_sequences.items()
+            }
+
+            # Get relevant ranges for input sequences
+            relative_ranges = {
+                chain_id: tuple(
+                    [
+                        idx + offsets[chain_id]
+                        for idx, ((seq_id, _), _) in enumerate(numbered_sequences[chain_id])
+                        if seq_id in IMGT_CDR
+                    ]
+                )
+                for chain_id in ('D', 'E')
+            }
+
+            if max([seq_id for (seq_id, _), _ in numbered_sequences['A']]) > MHC_I_IMGT_BETA_HELIX_START:
+                tcr_contact_positions = []
+
+                for helix in IMGT_MHC_TCR_CONTACT_POSITIONS:
+                    offset = MHC_I_IMGT_BETA_HELIX_START if helix == 'beta' else 0
+
+                    for res_id in IMGT_MHC_TCR_CONTACT_POSITIONS[helix]:
+                        seq_id = int(''.join([char for char in res_id if char.isnumeric()])) + offset
+                        insert_code = (
+                            ''.join(
+                                [char for char in res_id if not char.isnumeric()],
+                            )
+                            if len([char for char in res_id if not char.isnumeric()]) > 0
+                            else ' '
+                        )
+
+                        tcr_contact_positions.append((seq_id, insert_code))
+
+                tcr_contact_positions = set(tcr_contact_positions)
+
+                relative_ranges['A'] = tuple(
+                    [
+                        idx + offsets['A']
+                        for idx, (res_id, _) in enumerate(numbered_sequences['A'])
+                        if res_id in tcr_contact_positions
+                    ]
+                )
+                relative_ranges['B'] = None
+
+            else:
+                tcr_contact_positions = {'A': [], 'B': []}
+
+                for helix in IMGT_MHC_TCR_CONTACT_POSITIONS:
+                    for res_id in IMGT_MHC_TCR_CONTACT_POSITIONS[helix]:
+                        seq_id = int(''.join([char for char in res_id if char.isnumeric()]))
+                        insert_code = (
+                            ''.join(
+                                [char for char in res_id if not char.isnumeric()],
+                            )
+                            if len([char for char in res_id if not char.isnumeric()]) > 0
+                            else ' '
+                        )
+
+                        tcr_contact_positions['A' if helix == 'alpha' else 'B'].append((seq_id, insert_code))
+
+                relative_ranges['A'] = tuple(
+                    [
+                        idx + offsets['A']
+                        for idx, (res_id, _) in enumerate(numbered_sequences['A'])
+                        if res_id in tcr_contact_positions['A']
+                    ]
+                )
+
+                relative_ranges['B'] = tuple(
+                    [
+                        idx + offsets['B']
+                        for idx, (res_id, _) in enumerate(numbered_sequences['B'])
+                        if res_id in tcr_contact_positions['B']
+                    ]
+                )
+
+            relative_ranges['C'] = [idx + offsets['C'] for idx, _ in enumerate(numbered_sequences['C'])]
+
+            # Translate ranges to pLDDT space
+            current_chain = None
+            relative_offset = {}
+
+            for plddt_idx, (chain_id, _) in plddt_numbering:
+                if chain_id != current_chain:
+                    relative_offset[chain_id] = plddt_idx
+                    current_chain = chain_id
+
+            ranges = {
+                chain_id: [idx + relative_offset[chain_id] for idx in relative_range]
+                for chain_id, relative_range in relative_ranges.items()
+                if relative_range is not None
+            }
+
+            # Get pLDDT values and average
+            tcr_idxs = np.array(
+                [idx for chain_id, range_ in ranges.items() for idx in range_ if chain_id in ('D', 'E')]
+            )
+            pmhc_idxs = np.array(
+                [idx for chain_id, range_ in ranges.items() for idx in range_ if chain_id not in ('D', 'E')]
+            )
+
+            plddt_score['cdr_pmhc_plddt_score'] = np.mean(
+                np.array(confidence['atom_plddts'])[np.concatenate([tcr_idxs, pmhc_idxs])]
+            )
+
+            specific_plddt_scores.append(plddt_score)
+
+    return pd.DataFrame(specific_plddt_scores)
+
+
 def main() -> None:
     args = parser.parse_args()
     setup_logger(logger, args.log_level)
@@ -311,6 +553,14 @@ def main() -> None:
     logger.info('Collecting specific PAE scores')
     specific_pae_scores = collect_specific_pae_scores(args.paths)
     af3_scores = af3_scores.merge(specific_pae_scores, how='inner', on=['structure_name', 'seed', 'sample'])
+
+    logger.info('Collecting pLDDT scores')
+    plddt_scores = collect_plddt_scores(args.paths)
+    af3_scores = af3_scores.merge(plddt_scores, how='inner', on=['structure_name', 'seed', 'sample'])
+
+    logger.info('Collecting specific pLDDT scores')
+    specific_plddt_scores = collect_specific_plddt_scores(args.paths)
+    af3_scores = af3_scores.merge(specific_plddt_scores, how='inner', on=['structure_name', 'seed', 'sample'])
 
     logger.info('Outputting to %s', args.output)
     af3_scores.to_csv(args.output, index=False)
