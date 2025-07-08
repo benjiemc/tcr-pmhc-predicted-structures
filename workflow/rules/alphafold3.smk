@@ -16,19 +16,7 @@ def _get_json_names(path: str) -> list[str]:
         return [f"data/interim/sequences-af3/{entry['index']}.json" for entry in reader]
 
 rule create_af3_jsons:
-    input:
-        sequences="data/interim/sequences_sample.csv",
-        mhc_sequences=expand("data/external/hla_sequences/{mhc}.json", mhc=[
-            'h2_d',
-            'h2_k',
-            'h2_l',
-            'hla_a',
-            'hla_b',
-            'hla_c',
-            'hla_e',
-            'hla_f',
-            'hla_g',
-        ])
+    input: "data/interim/sequences_full.csv"
     output: _get_json_names("data/interim/sequences_sample.csv")
     shell:
         """
@@ -37,9 +25,8 @@ rule create_af3_jsons:
         python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
             --log-level info \
             --format alphafold3 \
-            --mhc-sequences {input.mhc_sequences} \
             -o $out_dir_name \
-            {input.sequences}
+            {input}
         """
 
 rule run_alphafold_msas:

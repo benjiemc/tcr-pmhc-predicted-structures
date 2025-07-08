@@ -2,7 +2,6 @@ Create AF3 output
   $ python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
   > --log-level error \
   > --format alphafold3 \
-  > --mhc-sequences $TESTDIR/data/hla_a.json $TESTDIR/data/h2_d.json \
   > -o jsons \
   > $TESTDIR/data/sequences.csv
 
@@ -33,7 +32,6 @@ Create AF3 output
 Create chai input
   $ python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
   > --format chai \
-  > --mhc-sequences $TESTDIR/data/hla_a.json $TESTDIR/data/h2_d.json \
   > -o chai \
   > $TESTDIR/data/sequences.csv
 
@@ -47,7 +45,6 @@ Create chai input
 Create chai input with restraints.
   $ python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
   > --format chai \
-  > --mhc-sequences $TESTDIR/data/hla_a.json $TESTDIR/data/h2_d.json \
   > --chai-restraints $TESTDIR/data/restraints.csv \
   > -o chai-with-restraints \
   > $TESTDIR/data/sequences.csv

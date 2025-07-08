@@ -16,26 +16,14 @@ def _get_chai_names(path: str) -> list[str]:
 
 rule create_chai_sequences_and_restraints:
     input:
-        sequences="data/interim/sequences_sample.csv",
-        restraints="data/processed/tcr_pmhc_distance_restaints.csv",
-        mhc_sequences=expand("data/external/hla_sequences/{mhc}.json", mhc=[
-            'h2_d',
-            'h2_k',
-            'h2_l',
-            'hla_a',
-            'hla_b',
-            'hla_c',
-            'hla_e',
-            'hla_f',
-            'hla_g',
-        ])
+        sequences="data/interim/sequences_full.csv",
+        restraints="data/processed/tcr_pmhc_distance_restaints.csv"
     output: _get_chai_names('data/interim/sequences_sample.csv')
     shell:
         """
         python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
             --log-level info \
             --format chai \
-            --mhc-sequences {input.mhc_sequences} \
             --chai-restraints {input.restraints} \
             -o $(dirname {output[0]}) \
             {input.sequences}

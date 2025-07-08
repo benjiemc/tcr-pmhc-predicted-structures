@@ -19,6 +19,30 @@ rule sample_sequences:
         sequences_sample = sequences.groupby(['fold', 'label']).sample(group_sample_size, random_state=params.seed)
         sequences_sample.to_csv(output[0])
 
+rule create_full_length_sequences:
+    input:
+        sequences="data/interim/sequences_sample.csv",
+        mhc_sequences=expand("data/external/hla_sequences/{mhc}.json", mhc=[
+                'h2_d',
+                'h2_k',
+                'h2_l',
+                'hla_a',
+                'hla_b',
+                'hla_c',
+                'hla_e',
+                'hla_f',
+                'hla_g',
+            ])
+    output: "data/interim/sequences_full.csv"
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.apps.create_full_length_sequences \
+            --log-level info \
+            --mhc-sequences {input.mhc_sequences} \
+            -o {output} \
+            {input.sequences}
+        """
+
 def create_paths(summary_file: str, path_name: str) -> list[str]:
     if not os.path.exists(summary_file):
         print(summary_file, 'does not exist!')
