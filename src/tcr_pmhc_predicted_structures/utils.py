@@ -3,6 +3,7 @@
 import logging
 import re
 import warnings
+from functools import lru_cache
 
 import pandas as pd
 from Bio.PDB import Entity
@@ -95,6 +96,7 @@ def assign_species(allele: str) -> str | None:
     return None
 
 
+@lru_cache
 def stitch_sequence(v_gene: str, j_gene: str, cdr3: str, species: str) -> str | None:
     """Create full length TCR sequence from V gene, J, gene, CDR3 and species information."""
 
