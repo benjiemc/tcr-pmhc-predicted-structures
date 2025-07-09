@@ -15,8 +15,23 @@ def _get_json_names(path: str) -> list[str]:
 
         return [f"data/interim/sequences-af3/{entry['index']}.json" for entry in reader]
 
+def _get_sequence_id_path_names(path: str, template: str) -> list[str]:
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
+
+    with open(path, 'r') as fh:
+        ids = [line.split()[0] for line in fh.readlines() if line]
+
+    return expand(template, name=ids)
+
 rule create_af3_jsons:
-    input: "data/interim/sequences_full.csv"
+    input:
+        sequences="data/interim/sequences_full.csv",
+        sequence_key="data/interim/sequence_key.txt",
+        unpaired_msas=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/msas/{name}_paired.a3m'),
+        paired_msas=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/msas/{name}_unpaired.a3m'),
+        templates=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/templates/{name}')
     output: _get_json_names("data/interim/sequences_sample.csv")
     shell:
         """
@@ -25,56 +40,72 @@ rule create_af3_jsons:
         python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
             --log-level info \
             --format alphafold3 \
+            --sequence-key {input.sequence_key} \
+            --relative-paths \
+            --unpaired-msa-paths {input.unpaired_msas} \
+            --paired-msa-paths {input.paired_msas} \
+            --template-paths {input.templates} \
             -o $out_dir_name \
-            {input}
+            {input.sequences}
         """
 
-rule run_alphafold_msas:
-    input: "data/interim/sequences-af3/{name}.json"
-    output: directory("data/interim/msas-af3/{name}")
-    params:
-        alphafold_data_dir=os.environ['ALPHAFOLD_DATA_DIR'],
-    shell:
-        """
-        mkdir -p $(dirname {output})
-
-        apptainer exec \
-            --bind {params.alphafold_data_dir}:/root/public_databases \
-            containers/alphafold3.sif \
-            python third_party/alphafold3/run_alphafold.py \
-                --norun_inference \
-                --db_dir=/root/public_databases \
-                --json_path={input} \
-                --output_dir=$(dirname {output})
-        """
-
-def _get_af3_msa_names(path: str) -> list[str]:
+def _get_required_msas(wildcards, path, sequence_key_path, template) -> list[str]:
     if not os.path.exists(path):
         print(path, 'does not exist!')
         return []
 
-    with open(path, 'r') as fh:
-        return [f"data/interim/msas-af3/{entry['index']}" for entry in csv.DictReader(fh)]
+    if not os.path.exists(sequence_key_path):
+        print(sequence_key_path, 'does not exist!')
+        return []
 
-rule create_af3_msas:
-    input: _get_af3_msa_names("data/interim/sequences_sample.csv")
+    with open(sequence_key_path, 'r') as fh:
+        sequence_key = {sequence: key for key, sequence in (line.split() for line in fh if line)}
+
+    with open(path, 'r') as fh:
+        reader = csv.DictReader(fh)
+        relevant_entries = [entry for entry in reader if entry['id'] == wildcards.name]
+
+    sequences = [
+        value for entry in relevant_entries for key, value in entry.items()
+        if key in ('tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2')
+    ]
+
+    keys = [sequence_key[sequence] for sequence in sequences]
+
+    return expand(template, key=keys)
+
 
 rule run_alphafold_predictions:
-    input: "data/interim/msas-af3/{name}/{name}_data.json"
+    input:
+        sequence="data/interim/sequences-af3/{name}.json",
+        unpaired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/msas/{key}_unpaired.a3m"),
+        paired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/msas/{key}_paired.a3m"),
+        templates=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/templates/{key}")
     output: directory("data/interim/structures-af3/{name}")
     params:
         alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
     shell:
         """
+        input_dir_abs=$TMPDIR/{wildcards.name}
+        mkdir -p $input_dir_abs
+
+        cp {input.sequence} $input_dir_abs
+        cp {input.unpaired_msas} $input_dir_abs
+        cp {input.paired_msas} $input_dir_abs
+        cp -r {input.templates} $input_dir_abs
+
         mkdir -p $(dirname {output})
+
+        input_file_name="$(basename {input.sequence})"
 
         apptainer exec \
             --nv \
+            --bind $input_dir_abs:/root/input
             --bind {params.alphafold3_weights_dir}:/root/models \
             containers/alphafold3.sif \
             python third_party/alphafold3/run_alphafold.py \
                 --norun_data_pipeline \
-                --json_path={input} \
+                --json_path=/root/input/$input_file_name \
                 --model_dir=/root/models \
                 --output_dir=$(dirname {output})
         """

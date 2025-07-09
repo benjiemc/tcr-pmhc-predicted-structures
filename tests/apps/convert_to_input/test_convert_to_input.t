@@ -29,6 +29,42 @@ Create AF3 output
   $ jq --sort-keys . $TESTDIR/reference/alphafold3/5.json > ref
   $ diff test ref
 
+Create AF3 inputs with paths
+  $ python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
+  > --log-level error \
+  > --format alphafold3 \
+  > --sequence-key $TESTDIR/data/sequence_key.txt \
+  > --relative-paths \
+  > --unpaired-msa-paths $TESTDIR/data/msas/*_unpaired.a3m \
+  > --paired-msa-paths $TESTDIR/data/msas/*_paired.a3m \
+  > --template-paths $TESTDIR/data/templates/* \
+  > -o jsons-paths \
+  > $TESTDIR/data/sequences.csv
+
+  $ jq --sort-keys . jsons-paths/0.json > test
+  $ jq --sort-keys . $TESTDIR/reference/alphafold3/0_path.json > ref
+  $ diff test ref
+
+  $ jq --sort-keys . jsons-paths/1.json > test
+  $ jq --sort-keys . $TESTDIR/reference/alphafold3/1_path.json > ref
+  $ diff test ref
+
+  $ jq --sort-keys . jsons-paths/2.json > test
+  $ jq --sort-keys . $TESTDIR/reference/alphafold3/2_path.json > ref
+  $ diff test ref
+
+  $ jq --sort-keys . jsons-paths/3.json > test
+  $ jq --sort-keys . $TESTDIR/reference/alphafold3/3_path.json > ref
+  $ diff test ref
+
+  $ jq --sort-keys . jsons-paths/4.json > test
+  $ jq --sort-keys . $TESTDIR/reference/alphafold3/4_path.json > ref
+  $ diff test ref
+
+  $ jq --sort-keys . jsons-paths/5.json > test
+  $ jq --sort-keys . $TESTDIR/reference/alphafold3/5_path.json > ref
+  $ diff test ref
+
 Create chai input
   $ python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
   > --format chai \

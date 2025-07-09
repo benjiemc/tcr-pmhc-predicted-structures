@@ -2,6 +2,7 @@
 
 import argparse
 import csv
+import glob
 import json
 import logging
 import os
@@ -34,6 +35,17 @@ parser.add_argument(
     '--alphafold3-model-seeds', nargs='+', type=int, default=[1], help='Seeds for alphafold3 (Default: [1])'
 )
 parser.add_argument('--chai-restraints', help='restraints file for chai restraints')
+
+paths_group = parser.add_argument_group('Paths')
+paths_group.add_argument('--sequence-key-path', help='path to sequence key file')
+paths_group.add_argument(
+    '--relative-paths',
+    action='store_true',
+    help='use relative path names for MSA and template paths instead of full path names',
+)
+paths_group.add_argument('--unpaired-msa-paths', nargs='+', help='paths to the unpaired MSA files')
+paths_group.add_argument('--paired-msa-paths', nargs='+', help='paths to the paired MSA files')
+paths_group.add_argument('--template-paths', nargs='+', help='path to the templates')
 
 add_logging_arguments(parser)
 
@@ -187,28 +199,102 @@ def format_sequences_for_chai(sequences: list[dict], output_dir: str, restraints
                 fh.write('\n')
 
 
-def format_sequences_for_af3(sequences: list[dict], output_dir: str, model_seeds: list[int]) -> None:
+def format_sequences_for_af3(
+    sequences: list[dict],
+    output_dir: str,
+    model_seeds: list[int],
+    sequence_key: dict[str, str] | None = None,
+    unpaired_msa_paths: list[str] | None = None,
+    paired_msa_paths: list[str] | None = None,
+    templates: dict[str, list[dict[str, str]]] | None = None,
+) -> None:
+    if unpaired_msa_paths is None:
+        unpaired_msa_paths = []
+
+    if paired_msa_paths is None:
+        paired_msa_paths = []
+
+    if templates is None:
+        templates = []
+
     for sequence_info in sequences:
         logger.debug('Writing json for %s', sequence_info['id'])
         output_name = os.path.join(output_dir, f"{sequence_info['id']}.json")
+
+        output = {
+            'name': sequence_info['id'],
+            'modelSeeds': model_seeds,
+            'sequences': [
+                {'protein': {'id': 'D', 'sequence': sequence_info['tcr_alpha_chain']}},
+                {'protein': {'id': 'E', 'sequence': sequence_info['tcr_beta_chain']}},
+                {'protein': {'id': 'C', 'sequence': sequence_info['peptide']}},
+                {'protein': {'id': 'A', 'sequence': sequence_info['mhc_chain_1']}},
+                {'protein': {'id': 'B', 'sequence': sequence_info['mhc_chain_2']}},
+            ],
+            'dialect': 'alphafold3',
+            'version': 2,
+        }
+
+        if sequence_key:
+            new_sequence_entries = []
+            for sequence_entry in output['sequences']:
+                new_sequence_entry = {**sequence_entry}
+
+                if sequence_entry['protein']['id'] == 'C':
+                    msa = f">query\n{sequence_entry['protein']['sequence']}\n"
+                    new_sequence_entry['protein']['unpairedMsa'] = msa
+                    new_sequence_entry['protein']['pairedMsa'] = msa
+                    new_sequence_entry['protein']['templates'] = []
+
+                else:
+                    try:
+                        key = sequence_key[sequence_entry['protein']['sequence']]
+
+                    except KeyError:
+                        logger.error('No entry found for sequence: %s', sequence_entry['protein']['sequence'])  # noqa: TRY400
+
+                    else:
+                        relevant_unpaired_msas = [msa_path for msa_path in unpaired_msa_paths if key in msa_path]
+
+                        if len(relevant_unpaired_msas) < 1:
+                            logger.error(
+                                'Missing unpaired MSAs for sequence: %s (key: %s)',
+                                sequence_entry['protein']['sequence'],
+                                key,
+                            )
+
+                        else:
+                            new_sequence_entry['protein']['unpairedMsaPath'] = relevant_unpaired_msas[0]
+
+                        relevant_paired_msas = [msa_path for msa_path in paired_msa_paths if key in msa_path]
+
+                        if len(relevant_unpaired_msas) < 1:
+                            logger.warning(
+                                'Missing paired MSAs for sequence: %s (key: %s)',
+                                sequence_entry['protein']['sequence'],
+                                key,
+                            )
+
+                        else:
+                            new_sequence_entry['protein']['pairedMsaPath'] = relevant_paired_msas[0]
+
+                        try:
+                            new_sequence_entry['protein']['templates'] = templates[key]
+
+                        except KeyError:
+                            logger.warning(
+                                'Missing paired MSAs for sequence: %s (key: %s)',
+                                sequence_entry['protein']['sequence'],
+                                key,
+                            )
+
+                new_sequence_entries.append(new_sequence_entry)
+
+            output['sequences'] = new_sequence_entries
+
         with open(output_name, 'w') as output_fh:
             logger.debug('Writing to %s', output_name)
-            json.dump(
-                {
-                    'name': sequence_info['id'],
-                    'modelSeeds': model_seeds,
-                    'sequences': [
-                        {'protein': {'id': 'D', 'sequence': sequence_info['tcr_alpha_chain']}},
-                        {'protein': {'id': 'E', 'sequence': sequence_info['tcr_beta_chain']}},
-                        {'protein': {'id': 'C', 'sequence': sequence_info['peptide']}},
-                        {'protein': {'id': 'A', 'sequence': sequence_info['mhc_chain_1']}},
-                        {'protein': {'id': 'B', 'sequence': sequence_info['mhc_chain_2']}},
-                    ],
-                    'dialect': 'alphafold3',
-                    'version': 1,
-                },
-                output_fh,
-            )
+            json.dump(output, output_fh)
 
 
 def main() -> None:
@@ -219,6 +305,54 @@ def main() -> None:
     with open(args.input, 'r') as fh:
         sequences = list(csv.DictReader(fh))
 
+    if args.sequence_key_path:
+        logger.info('Loading sequence keys from %s', args.sequence_key_path)
+        with open(args.sequence_key_path, 'r') as fh:
+            sequence_key = {sequence: key for key, sequence in (line.split() for line in fh if line)}
+
+        unpaired_msa_paths = args.unpaired_msa_paths
+        if args.relative_paths and unpaired_msa_paths:
+            dirname = os.path.dirname(unpaired_msa_paths[0])
+            unpaired_msa_paths = [path.replace(dirname, '').strip('/') for path in unpaired_msa_paths]
+
+        paired_msa_paths = args.paired_msa_paths
+        if args.relative_paths and paired_msa_paths:
+            dirname = os.path.dirname(paired_msa_paths[0])
+            paired_msa_paths = [path.replace(dirname, '').strip('/') for path in paired_msa_paths]
+
+        if args.template_paths:
+            templates = {}
+            for path in args.template_paths:
+                name = os.path.basename(path)
+
+                indices_paths = sorted(glob.glob(os.path.join(path, '*_indices.json')))
+                structure_paths = sorted(glob.glob(os.path.join(path, '*.cif')))
+
+                entry_templates = []
+                for indices_path, structure_path in zip(indices_paths, structure_paths, strict=True):
+                    with open(indices_path, 'r') as fh:
+                        entry_template = json.load(fh)
+
+                    if args.relative_paths:
+                        dirname = os.path.dirname(path)
+                        entry_template['mmcifPath'] = structure_path.replace(dirname, '').strip('/')
+
+                    else:
+                        entry_template['mmcifPath'] = structure_path
+
+                    entry_templates.append(entry_template)
+
+                templates[name] = entry_templates
+
+        else:
+            templates = None
+
+    else:
+        sequence_key = None
+        unpaired_msa_paths = None
+        paired_msa_paths = None
+        templates = None
+
     if not os.path.exists(args.output):
         logger.debug('Creating output dir: %s', args.output)
         os.mkdir(args.output)
@@ -226,7 +360,15 @@ def main() -> None:
     match args.format:
         case 'alphafold3':
             logger.info('Formatting sequences for Alphafold3 and outputting to %s', args.output)
-            format_sequences_for_af3(sequences, args.output, args.alphafold3_model_seeds)
+            format_sequences_for_af3(
+                sequences,
+                args.output,
+                args.alphafold3_model_seeds,
+                sequence_key,
+                unpaired_msa_paths,
+                paired_msa_paths,
+                templates,
+            )
 
         case 'chai':
             logger.info('Formatting sequences for chai and outputting to %s', args.output)
