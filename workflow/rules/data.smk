@@ -1,4 +1,5 @@
 import csv
+import json
 import os
 
 rule sample_sequences:
@@ -42,6 +43,67 @@ rule create_full_length_sequences:
             -o {output} \
             {input.sequences}
         """
+
+rule create_sequence_key:
+    input: "data/interim/sequences_full.csv"
+    output: "data/interim/sequence_key.txt"
+    shell:
+        """
+        cat \
+            <(sed 1d {input} | cut -d, -f2 | sort | uniq) \
+            <(sed 1d {input} | cut -d, -f3 | sort | uniq) \
+            <(sed 1d {input} | cut -d, -f5 | sort | uniq) \
+            <(sed 1d {input} | cut -d, -f6 | sort | uniq) | sort | uniq > $TEMPDIR/sequences.txt
+
+        paste -d ' ' <(cat $TEMPDIR/sequences.txt | xargs -I {{}} sh -c 'echo -n "{{}}" | sha256sum | cut -c1-8') $TEMPDIR/sequences.txt > {output}
+        """
+
+def _create_msa_names(path: str, template: list[str]) -> list[str]:
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
+
+    with open(path, 'r') as fh:
+        ids = [line.split()[0] for line in fh.readlines() if line]
+
+    return expand(template, name=ids)
+
+rule create_msa_inputs:
+    input: "data/interim/sequence_key.txt"
+    output: _create_msa_names("data/interim/sequence_key.txt", 'data/interim/msa-inputs/{name}.json')
+    run:
+        output_dir = os.path.dirname(output[0])
+        if not os.path.exists(output_dir):
+            os.mkdir(output_dir)
+
+        with open(input[0], 'r') as fh:
+            for id_, sequence in (line.split() for line in fh.readlines() if line):
+                with open(os.path.join(output_dir, id_ + '.json'), 'w') as output_fh:
+                    json.dump(
+                    {
+                        'name': id_,
+                        'modelSeeds': [1],
+                        'sequences': [
+                            {'protein': {'id': 'A', 'sequence': sequence}},
+                        ],
+                        'dialect': 'alphafold3',
+                        'version': 1,
+                    },
+                    output_fh,
+                )
+
+rule run_create_msas_and_find_templates:
+    input: "data/interim/msa-inputs/{name}.json"
+    output:
+        unpaired_msa='data/interim/msas/{name}_unpaired.a3m',
+        paired_msa='data/interim/msas/{name}_paired.a3m',
+        templates=directory('data/interim/templates/{name}')
+    params:
+        alphafold_data_dir=os.environ['ALPHAFOLD_DATA_DIR']
+    script: "../scripts/create_msas_and_find_templates.py"
+
+rule create_msas_and_find_templates:
+    input: _create_msa_names("data/interim/sequence_key.txt", 'data/interim/msas/{name}_unpaired.a3m')
 
 def create_paths(summary_file: str, path_name: str) -> list[str]:
     if not os.path.exists(summary_file):
