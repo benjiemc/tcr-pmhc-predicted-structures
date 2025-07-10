@@ -1,7 +1,7 @@
 """Extract confidence metrics from alphafold3 structures."""
 
 import argparse
-import glob
+import contextlib
 import json
 import logging
 import os
@@ -36,7 +36,9 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
 )
 
-parser.add_argument('paths', nargs='+', help='paths to the af3 output directories')
+parser.add_argument('--summary-confidence-paths', required=True, nargs='+', help='paths to the af3 summary confidences')
+parser.add_argument('--confidence-paths', required=True, nargs='+', help='paths to the af3 confidences')
+parser.add_argument('--sequence-paths', required=True, nargs='+', help='paths to the af3 input sequence jsons')
 parser.add_argument('--output', '-o', help='paths to the output csv')
 
 add_logging_arguments(parser)
@@ -70,39 +72,38 @@ RESIDUE_NUMBER_OF_ATOMS = {
 def collect_summary_scores(paths: list[str]) -> pd.DataFrame:
     af3_scores = []
 
-    for af3_dir in paths:
-        for path in glob.glob(os.path.join(af3_dir, 'seed-*_sample-*/*_summary_confidences.json')):
-            with open(path) as fh:
-                summary_confidences = json.load(fh)
+    for path in paths:
+        with open(path) as fh:
+            summary_confidences = json.load(fh)
 
-            name = re.match(
-                r'(?P<structure_name>\d+(?:_\d+)?)_seed-(?P<seed>\d+)_sample-(?P<sample>\d+)_summary_confidences.json',
-                os.path.basename(path),
-            )
+        name = re.match(
+            r'(?P<structure_name>\d+(?:_\d+)?)_seed-(?P<seed>\d+)_sample-(?P<sample>\d+)_summary_confidences.json',
+            os.path.basename(path),
+        )
 
-            score = {
-                **name.groupdict(),
-                **{key: val for key, val in summary_confidences.items() if not isinstance(val, list)},
-            }
+        score = {
+            **name.groupdict(),
+            **{key: val for key, val in summary_confidences.items() if not isinstance(val, list)},
+        }
 
-            for chain_name, chain_ptm in zip(CHAIN_ORDER, summary_confidences['chain_ptm'], strict=True):
-                score[chain_name + '_ptm'] = chain_ptm
+        for chain_name, chain_ptm in zip(CHAIN_ORDER, summary_confidences['chain_ptm'], strict=True):
+            score[chain_name + '_ptm'] = chain_ptm
 
-            for chain_name, chain_ptm in zip(CHAIN_ORDER, summary_confidences['chain_iptm'], strict=True):
-                score[chain_name + '_iptm'] = chain_ptm
+        for chain_name, chain_ptm in zip(CHAIN_ORDER, summary_confidences['chain_iptm'], strict=True):
+            score[chain_name + '_iptm'] = chain_ptm
 
-            for i, (chain_name_1, chain_iptms) in enumerate(
-                zip(CHAIN_ORDER, summary_confidences['chain_pair_iptm'], strict=True)
-            ):
-                for chain_name_2, iptm in zip(CHAIN_ORDER[i + 1 :], chain_iptms[i + 1 :], strict=True):
-                    if chain_name_1 != chain_name_2:
-                        score[chain_name_1 + '_' + chain_name_2 + '_iptm'] = iptm
+        for i, (chain_name_1, chain_iptms) in enumerate(
+            zip(CHAIN_ORDER, summary_confidences['chain_pair_iptm'], strict=True)
+        ):
+            for chain_name_2, iptm in zip(CHAIN_ORDER[i + 1 :], chain_iptms[i + 1 :], strict=True):
+                if chain_name_1 != chain_name_2:
+                    score[chain_name_1 + '_' + chain_name_2 + '_iptm'] = iptm
 
-            for chain_name_1, chain_pae_min in zip(CHAIN_ORDER, summary_confidences['chain_pair_pae_min'], strict=True):
-                for chain_name_2, pae_min in zip(CHAIN_ORDER, chain_pae_min, strict=True):
-                    score[chain_name_1 + '_' + chain_name_2 + '_pae_min'] = pae_min
+        for chain_name_1, chain_pae_min in zip(CHAIN_ORDER, summary_confidences['chain_pair_pae_min'], strict=True):
+            for chain_name_2, pae_min in zip(CHAIN_ORDER, chain_pae_min, strict=True):
+                score[chain_name_1 + '_' + chain_name_2 + '_pae_min'] = pae_min
 
-            af3_scores.append(score)
+        af3_scores.append(score)
 
     return pd.DataFrame(af3_scores)
 
@@ -432,60 +433,61 @@ def compute_alpha_bridge_scores(pae_scores, plddt_scores, atom_chain_ids, atom_r
     return scores
 
 
-def collect_raw_scores(paths) -> pd.DataFrame:
+def collect_raw_scores(confidence_paths: list[str], sequence_paths: list[str]) -> pd.DataFrame:
     raw_scores = []
-    for af3_dir in paths:
-        for path in (
-            path
-            for path in glob.glob(os.path.join(af3_dir, 'seed-*_sample-*/*_confidences.json'))
-            if 'summary' not in os.path.basename(path)
-        ):
-            logger.debug('Getting scores from %s', path)
+    for path in confidence_paths:
+        logger.debug('Getting scores from %s', path)
 
-            name = re.match(
-                r'(?P<structure_name>\d+(?:_\d+)?)_seed-(?P<seed>\d+)_sample-(?P<sample>\d+)_confidences.json',
-                os.path.basename(path),
-            )
+        name = re.match(
+            r'(?P<structure_name>\d+(?:_\d+)?)_seed-(?P<seed>\d+)_sample-(?P<sample>\d+)_confidences.json',
+            os.path.basename(path),
+        )
 
-            scores = {**name.groupdict()}
+        scores = {**name.groupdict()}
 
-            with open(path, 'r') as fh:
-                confidence = json.load(fh)
+        with open(path, 'r') as fh:
+            confidence = json.load(fh)
 
-            # Load sequence information
-            with open(glob.glob(os.path.join(os.path.dirname(os.path.dirname(path)), '*_data.json'))[0], 'r') as fh:
-                input_data = json.load(fh)
+        with open(
+            [
+                sequence_path
+                for sequence_path in sequence_paths
+                if name['structure_name'] == os.path.basename(sequence_path).split('.')[0]
+            ][0],
+            'r',
+        ) as fh:
+            input_data = json.load(fh)
 
-            input_sequences = {
-                sequence_info['protein']['id']: sequence_info['protein']['sequence']
-                for sequence_info in input_data['sequences']
-            }
+        input_sequences = {
+            sequence_info['protein']['id']: sequence_info['protein']['sequence']
+            for sequence_info in input_data['sequences']
+        }
 
-            logger.debug('Collecting PAE scores')
-            pae_scores = collect_pae_scores(confidence)
-            scores['tcr_pmhc_pae_score'] = np.mean(pae_scores)
+        logger.debug('Collecting PAE scores')
+        pae_scores = collect_pae_scores(confidence)
+        scores['tcr_pmhc_pae_score'] = np.mean(pae_scores)
 
-            logger.debug('Collecting specific PAE scores')
-            specific_pae_scores = collect_specific_pae_scores(confidence, input_sequences)
-            scores['cdr_pmhc_pae_score'] = np.mean(specific_pae_scores)
+        logger.debug('Collecting specific PAE scores')
+        specific_pae_scores = collect_specific_pae_scores(confidence, input_sequences)
+        scores['cdr_pmhc_pae_score'] = np.mean(specific_pae_scores)
 
-            logger.debug('Collecting pLDDT scores')
-            plddt_scores = collect_plddt_scores(confidence)
-            scores['tcr_pmhc_plddt_score'] = np.mean(plddt_scores)
+        logger.debug('Collecting pLDDT scores')
+        plddt_scores = collect_plddt_scores(confidence)
+        scores['tcr_pmhc_plddt_score'] = np.mean(plddt_scores)
 
-            logger.debug('Collecting specific pLDDT scores')
-            specifc_plddt_scores, atom_chain_ids, atom_res_ids = collect_specific_plddt_scores(
-                confidence, input_sequences
-            )
-            scores['cdr_pmhc_plddt_score'] = np.mean(specifc_plddt_scores)
+        logger.debug('Collecting specific pLDDT scores')
+        specifc_plddt_scores, atom_chain_ids, atom_res_ids = collect_specific_plddt_scores(
+            confidence, input_sequences
+        )
+        scores['cdr_pmhc_plddt_score'] = np.mean(specifc_plddt_scores)
 
-            logger.debug('Computing AlphaBridge scores')
-            alpha_bridge_scores = compute_alpha_bridge_scores(
-                specific_pae_scores, specifc_plddt_scores, atom_chain_ids, atom_res_ids
-            )
-            scores['alphabridge_score'] = np.mean(alpha_bridge_scores)
+        logger.debug('Computing AlphaBridge scores')
+        alpha_bridge_scores = compute_alpha_bridge_scores(
+            specific_pae_scores, specifc_plddt_scores, atom_chain_ids, atom_res_ids
+        )
+        scores['alphabridge_score'] = np.mean(alpha_bridge_scores)
 
-            raw_scores.append(scores)
+        raw_scores.append(scores)
 
     return pd.DataFrame(raw_scores)
 
@@ -495,7 +497,7 @@ def main() -> None:
     setup_logger(logger, args.log_level)
 
     logger.info('Collecting summary scores')
-    af3_scores = collect_summary_scores(args.paths)
+    af3_scores = collect_summary_scores(args.summary_confidence_paths)
 
     logger.debug('Identifying top model')
     af3_scores['top_model'] = False
@@ -517,7 +519,7 @@ def main() -> None:
     )
 
     logger.info('Collecting raw confidence scores')
-    raw_scores = collect_raw_scores(args.paths)
+    raw_scores = collect_raw_scores(args.confidence_paths, args.sequence_paths)
     af3_scores = af3_scores.merge(raw_scores, how='inner', on=['structure_name', 'seed', 'sample'])
 
     logger.info('Outputting to %s', args.output)

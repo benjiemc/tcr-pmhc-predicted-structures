@@ -219,7 +219,7 @@ def format_sequences_for_af3(
 
     for sequence_info in sequences:
         logger.debug('Writing json for %s', sequence_info['id'])
-        output_name = os.path.join(output_dir, f"{sequence_info['id']}.json")
+        output_name = os.path.join(output_dir, f"{sequence_info['id']}_{'-'.join(model_seeds)}.json")
 
         output = {
             'name': sequence_info['id'],
