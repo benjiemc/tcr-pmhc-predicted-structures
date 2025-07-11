@@ -100,6 +100,7 @@ rule run_create_msas_and_find_templates:
         templates=directory('data/interim/templates/{name}')
     params:
         alphafold_data_dir=os.environ['ALPHAFOLD_DATA_DIR']
+    threads: 32
     script: "../scripts/create_msas_and_find_templates.py"
 
 rule create_msas_and_find_templates:

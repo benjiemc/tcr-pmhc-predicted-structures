@@ -8,6 +8,9 @@ import tempfile
 
 from snakemake.script import snakemake
 
+NUM_PARALLEL_AF_PROCESSES = 4
+'''AF3 runs 4 processes at once for building the MSAs.'''
+
 with tempfile.TemporaryDirectory() as temp_dir:
     subprocess.run(  # noqa: S603
         [
@@ -18,6 +21,8 @@ with tempfile.TemporaryDirectory() as temp_dir:
             'python',
             'third_party/alphafold3/run_alphafold.py',
             '--norun_inference',
+            f'--jackhmmer_n_cpu={max(snakemake.threads // NUM_PARALLEL_AF_PROCESSES, 1)}',
+            f'--nhmmer_n_cpu={max(snakemake.threads // NUM_PARALLEL_AF_PROCESSES, 1)}',
             '--db_dir=/root/public_databases',
             f'--json_path={snakemake.input[0]}',
             f'--output_dir={temp_dir}',
