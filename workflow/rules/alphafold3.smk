@@ -41,7 +41,7 @@ rule create_af3_jsons:
         out_dir_name=$(dirname {output[0]})
 
         python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
-            --log-level info \
+            --log-level {config[log_level]} \
             --format alphafold3 \
              --alphafold3-model-seeds {wildcards.seed} \
             --sequence-key {input.sequence_key} \
@@ -153,7 +153,7 @@ rule aggregate_af3_confidence_scores:
     shell:
         """
         python -m tcr_pmhc_predicted_structures.apps.extract_confidence_from_af3 \
-            --log-level info \
+            --log-level {config[log_level]} \
             -o {output} \
             --summary-confidence-paths {input.summary_confidences} \
             --confidence-paths {input.confidences} \
@@ -324,7 +324,7 @@ rule create_contact_map:
     shell:
         """
         python -m tcr_pmhc_predicted_structures.apps.create_contact_map \
-            --log-level info \
+            --log-level {config[log_level]} \
             --cutoff-distance {params.contact_distance} \
             -o {output} \
             {input}

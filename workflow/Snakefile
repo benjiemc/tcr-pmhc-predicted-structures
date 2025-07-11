@@ -1,3 +1,9 @@
+default_config = {
+    'log_level': 'info',
+}
+
+config = {**default_config, **config}
+
 include: "rules/data.smk"
 include: "rules/alphafold3.smk"
 include: "rules/chai.smk"

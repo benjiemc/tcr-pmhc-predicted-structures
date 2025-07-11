@@ -38,7 +38,7 @@ rule create_full_length_sequences:
     shell:
         """
         python -m tcr_pmhc_predicted_structures.apps.create_full_length_sequences \
-            --log-level info \
+            --log-level {config[log_level]} \
             --mhc-sequences {input.mhc_sequences} \
             -o {output} \
             {input.sequences}
