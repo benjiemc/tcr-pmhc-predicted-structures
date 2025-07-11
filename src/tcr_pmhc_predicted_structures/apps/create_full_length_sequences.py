@@ -54,7 +54,13 @@ def create_full_length_sequences(sequences: list[dict], mhc_sequences: pd.DataFr
 
         logger.debug('Stitching TCR alpha chain')
         for species in sequence['species'].split('/'):
-            tcr_alpha_seq = stitch_sequence(sequence['v_alpha'], sequence['j_alpha'], sequence['cdr3_alpha'], species)
+            try:
+                tcr_alpha_seq = stitch_sequence(
+                    sequence['v_alpha'], sequence['j_alpha'], sequence['cdr3_alpha'], species
+                )
+
+            except Exception:  # noqa: BLE001 stitchr can throw base exceptions for invalid sequence combinations
+                tcr_alpha_seq = None
 
             if tcr_alpha_seq is not None:
                 break
@@ -71,7 +77,11 @@ def create_full_length_sequences(sequences: list[dict], mhc_sequences: pd.DataFr
 
         logger.debug('Stitching TCR beta chain')
         for species in sequence['species'].split('/'):
-            tcr_beta_seq = stitch_sequence(sequence['v_beta'], sequence['j_beta'], sequence['cdr3_beta'], species)
+            try:
+                tcr_beta_seq = stitch_sequence(sequence['v_beta'], sequence['j_beta'], sequence['cdr3_beta'], species)
+
+            except Exception:  # noqa: BLE001 stitchr can throw base exceptions for invalid sequence combinations
+                tcr_beta_seq = None
 
             if tcr_beta_seq is not None:
                 break
@@ -87,14 +97,16 @@ def create_full_length_sequences(sequences: list[dict], mhc_sequences: pd.DataFr
             continue
 
         logger.debug('Looking up MHC chain 1 sequence')
-        mhc_1_seq = mhc_sequences[mhc_sequences['mhc_code'] == sequence['mhc1']].iloc[0]['canonical_sequence']
-        mhc_species = mhc_sequences[mhc_sequences['mhc_code'] == sequence['mhc1']].iloc[0]['species']
+        mhc_allele, *_ = sequence['mhc1'].split(';')
+        mhc_1_seq = mhc_sequences[mhc_sequences['mhc_code'] == mhc_allele].iloc[0]['canonical_sequence']
+        mhc_species = mhc_sequences[mhc_sequences['mhc_code'] == mhc_allele].iloc[0]['species']
 
         logger.debug('Looking up MHC chain 2 sequence')
+        mhc_allele, *_ = sequence['mhc2'].split(';')
         mhc_2_seq = (
             B2M_SEQUENCES[mhc_species]
-            if sequence['mhc2'] == 'B2M'
-            else mhc_sequences[mhc_sequences['mhc_code'] == sequence['mhc2']].iloc[0]['canonical_sequence']
+            if mhc_allele == 'B2M'
+            else mhc_sequences[mhc_sequences['mhc_code'] == mhc_allele].iloc[0]['canonical_sequence']
         )
 
         sequences_full.append(
