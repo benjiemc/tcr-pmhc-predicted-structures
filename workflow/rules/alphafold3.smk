@@ -49,29 +49,16 @@ rule run_alphafold_msas:
         alphafold_data_dir=os.environ['ALPHAFOLD_DATA_DIR'],
     shell:
         """
-        input_file_name="$(basename {input})"
-        input_dir_abs="$(pwd)/$(dirname {input})"
-        output_dir_abs="$(pwd)/$(dirname {output})"
+        mkdir -p $(dirname {output})
 
-        mkdir -p $output_dir_abs
-
-        docker run -it \
-            --volume $output_dir_abs:/tmp/af_output \
-            --entrypoint bash \
-            alphafold3 \
-            -c "chown -R $(id -u):$(id -g) /tmp/af_output"
-
-
-        docker run -it \
-            --user $(id -u):$(id -g) \
-            --volume $input_dir_abs:/tmp/af_input \
-            --volume $output_dir_abs:/tmp/af_output \
-            --volume {params.alphafold_data_dir}:/public_databases \
-            alphafold3 \
-            python run_alphafold.py \
+        apptainer exec \
+            --bind {params.alphafold_data_dir}:/root/public_databases \
+            containers/alphafold3.sif \
+            python third_party/alphafold3/run_alphafold.py \
                 --norun_inference \
-                --json_path=/tmp/af_input/$input_file_name \
-                --output_dir=/tmp/af_output
+                --db_dir=/root/public_databases \
+                --json_path={input} \
+                --output_dir=$(dirname {output})
         """
 
 def _get_af3_msa_names(path: str) -> list[str]:
@@ -92,31 +79,17 @@ rule run_alphafold_predictions:
         alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
     shell:
         """
-        input_file_name="$(basename {input})"
-        input_dir_abs="$(pwd)/$(dirname {input})"
-        output_dir_abs="$(pwd)/$(dirname {output})"
+        mkdir -p $(dirname {output})
 
-        mkdir -p $output_dir_abs
-
-        docker run -it \
-            --volume $output_dir_abs:/tmp/af_output \
-            --entrypoint bash \
-            alphafold3 \
-            -c "chown -R $(id -u):$(id -g) /tmp/af_output"
-
-
-        docker run -it \
-            --user $(id -u):$(id -g) \
-            --volume $input_dir_abs:/tmp/af_input \
-            --volume $output_dir_abs:/tmp/af_output \
-            --volume {params.alphafold3_weights_dir}:/models \
-            --gpus all \
-            alphafold3 \
-            python run_alphafold.py \
+        apptainer exec \
+            --nv \
+            --bind {params.alphafold3_weights_dir}:/root/models \
+            containers/alphafold3.sif \
+            python third_party/alphafold3/run_alphafold.py \
                 --norun_data_pipeline \
-                --json_path=/tmp/af_input/$input_file_name \
-                --model_dir=/models \
-                --output_dir=/tmp/af_output
+                --json_path={input} \
+                --model_dir=/root/models \
+                --output_dir=$(dirname {output})
         """
 
 def _get_af3_names(path: str) -> list[str]:

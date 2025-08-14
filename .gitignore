@@ -1,6 +1,7 @@
 # Project Files
 jobs/*
 notebooks/exploratory/
+containers/*
 
 data/raw/*
 !data/raw/.gitkeep
