@@ -2,6 +2,9 @@ import csv
 import json
 import os
 
+envvars:
+    "COLABFOLD_DATA_DIR"
+
 rule sample_sequences:
     input: "data/raw/sequences_pMHC_split.csv"
     output: "data/interim/sequences_sample.csv"
@@ -68,7 +71,7 @@ def _create_msa_names(path: str, template: list[str]) -> list[str]:
 
     return expand(template, name=ids)
 
-rule create_msa_inputs:
+rule create_af3_msa_inputs:
     input: "data/interim/sequence_key.txt"
     output: _create_msa_names("data/interim/sequence_key.txt", 'data/interim/msa-inputs/{name}.json')
     run:
@@ -92,7 +95,7 @@ rule create_msa_inputs:
                     output_fh,
                 )
 
-rule run_create_msas_and_find_templates:
+rule run_create_af3_msas_and_find_templates:
     input: "data/interim/msa-inputs/{name}.json"
     output:
         unpaired_msa='data/interim/msas/{name}_unpaired.a3m',
@@ -103,8 +106,55 @@ rule run_create_msas_and_find_templates:
     threads: 32
     script: "../scripts/create_msas_and_find_templates.py"
 
-rule create_msas_and_find_templates:
+rule create_af3_msas_and_find_templates:
     input: _create_msa_names("data/interim/sequence_key.txt", 'data/interim/msas/{name}_unpaired.a3m')
+
+rule create_colabfold_msa_inputs:
+    input: "data/interim/sequence_key.txt"
+    output: _create_msa_names("data/interim/sequence_key.txt", "data/interim/colabfold-msa-inputs/{name}.fasta")
+    run:
+        output_dir = os.path.dirname(output[0])
+        if not os.path.exists(output_dir):
+            os.mkdir(output_dir)
+
+        with open(input[0], 'r') as fh:
+            for id_, sequence in (line.split() for line in fh.readlines() if line):
+                with open(os.path.join(output_dir, id_ + '.fasta'), 'w') as output_fh:
+                    output_fh.write(f'>{id_}\n{sequence}\n')
+
+rule run_create_colabfold_msas_and_find_templates:
+    input: "data/interim/colabfold-msa-inputs/{name}.fasta"
+    output:
+        msa='data/interim/colabfold-msas/{name}.a3m',
+        templates='data/interim/colabfold-templates/{name}.m8'
+    threads: 32
+    params:
+        colabfold_data_dir=os.environ['COLABFOLD_DATA_DIR']
+    benchmark:
+        "data/benchmarks/msa-generation_mmseq_colabfold_{name}.tsv"
+    shell:
+        """
+        working_dir=$TMPDIR/{wildcards.name}
+        if [ -d $working_dir ]; then
+            rm -r $working_dir
+        fi
+        mkdir $working_dir
+
+        colabfold_search \
+            --mmseqs $(which mmseqs) \
+            --use-templates 1 \
+            --threads {threads} \
+            --db2 pdb100_230517 \
+            {input} \
+            {params.colabfold_data_dir} \
+            $working_dir
+
+        mv $working_dir/0.a3m {output.msa}
+        mv $working_dir/pdb100_230517.m8 {output.templates}
+        """
+
+rule create_colabfold_msas_and_find_templates:
+    input: _create_msa_names("data/interim/sequence_key.txt", 'data/interim/colabfold-msas/{name}.a3m')
 
 def create_paths(summary_file: str, path_name: str) -> list[str]:
     if not os.path.exists(summary_file):

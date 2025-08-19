@@ -11,6 +11,8 @@ data/interim/*
 !data/interim/.gitkeep
 data/processed/*
 !data/processed/.gitkeep
+data/benchmarks/*
+!data/benchmarks/.gitkeep
 
 # Python Files
 **/*.egg-info/*
