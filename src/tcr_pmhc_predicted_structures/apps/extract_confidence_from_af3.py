@@ -107,47 +107,7 @@ def collect_summary_scores(paths: list[str]) -> pd.DataFrame:
     return pd.DataFrame(af3_scores)
 
 
-def collect_pae_scores(paths: list[str]) -> pd.DataFrame:
-    pae_scores = []
-
-    for af3_dir in paths:
-        for path in (
-            path
-            for path in glob.glob(os.path.join(af3_dir, 'seed-*_sample-*/*_confidences.json'))
-            if 'summary' not in os.path.basename(path)
-        ):
-            with open(path, 'r') as fh:
-                confidence = json.load(fh)
-
-            name = re.match(
-                r'(?P<structure_name>\d+(?:_\d+)?)_seed-(?P<seed>\d+)_sample-(?P<sample>\d+)_confidences.json',
-                os.path.basename(path),
-            )
-
-            pae_score = {**name.groupdict()}
-
-            pae_numbering = [
-                (idx, (chain_id, res_seq_id))
-                for idx, (chain_id, res_seq_id) in enumerate(
-                    zip(confidence['token_chain_ids'], confidence['token_res_ids'], strict=True)
-                )
-            ]
-
-            tcr_idxs = np.array([idx for idx, (chain_id, _) in pae_numbering if chain_id in ('D', 'E')])
-            pmhc_idxs = np.array([idx for idx, (chain_id, _) in pae_numbering if chain_id in ('A', 'C')])
-
-            pae_score['tcr_pmhc_pae_score'] = np.mean(np.array(confidence['pae'])[np.ix_(tcr_idxs, pmhc_idxs)])
-
-            pae_scores.append(pae_score)
-
-    return pd.DataFrame(pae_scores)
-
-
-def get_specific_pae_scores(path: str) -> np.array:
-    # Load raw confidence data
-    with open(path, 'r') as fh:
-        confidence = json.load(fh)
-
+def collect_pae_scores(confidence: dict) -> np.array:
     pae_numbering = [
         (idx, (chain_id, res_seq_id))
         for idx, (chain_id, res_seq_id) in enumerate(
@@ -155,14 +115,19 @@ def get_specific_pae_scores(path: str) -> np.array:
         )
     ]
 
-    # Load sequence information
-    with open(glob.glob(os.path.join(os.path.dirname(os.path.dirname(path)), '*_data.json'))[0], 'r') as fh:
-        input_data = json.load(fh)
+    tcr_idxs = np.array([idx for idx, (chain_id, _) in pae_numbering if chain_id in ('D', 'E')])
+    pmhc_idxs = np.array([idx for idx, (chain_id, _) in pae_numbering if chain_id in ('A', 'C')])
 
-    input_sequences = {
-        sequence_info['protein']['id']: sequence_info['protein']['sequence']
-        for sequence_info in input_data['sequences']
-    }
+    return np.array(confidence['pae'])[np.ix_(tcr_idxs, pmhc_idxs)]
+
+
+def collect_specific_pae_scores(confidence: dict, input_sequences: dict) -> np.array:
+    pae_numbering = [
+        (idx, (chain_id, res_seq_id))
+        for idx, (chain_id, res_seq_id) in enumerate(
+            zip(confidence['token_chain_ids'], confidence['token_res_ids'], strict=True)
+        )
+    ]
 
     # Number sequences using ANARCI
     numbered_sequences = {}
@@ -282,76 +247,19 @@ def get_specific_pae_scores(path: str) -> np.array:
     return np.array(confidence['pae'])[np.ix_(tcr_idxs, pmhc_idxs)]
 
 
-def collect_specific_pae_scores(paths: list[str]) -> pd.DataFrame:
-    specific_pae_scores = []
+def collect_plddt_scores(confidence: dict) -> float:
+    tcr_pmhc_plddts = np.array(
+        [
+            plddt
+            for chain_id, plddt in zip(confidence['atom_chain_ids'], confidence['atom_plddts'], strict=True)
+            if chain_id in {'A', 'C', 'D', 'E'}
+        ]
+    )
 
-    for af3_dir in paths:
-        for path in (
-            path
-            for path in glob.glob(os.path.join(af3_dir, 'seed-*_sample-*/*_confidences.json'))
-            if 'summary' not in os.path.basename(path)
-        ):
-            name = re.match(
-                r'(?P<structure_name>\d+(?:_\d+)?)_seed-(?P<seed>\d+)_sample-(?P<sample>\d+)_confidences.json',
-                os.path.basename(path),
-            )
-
-            pae_score = {**name.groupdict()}
-            pae_score['cdr_pmhc_pae_score'] = np.mean(get_specific_pae_scores(path))
-
-            specific_pae_scores.append(pae_score)
-
-    return pd.DataFrame(specific_pae_scores)
+    return tcr_pmhc_plddts
 
 
-def collect_plddt_scores(paths: list[str]) -> pd.DataFrame:
-    plddt_scores = []
-
-    for af3_dir in paths:
-        for path in (
-            path
-            for path in glob.glob(os.path.join(af3_dir, 'seed-*_sample-*/*_confidences.json'))
-            if 'summary' not in os.path.basename(path)
-        ):
-            with open(path, 'r') as fh:
-                confidence = json.load(fh)
-
-            name = re.match(
-                r'(?P<structure_name>\d+(?:_\d+)?)_seed-(?P<seed>\d+)_sample-(?P<sample>\d+)_confidences.json',
-                os.path.basename(path),
-            )
-
-            plddt_score = {**name.groupdict()}
-
-            tcr_pmhc_plddts = np.array(
-                [
-                    plddt
-                    for chain_id, plddt in zip(confidence['atom_chain_ids'], confidence['atom_plddts'], strict=True)
-                    if chain_id in {'A', 'C', 'D', 'E'}
-                ]
-            )
-
-            plddt_score['tcr_pmhc_plddt_score'] = np.mean(tcr_pmhc_plddts)
-
-            plddt_scores.append(plddt_score)
-
-    return pd.DataFrame(plddt_scores)
-
-
-def get_specific_plddt_score(path: str) -> np.array:
-    # Load raw confidence data
-    with open(path, 'r') as fh:
-        confidence = json.load(fh)
-
-    # Load sequence information
-    with open(glob.glob(os.path.join(os.path.dirname(os.path.dirname(path)), '*_data.json'))[0], 'r') as fh:
-        input_data = json.load(fh)
-
-    input_sequences = {
-        sequence_info['protein']['id']: sequence_info['protein']['sequence']
-        for sequence_info in input_data['sequences']
-    }
-
+def collect_specific_plddt_scores(confidence: dict, input_sequences: dict) -> np.array:
     res_id_grouped_by_chain = defaultdict(list)
     for chain_id, res_id in zip(confidence['token_chain_ids'], confidence['token_res_ids'], strict=True):
         res_id_grouped_by_chain[chain_id].append(res_id)
@@ -490,83 +398,96 @@ def get_specific_plddt_score(path: str) -> np.array:
     )
 
 
-def collect_specific_plddt_scores(paths: list[str]) -> pd.DataFrame:
-    specific_plddt_scores = []
+def compute_alpha_bridge_scores(pae_scores, plddt_scores, atom_chain_ids, atom_res_ids) -> pd.DataFrame:
+    idx = 0
+    plddt_indices = []
 
+    ids = list(zip(atom_chain_ids, atom_res_ids, strict=True))
+    previous_id = ids[0]
+
+    for current_id in ids:
+        if current_id != previous_id:
+            idx += 1
+            previous_id = current_id
+
+        plddt_indices.append(idx)
+
+    plddt_indices = np.array(plddt_indices)
+
+    (tcr_plddt_indices,) = np.where((atom_chain_ids == 'D') | (atom_chain_ids == 'E'))
+    (pmhc_plddt_indices,) = np.where((atom_chain_ids != 'D') & (atom_chain_ids != 'E'))
+
+    tcr_indices = np.unique(plddt_indices[tcr_plddt_indices])
+    pmhc_indices = np.unique(plddt_indices[pmhc_plddt_indices])
+
+    plddt_agg = np.zeros((len(tcr_indices), len(pmhc_indices)), dtype=np.float64)
+    for i, tcr_idx in enumerate(tcr_indices):
+        for j, pmhc_idx in enumerate(pmhc_indices):
+            tcr_part = plddt_scores[np.where(plddt_indices == tcr_idx)[0]]
+            pmhc_part = plddt_scores[np.where(plddt_indices == pmhc_idx)[0]]
+            plddt_agg[i, j] = 1 / (len(tcr_part) + len(pmhc_part)) * (np.sum(tcr_part) + np.sum(pmhc_part)) - 100
+
+    scores = pae_scores - 1 / 3 * plddt_agg
+
+    return scores
+
+
+def collect_raw_scores(paths) -> pd.DataFrame:
+    raw_scores = []
     for af3_dir in paths:
         for path in (
             path
             for path in glob.glob(os.path.join(af3_dir, 'seed-*_sample-*/*_confidences.json'))
             if 'summary' not in os.path.basename(path)
         ):
+            logger.debug('Getting scores from %s', path)
+
             name = re.match(
                 r'(?P<structure_name>\d+(?:_\d+)?)_seed-(?P<seed>\d+)_sample-(?P<sample>\d+)_confidences.json',
                 os.path.basename(path),
             )
 
-            plddt_score = {**name.groupdict()}
-            plddt_scores, *_ = get_specific_plddt_score(path)
-            plddt_score['cdr_pmhc_plddt_score'] = np.mean(plddt_scores)
+            scores = {**name.groupdict()}
 
-            specific_plddt_scores.append(plddt_score)
+            with open(path, 'r') as fh:
+                confidence = json.load(fh)
 
-    return pd.DataFrame(specific_plddt_scores)
+            # Load sequence information
+            with open(glob.glob(os.path.join(os.path.dirname(os.path.dirname(path)), '*_data.json'))[0], 'r') as fh:
+                input_data = json.load(fh)
 
+            input_sequences = {
+                sequence_info['protein']['id']: sequence_info['protein']['sequence']
+                for sequence_info in input_data['sequences']
+            }
 
-def compute_alpha_bridge_scores(paths: list[str]) -> pd.DataFrame:
-    alphabridge_scores = []
+            logger.debug('Collecting PAE scores')
+            pae_scores = collect_pae_scores(confidence)
+            scores['tcr_pmhc_pae_score'] = np.mean(pae_scores)
 
-    for af3_dir in paths:
-        for path in (
-            path
-            for path in glob.glob(os.path.join(af3_dir, 'seed-*_sample-*/*_confidences.json'))
-            if 'summary' not in os.path.basename(path)
-        ):
-            name = re.match(
-                r'(?P<structure_name>\d+(?:_\d+)?)_seed-(?P<seed>\d+)_sample-(?P<sample>\d+)_confidences.json',
-                os.path.basename(path),
+            logger.debug('Collecting specific PAE scores')
+            specific_pae_scores = collect_specific_pae_scores(confidence, input_sequences)
+            scores['cdr_pmhc_pae_score'] = np.mean(specific_pae_scores)
+
+            logger.debug('Collecting pLDDT scores')
+            plddt_scores = collect_plddt_scores(confidence)
+            scores['tcr_pmhc_plddt_score'] = np.mean(plddt_scores)
+
+            logger.debug('Collecting specific pLDDT scores')
+            specifc_plddt_scores, atom_chain_ids, atom_res_ids = collect_specific_plddt_scores(
+                confidence, input_sequences
             )
-            alphabridge_score = {**name.groupdict()}
+            scores['cdr_pmhc_plddt_score'] = np.mean(specifc_plddt_scores)
 
-            plddt_scores, atom_chain_ids, atom_res_ids = get_specific_plddt_score(path)
-            pae_scores = get_specific_pae_scores(path)
+            logger.debug('Computing AlphaBridge scores')
+            alpha_bridge_scores = compute_alpha_bridge_scores(
+                specific_pae_scores, specifc_plddt_scores, atom_chain_ids, atom_res_ids
+            )
+            scores['alphabridge_score'] = np.mean(alpha_bridge_scores)
 
-            idx = 0
-            plddt_indices = []
+            raw_scores.append(scores)
 
-            ids = list(zip(atom_chain_ids, atom_res_ids, strict=True))
-            previous_id = ids[0]
-
-            for current_id in ids:
-                if current_id != previous_id:
-                    idx += 1
-                    previous_id = current_id
-
-                plddt_indices.append(idx)
-
-            plddt_indices = np.array(plddt_indices)
-
-            (tcr_plddt_indices,) = np.where((atom_chain_ids == 'D') | (atom_chain_ids == 'E'))
-            (pmhc_plddt_indices,) = np.where((atom_chain_ids != 'D') & (atom_chain_ids != 'E'))
-
-            tcr_indices = np.unique(plddt_indices[tcr_plddt_indices])
-            pmhc_indices = np.unique(plddt_indices[pmhc_plddt_indices])
-
-            plddt_agg = np.zeros((len(tcr_indices), len(pmhc_indices)), dtype=np.float64)
-            for i, tcr_idx in enumerate(tcr_indices):
-                for j, pmhc_idx in enumerate(pmhc_indices):
-                    tcr_part = plddt_scores[np.where(plddt_indices == tcr_idx)[0]]
-                    pmhc_part = plddt_scores[np.where(plddt_indices == pmhc_idx)[0]]
-                    plddt_agg[i, j] = (
-                        1 / (len(tcr_part) + len(pmhc_part)) * (np.sum(tcr_part) + np.sum(pmhc_part)) - 100
-                    )
-
-            score = pae_scores - 1 / 3 * plddt_agg
-            alphabridge_score['alphabridge_score'] = np.mean(score)
-
-            alphabridge_scores.append(alphabridge_score)
-
-    return pd.DataFrame(alphabridge_scores)
+    return pd.DataFrame(raw_scores)
 
 
 def main() -> None:
@@ -595,25 +516,9 @@ def main() -> None:
         'mean', axis=1
     )
 
-    logger.info('Collecting PAE scores')
-    pae_scores = collect_pae_scores(args.paths)
-    af3_scores = af3_scores.merge(pae_scores, how='inner', on=['structure_name', 'seed', 'sample'])
-
-    logger.info('Collecting specific PAE scores')
-    specific_pae_scores = collect_specific_pae_scores(args.paths)
-    af3_scores = af3_scores.merge(specific_pae_scores, how='inner', on=['structure_name', 'seed', 'sample'])
-
-    logger.info('Collecting pLDDT scores')
-    plddt_scores = collect_plddt_scores(args.paths)
-    af3_scores = af3_scores.merge(plddt_scores, how='inner', on=['structure_name', 'seed', 'sample'])
-
-    logger.info('Collecting specific pLDDT scores')
-    specific_plddt_scores = collect_specific_plddt_scores(args.paths)
-    af3_scores = af3_scores.merge(specific_plddt_scores, how='inner', on=['structure_name', 'seed', 'sample'])
-
-    logger.info('Computing AlphaBridge scores')
-    alphabridge_score = compute_alpha_bridge_scores(args.paths)
-    af3_scores = af3_scores.merge(alphabridge_score, how='inner', on=['structure_name', 'seed', 'sample'])
+    logger.info('Collecting raw confidence scores')
+    raw_scores = collect_raw_scores(args.paths)
+    af3_scores = af3_scores.merge(raw_scores, how='inner', on=['structure_name', 'seed', 'sample'])
 
     logger.info('Outputting to %s', args.output)
     af3_scores.to_csv(args.output, index=False)

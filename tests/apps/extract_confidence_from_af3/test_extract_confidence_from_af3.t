@@ -21,25 +21,5 @@
   'C'
   Error: Something really went wrong that has not been handled
   'C'
-  Error: Something really went wrong that has not been handled
-  'C'
-  Error: Something really went wrong that has not been handled
-  'C'
-  Error: Something really went wrong that has not been handled
-  'C'
-  Error: Something really went wrong that has not been handled
-  'C'
-  Error: Something really went wrong that has not been handled
-  'C'
-  Error: Something really went wrong that has not been handled
-  'C'
-  Error: Something really went wrong that has not been handled
-  'C'
-  Error: Something really went wrong that has not been handled
-  'C'
-  Error: Something really went wrong that has not been handled
-  'C'
-  Error: Something really went wrong that has not been handled
-  'C'
 
   $ diff test.csv $TESTDIR/reference/confidence_scores.csv
