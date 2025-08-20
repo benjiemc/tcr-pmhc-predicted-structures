@@ -1,7 +1,6 @@
 """Extract confidence metrics from alphafold3 structures."""
 
 import argparse
-import contextlib
 import json
 import logging
 import os
@@ -449,11 +448,11 @@ def collect_raw_scores(confidence_paths: list[str], sequence_paths: list[str]) -
             confidence = json.load(fh)
 
         with open(
-            [
+            next(
                 sequence_path
                 for sequence_path in sequence_paths
                 if name['structure_name'] == os.path.basename(sequence_path).split('.')[0]
-            ][0],
+            ),
             'r',
         ) as fh:
             input_data = json.load(fh)
@@ -476,9 +475,7 @@ def collect_raw_scores(confidence_paths: list[str], sequence_paths: list[str]) -
         scores['tcr_pmhc_plddt_score'] = np.mean(plddt_scores)
 
         logger.debug('Collecting specific pLDDT scores')
-        specifc_plddt_scores, atom_chain_ids, atom_res_ids = collect_specific_plddt_scores(
-            confidence, input_sequences
-        )
+        specifc_plddt_scores, atom_chain_ids, atom_res_ids = collect_specific_plddt_scores(confidence, input_sequences)
         scores['cdr_pmhc_plddt_score'] = np.mean(specifc_plddt_scores)
 
         logger.debug('Computing AlphaBridge scores')
