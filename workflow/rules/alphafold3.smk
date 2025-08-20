@@ -7,7 +7,7 @@ envvars:
     "ALPHAFOLD_DATA_DIR",
     "ALPHAFOLD3_WEIGHTS_DIR"
 
-def _get_json_names(path: str) -> list[str]:
+def _get_json_names(template: str, path: str) -> list[str]:
     if not os.path.exists(path):
         print(path, 'does not exist!')
         return []
@@ -16,7 +16,7 @@ def _get_json_names(path: str) -> list[str]:
         reader = csv.DictReader(fh)
         indices = [entry['index'] for entry in reader]
 
-    return expand("data/interim/sequences-af3/{name}_{{seed}}.json", name=indices)
+    return expand(template, name=indices)
 
 def _get_sequence_id_path_names(path: str, template: str) -> list[str]:
     if not os.path.exists(path):
@@ -35,7 +35,7 @@ rule create_af3_jsons:
         unpaired_msas=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/msas/{name}_paired.a3m'),
         paired_msas=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/msas/{name}_unpaired.a3m'),
         templates=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/templates/{name}')
-    output: _get_json_names("data/interim/sequences_sample.csv")
+    output: _get_json_names("data/interim/sequences-af3/{name}_{{seed}}.json", "data/interim/sequences_sample.csv")
     shell:
         """
         out_dir_name=$(dirname {output[0]})
@@ -149,11 +149,96 @@ def _get_af3_names(path: str, template: str, seed: int) -> list[str]:
 rule create_af3_structures:
     input: _get_af3_names("data/interim/sequences_sample.csv", "data/interim/structures-af3/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
 
+rule create_af3_jsons_tcrmodel2_data:
+    input:
+        sequences="data/interim/sequences_full.csv",
+        sequence_key="data/interim/sequence_key.txt",
+        unpaired_msas=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/tcrmodel2-msas/{name}_paired.a3m'),
+        paired_msas=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/tcrmodel2-msas/{name}_unpaired.a3m'),
+        templates=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/tcrmodel2-templates/{name}')
+    output: _get_json_names("data/interim/tcrmodel2-sequences-af3/{name}_{{seed}}.json", "data/interim/sequences_sample.csv")
+    shell:
+        """
+        out_dir_name=$(dirname {output[0]})
+
+        python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
+            --log-level {config[log_level]} \
+            --format alphafold3 \
+             --alphafold3-model-seeds {wildcards.seed} \
+            --sequence-key {input.sequence_key} \
+            --relative-paths \
+            --unpaired-msa-paths {input.unpaired_msas} \
+            --paired-msa-paths {input.paired_msas} \
+            --template-paths {input.templates} \
+            -o $out_dir_name \
+            {input.sequences}
+        """
+
+rule run_alphafold_predictions_with_tcrmodel2_data:
+    input:
+        sequence="data/interim/tcrmodel2-sequences-af3/{name}_{seed}.json",
+        unpaired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/tcrmodel2-msas/{key}_unpaired.a3m"),
+        paired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/tcrmodel2-msas/{key}_paired.a3m"),
+        templates=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/tcrmodel2-templates/{key}")
+    output:
+        structures=expand("data/interim/tcrmodel2-structures-af3/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5)),
+        summary_confidences=expand("data/interim/tcrmodel2-structures-af3/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5)),
+        confidences=expand("data/interim/tcrmodel2-structures-af3/{{name}}_seed-{{seed}}_sample-{sample}_confidences.json", sample=range(5))
+    params:
+        alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
+    shell:
+        """
+        input_dir_abs=$TMPDIR/{wildcards.name}/input
+        temp_output_dir_abs=$TMPDIR/{wildcards.name}/output
+        if [ -d $input_dir_abs ]; then
+            rm -r $input_dir_abs
+        fi
+        if [ -d $temp_output_dir_abs ]; then
+            rm -r $temp_output_dir_abs
+        fi
+        mkdir -p $input_dir_abs $temp_output_dir_abs
+
+        cp {input.sequence} $input_dir_abs
+        cp {input.unpaired_msas} $input_dir_abs
+        cp {input.paired_msas} $input_dir_abs
+        cp -r {input.templates} $input_dir_abs
+
+        mkdir -p $(dirname {output.structures[0]})
+
+        input_file_name="$(basename {input.sequence})"
+
+        apptainer exec \
+            --nv \
+            --bind $input_dir_abs:/root/input \
+            --bind $temp_output_dir_abs:/root/output \
+            --bind {params.alphafold3_weights_dir}:/root/models \
+            containers/alphafold3.sif \
+            python third_party/alphafold3/run_alphafold.py \
+                --norun_data_pipeline \
+                --json_path=/root/input/$input_file_name \
+                --model_dir=/root/models \
+                --output_dir=/root/output
+
+        output_dir=$(dirname {output.structures[0]})
+        mkdir -p $output_dir
+
+        for sample_num in {{0..4}}; do
+            prediction_dir="${{temp_output_dir_abs}}/{wildcards.name}/seed-{wildcards.seed}_sample-${{sample_num}}"
+
+            mv "$prediction_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_model.cif" $output_dir
+            mv "$prediction_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_summary_confidences.json" $output_dir
+            mv "$prediction_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_confidences.json" $output_dir
+        done
+        """
+
+rule create_af3_structures_with_tcrmodel2_data:
+    input: _get_af3_names("data/interim/sequences_sample.csv", "data/interim/tcrmodel2-structures-af3/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
+
 rule aggregate_af3_confidence_scores:
     input:
         summary_confidences=_get_af3_names("data/interim/sequences_sample.csv", "data/interim/structures-af3/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", seed),
         confidences=_get_af3_names("data/interim/sequences_sample.csv", "data/interim/structures-af3/{name}_seed-{seed}_sample-{sample}_confidences.json", seed),
-        sequences=expand(_get_json_names("data/interim/sequences_sample.csv"), seed=seed)
+        sequences=expand(_get_json_names("data/interim/sequences-af3/{name}_{{seed}}.json", "data/interim/sequences_sample.csv"), seed=seed)
     output: "data/interim/af3_confidence_scores.csv"
     shell:
         """

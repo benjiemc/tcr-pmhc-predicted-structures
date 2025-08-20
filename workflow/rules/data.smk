@@ -102,7 +102,13 @@ rule run_create_af3_msas_and_find_templates:
         paired_msa='data/interim/msas/{name}_paired.a3m',
         templates=directory('data/interim/templates/{name}')
     params:
-        alphafold_data_dir=os.environ['ALPHAFOLD_DATA_DIR']
+        alphafold_data_dir=os.environ['ALPHAFOLD_DATA_DIR'],
+        uniref90_database_path=lambda wildcards: "${DB_DIR}/uniref90_2022_05.fa",
+        mgnify_database_path=lambda wildcards: "${DB_DIR}/mgy_clusters_2022_05.fa",
+        small_bfd_database_path=lambda wildcards: "${DB_DIR}/bfd-first_non_consensus_sequences.fasta",
+        uniprot_cluster_annot_database_path=lambda wildcards: "${DB_DIR}/uniprot_all_2021_04.fa",
+        seqres_database_path=lambda wildcards: "${DB_DIR}/pdb_seqres_2022_09_28.fasta",
+        pdb_database_path=lambda wildcards: "${DB_DIR}/mmcif_files"
     threads: 32
     script: "../scripts/create_msas_and_find_templates.py"
 
@@ -155,6 +161,28 @@ rule run_create_colabfold_msas_and_find_templates:
 
 rule create_colabfold_msas_and_find_templates:
     input: _create_msa_names("data/interim/sequence_key.txt", 'data/interim/colabfold-msas/{name}.a3m')
+
+rule run_create_tcrmodel2_msas_and_find_templates:
+    input: "data/interim/msa-inputs/{name}.json"
+    output:
+        unpaired_msa='data/interim/tcrmodel2-msas/{name}_unpaired.a3m',
+        paired_msa='data/interim/tcrmodel2-msas/{name}_paired.a3m',
+        templates=directory('data/interim/tcrmodel2-templates/{name}')
+    params:
+        alphafold_data_dir=os.environ['TCRMODEL2_ALPHAFOLD_DATA_DIR'],
+        uniref90_database_path=lambda wildcards: "${DB_DIR}/uniref90.tcrmhc.fasta",
+        mgnify_database_path=lambda wildcards: "${DB_DIR}/mgnify.fasta",
+        small_bfd_database_path=lambda wildcards: "${DB_DIR}/small_bfd.tcrmhc.fasta",
+        uniprot_cluster_annot_database_path=lambda wildcards: "${DB_DIR}/uniprot.tcrmhc.fasta",
+        seqres_database_path=lambda wildcards: "${DB_DIR}/pdb_seqres.txt",
+        pdb_database_path=lambda wildcards: "${DB_DIR}/pdb_mmcif/mmcif_files"
+    threads: 32
+    benchmark:
+        "data/benchmarks/msa-generation_alphafold3_tcrmodel2_{name}.tsv"
+    script: "../scripts/create_msas_and_find_templates.py"
+
+rule create_tcrmodel2_msas_and_find_templates:
+    input: _create_msa_names("data/interim/sequence_key.txt", 'data/interim/tcrmodel2-msas/{name}_unpaired.a3m')
 
 def create_paths(summary_file: str, path_name: str) -> list[str]:
     if not os.path.exists(summary_file):
