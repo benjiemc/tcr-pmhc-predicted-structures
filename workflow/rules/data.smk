@@ -111,6 +111,8 @@ rule run_create_af3_msas_and_find_templates:
         uniprot_cluster_annot_database_path=lambda wildcards: "${DB_DIR}/uniprot_all_2021_04.fa",
         seqres_database_path=lambda wildcards: "${DB_DIR}/pdb_seqres_2022_09_28.fasta",
         pdb_database_path=lambda wildcards: "${DB_DIR}/mmcif_files"
+    benchmark:
+        "data/benchmarks/msa-generation_alphafold3_{name}.tsv"
     threads: 32
     script: "../scripts/create_msas_and_find_templates.py"
 
