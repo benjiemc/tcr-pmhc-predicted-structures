@@ -95,7 +95,12 @@ rule run_alphafold_predictions:
         """
         input_dir_abs=$TMPDIR/{wildcards.name}/input
         temp_output_dir_abs=$TMPDIR/{wildcards.name}/output
-        rm -r $input_dir_abs $temp_output_dir_abs
+        if [ -d $input_dir_abs ]; then
+            rm -r $input_dir_abs
+        fi
+        if [ -d $temp_output_dir_abs ]; then
+            rm -r $temp_output_dir_abs
+        fi
         mkdir -p $input_dir_abs $temp_output_dir_abs
 
         cp {input.sequence} $input_dir_abs
@@ -109,8 +114,8 @@ rule run_alphafold_predictions:
 
         apptainer exec \
             --nv \
-            --bind $input_dir_abs:/root/input
-            --bind $temp_output_dir_abs:/root/output
+            --bind $input_dir_abs:/root/input \
+            --bind $temp_output_dir_abs:/root/output \
             --bind {params.alphafold3_weights_dir}:/root/models \
             containers/alphafold3.sif \
             python third_party/alphafold3/run_alphafold.py \
