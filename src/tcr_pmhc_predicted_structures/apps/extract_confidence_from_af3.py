@@ -451,7 +451,7 @@ def collect_raw_scores(confidence_paths: list[str], sequence_paths: list[str]) -
             next(
                 sequence_path
                 for sequence_path in sequence_paths
-                if name['structure_name'] == os.path.basename(sequence_path).split('.')[0]
+                if name['structure_name'] == os.path.basename(sequence_path).split('.')[0].split('_')[0]
             ),
             'r',
         ) as fh:
