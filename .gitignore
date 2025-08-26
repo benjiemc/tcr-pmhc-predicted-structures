@@ -19,6 +19,7 @@ data/processed/*
 **/.pytest_cache/*
 **/*.t.err
 **/.coverage
+.venv/*
 
 # Snakemake Files
 **/.snakemake/*
