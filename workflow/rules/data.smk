@@ -63,6 +63,29 @@ rule create_sequence_key:
         paste -d ' ' <(cat $TEMPDIR/sequences.txt | xargs -I {{}} sh -c 'echo -n "{{}}" | sha256sum | cut -c1-8') $TEMPDIR/sequences.txt > {output}
         """
 
+def _get_complex_names(path: str, template: str) -> list[str]:
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
+
+    with open(path, 'r') as fh:
+        indices = [entry['index'] for entry in csv.DictReader(fh)]
+
+    return expand(template, name=indices)
+
+rule convert_sequences_to_jsons:
+    input: "data/interim/sequences_full.csv"
+    output: _get_complex_names("data/interim/sequences_sample.csv", "data/interim/sequences/{name}.json")
+    run:
+        output_dir = os.path.dirname(output[0])
+        os.makedirs(output_dir, exist_ok=True)
+
+        with open(input[0], 'r') as fh:
+            reader = csv.DictReader(fh)
+            for entry in reader:
+                with open(os.path.join(output_dir, f"{entry['id']}.json"), 'w') as output_fh:
+                    json.dump(entry, output_fh)
+
 def _create_msa_names(path: str, template: list[str]) -> list[str]:
     if not os.path.exists(path):
         print(path, 'does not exist!')

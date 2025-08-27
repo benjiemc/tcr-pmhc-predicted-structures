@@ -1,7 +1,6 @@
 """Convert sequence data into different formats for structure prediction methods."""
 
 import argparse
-import csv
 import glob
 import json
 import logging
@@ -28,7 +27,7 @@ parser = argparse.ArgumentParser(
     formatter_class=argparse.RawDescriptionHelpFormatter,
 )
 
-parser.add_argument('input', help='path to input csv')
+parser.add_argument('inputs', nargs='+', help='path to input json files')
 parser.add_argument('--output', '-o', required=True, help='')
 parser.add_argument('--format', required=True, choices=['alphafold3', 'chai'], help='Model to generate input files for')
 parser.add_argument(
@@ -303,9 +302,13 @@ def main() -> None:
     args = parser.parse_args()
     setup_logger(logger, args.log_level)
 
-    logger.info('Loading sequences from %s', args.input)
-    with open(args.input, 'r') as fh:
-        sequences = list(csv.DictReader(fh))
+    logger.info('Loading sequences')
+    sequences = []
+    for path in args.inputs:
+        logger.debug('Loading sequences from %s', path)
+
+        with open(path, 'r') as fh:
+            sequences.append(json.load(fh))
 
     if args.sequence_key_path:
         logger.info('Loading sequence keys from %s', args.sequence_key_path)

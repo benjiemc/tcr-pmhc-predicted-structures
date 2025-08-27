@@ -3,7 +3,7 @@ Create AF3 output
   > --log-level error \
   > --format alphafold3 \
   > -o jsons \
-  > $TESTDIR/data/sequences.csv
+  > $TESTDIR/data/0.json $TESTDIR/data/1.json $TESTDIR/data/2.json $TESTDIR/data/3.json $TESTDIR/data/4.json $TESTDIR/data/5.json
 
   $ jq --sort-keys . jsons/0_1.json > test
   $ jq --sort-keys . $TESTDIR/reference/alphafold3/0.json > ref
@@ -39,7 +39,7 @@ Create AF3 inputs with paths
   > --paired-msa-paths $TESTDIR/data/msas/*_paired.a3m \
   > --template-paths $TESTDIR/data/templates/* \
   > -o jsons-paths \
-  > $TESTDIR/data/sequences.csv
+  > $TESTDIR/data/0.json $TESTDIR/data/1.json $TESTDIR/data/2.json $TESTDIR/data/3.json $TESTDIR/data/4.json $TESTDIR/data/5.json
 
   $ jq --sort-keys . jsons-paths/0_1.json > test
   $ jq --sort-keys . $TESTDIR/reference/alphafold3/0_path.json > ref
@@ -69,7 +69,7 @@ Create chai input
   $ python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
   > --format chai \
   > -o chai \
-  > $TESTDIR/data/sequences.csv
+  > $TESTDIR/data/0.json $TESTDIR/data/1.json $TESTDIR/data/2.json $TESTDIR/data/3.json $TESTDIR/data/4.json $TESTDIR/data/5.json
 
   $ diff chai/0.fasta $TESTDIR/reference/chai/0.fasta
   $ diff chai/1.fasta $TESTDIR/reference/chai/1.fasta
@@ -83,7 +83,7 @@ Create chai input with restraints.
   > --format chai \
   > --chai-restraints $TESTDIR/data/restraints.csv \
   > -o chai-with-restraints \
-  > $TESTDIR/data/sequences.csv
+  > $TESTDIR/data/0.json $TESTDIR/data/1.json $TESTDIR/data/2.json $TESTDIR/data/3.json $TESTDIR/data/4.json $TESTDIR/data/5.json
 
   $ diff chai-with-restraints/0.fasta $TESTDIR/reference/chai/0.fasta
   $ diff chai-with-restraints/1.fasta $TESTDIR/reference/chai/1.fasta

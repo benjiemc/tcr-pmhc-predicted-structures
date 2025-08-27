@@ -17,24 +17,33 @@ def _get_json_names(template: str, path: str) -> list[str]:
 
     return expand(template, name=indices)
 
-def _get_sequence_id_path_names(path: str, template: str) -> list[str]:
-    if not os.path.exists(path):
-        print(path, 'does not exist!')
+def lookup_sequence_ids(sequence_path: str, sequence_key_path: str, template: str) -> list[str]:
+    if not os.path.exists(sequence_path):
+        print(sequence_path, 'does not exist!')
         return []
 
-    with open(path, 'r') as fh:
-        ids = [line.split()[0] for line in fh.readlines() if line]
+    with open(sequence_path, 'r') as fh:
+        sequences = json.load(fh)
+
+    if not os.path.exists(sequence_key_path):
+        print(sequence_key_path, 'does not exist!')
+        return []
+
+    with open(sequence_key_path, 'r') as fh:
+        sequence_key = {sequence: key for key, sequence in (line.split() for line in fh if line)}
+
+    ids = [sequence_key[sequence] for sequence in sequences.values() if sequence in sequence_key]
 
     return expand(template, name=ids)
 
-rule create_af3_jsons:
+rule run_create_af3_jsons:
     input:
-        sequences="data/interim/sequences_full.csv",
+        sequences="data/interim/sequences/{name}.json",
         sequence_key="data/interim/sequence_key.txt",
-        unpaired_msas=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/msas/{name}_paired.a3m'),
-        paired_msas=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/msas/{name}_unpaired.a3m'),
-        templates=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/templates/{name}')
-    output: _get_json_names("data/interim/sequences_af3_af3/{name}_{{seed}}.json", "data/interim/sequences_sample.csv")
+        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas/{name}_paired.a3m'),
+        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas/{name}_unpaired.a3m'),
+        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/templates/{name}')
+    output: "data/interim/sequences_af3_af3/{name}_{seed}.json"
     shell:
         """
         out_dir_name=$(dirname {output[0]})
@@ -51,6 +60,9 @@ rule create_af3_jsons:
             -o $out_dir_name \
             {input.sequences}
         """
+
+rule create_af3_jsons:
+    input: _get_json_names("data/interim/sequences_af3_af3/{name}_{{seed}}.json", "data/interim/sequences_sample.csv")
 
 def _get_required_msas(wildcards, path, sequence_key_path, template) -> list[str]:
     if not os.path.exists(path):
@@ -148,14 +160,14 @@ def _get_af3_names(path: str, template: str, seed: int) -> list[str]:
 rule create_af3_structures:
     input: _get_af3_names("data/interim/sequences_sample.csv", "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
 
-rule create_af3_jsons_tcrmodel2_data:
+rule run_create_af3_jsons_tcrmodel2_data:
     input:
-        sequences="data/interim/sequences_full.csv",
+        sequences="data/interim/sequences/{name}.json",
         sequence_key="data/interim/sequence_key.txt",
-        unpaired_msas=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/tcrmodel2-msas/{name}_paired.a3m'),
-        paired_msas=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/tcrmodel2-msas/{name}_unpaired.a3m'),
-        templates=_get_sequence_id_path_names("data/interim/sequence_key.txt", 'data/interim/tcrmodel2-templates/{name}')
-    output: _get_json_names("data/interim/sequences_af3_tcrmodel2/{name}_{{seed}}.json", "data/interim/sequences_sample.csv")
+        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/tcrmodel2-msas/{name}_paired.a3m'),
+        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/tcrmodel2-msas/{name}_unpaired.a3m'),
+        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/tcrmodel2-templates/{name}')
+    output: "data/interim/sequences_af3_tcrmodel2/{name}_{seed}.json"
     shell:
         """
         out_dir_name=$(dirname {output[0]})
@@ -172,6 +184,9 @@ rule create_af3_jsons_tcrmodel2_data:
             -o $out_dir_name \
             {input.sequences}
         """
+
+rule create_af3_jsons_tcrmodel2_data:
+    input: _get_json_names("data/interim/sequences_af3_tcrmodel2/{name}_{{seed}}.json", "data/interim/sequences_sample.csv")
 
 rule run_alphafold_predictions_with_tcrmodel2_data:
     input:
