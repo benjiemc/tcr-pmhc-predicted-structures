@@ -6,6 +6,9 @@ seed = config.get('seed', [1])
 envvars:
     "ALPHAFOLD3_WEIGHTS_DIR"
 
+wildcard_constraints:
+    sample_size="\d+"
+
 def _get_json_names(template: str, path: str) -> list[str]:
     if not os.path.exists(path):
         print(path, 'does not exist!')
@@ -60,9 +63,6 @@ rule run_create_af3_jsons:
             -o $out_dir_name \
             {input.sequences}
         """
-
-rule create_af3_jsons:
-    input: _get_json_names("data/interim/sequences_af3_af3/{name}_{{seed}}.json", "data/interim/sequences_sample.csv")
 
 def _get_required_msas(wildcards, path, sequence_key_path, template) -> list[str]:
     if not os.path.exists(path):
@@ -157,8 +157,9 @@ def _get_af3_names(path: str, template: str, seed: int) -> list[str]:
 
     return expand(template, name=indices, seed=seed, sample=range(5))
 
-rule create_af3_structures:
-    input: _get_af3_names("data/interim/sequences_sample.csv", "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
+
+rule create_af3_structures_sample_size_50:
+    input: _get_af3_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
 
 rule run_create_af3_jsons_tcrmodel2_data:
     input:
@@ -184,9 +185,6 @@ rule run_create_af3_jsons_tcrmodel2_data:
             -o $out_dir_name \
             {input.sequences}
         """
-
-rule create_af3_jsons_tcrmodel2_data:
-    input: _get_json_names("data/interim/sequences_af3_tcrmodel2/{name}_{{seed}}.json", "data/interim/sequences_sample.csv")
 
 rule run_alphafold_predictions_with_tcrmodel2_data:
     input:
@@ -245,15 +243,16 @@ rule run_alphafold_predictions_with_tcrmodel2_data:
         done
         """
 
-rule create_af3_structures_with_tcrmodel2_data:
-    input: _get_af3_names("data/interim/sequences_sample.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
+
+rule create_af3_structures_with_tcrmodel2_data_sample_size_50:
+    input: _get_af3_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
 
 rule aggregate_af3_confidence_scores:
     input:
-        summary_confidences=_get_af3_names("data/interim/sequences_sample.csv", "data/interim/structures_{{method}}_{{data}}/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", seed),
-        confidences=_get_af3_names("data/interim/sequences_sample.csv", "data/interim/structures_{{method}}_{{data}}/{name}_seed-{seed}_sample-{sample}_confidences.json", seed),
-        sequences=expand(_get_json_names("data/interim/sequences_{{{{method}}}}_{{{{data}}}}/{name}_{{seed}}.json", "data/interim/sequences_sample.csv"), seed=seed)
-    output: "data/interim/confidence_scores_{method}_{data}.csv"
+        summary_confidences=lambda wildcards: _get_af3_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/structures_{{method}}_{{data}}/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", seed),
+        confidences=lambda wildcards: _get_af3_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/structures_{{method}}_{{data}}/{name}_seed-{seed}_sample-{sample}_confidences.json", seed),
+        sequences=lambda wildcards: expand(_get_json_names("data/interim/sequences_{{{{method}}}}_{{{{data}}}}/{name}_{{seed}}.json", "data/interim/sequences_sample_{wildcarsd.sample_size}.csv"), seed=seed)
+    output: "data/interim/confidence_scores_{method}_{data}_{sample_size}.csv"
     shell:
         """
         python -m tcr_pmhc_predicted_structures.apps.extract_confidence_from_af3 \
@@ -307,9 +306,9 @@ def _get_ipsaes_names(path: str, seeds: list[int], distance_cutoff: float, pae_c
 
 rule add_ipsaes_to_confidence_scores:
     input:
-        confidence_scores="data/interim/confidence_scores_{method}_{data}.csv",
-        ipaes=_get_ipsaes_names("data/interim/sequences_sample.csv", seeds=[1], distance_cutoff=10, pae_cutoff=10)
-    output: "data/processed/confidence_scores_{method}_{data}.csv"
+        confidence_scores="data/interim/confidence_scores_{method}_{data}_{sample_size}.csv",
+        ipaes=lambda wildcards: _get_ipsaes_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", seeds=[1], distance_cutoff=10, pae_cutoff=10)
+    output: "data/processed/confidence_scores_{method}_{data}_{sample_size}.csv"
     run:
         import pandas as pd
 
@@ -365,8 +364,8 @@ def _get_af3_structural_features_names(path: str, seeds: list) -> list[str]:
     return [f"data/interim/{name}_{seed}_{sample}_structural_summary.json" for name in indices for seed in seeds for sample in range(5)]
 
 rule aggregate_af3_structural_features:
-    input: _get_af3_structural_features_names("data/interim/sequences_sample.csv", [1])
-    output: "data/processed/af3_structural_features.csv"
+    input: lambda wildcards: _get_af3_structural_features_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", [1])
+    output: "data/processed/af3_structural_features_{sample_size}.csv"
     run:
         import json
         import pandas as pd
@@ -417,11 +416,12 @@ def _get_processed_structure_names(path: str, template: str, seeds: list) -> lis
 
     return expand(template, name=indices, seed=seeds, sample=list(range(5)))
 
-rule process_af3_structures:
-    input: _get_processed_structure_names("data/interim/sequences_sample.csv", "data/processed/structures_af3_af3/{name}_{seed}_{sample}.pdb", [1])
 
-rule process_af3_structures_with_tcrmodel2_data:
-    input: _get_processed_structure_names("data/interim/sequences_sample.csv", "data/processed/structures_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", [1])
+rule process_af3_structures_sample_size_50:
+    input: _get_processed_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_af3_af3/{name}_{seed}_{sample}.pdb", [1])
+
+rule process_af3_structures_with_tcrmodel2_data_sample_size_50:
+    input: _get_processed_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", [1])
 
 rule create_contact_map:
     input: "data/processed/structures_af3_af3/{name}_{seed}_{sample}.pdb"
@@ -437,7 +437,7 @@ rule create_contact_map:
             {input}
         """
 
-def _get_af3_contact_maps(path: str, seeds: list) -> list[str]:
+def _get_af3_contact_maps(path: str, template: str, seeds: list) -> list[str]:
     if not os.path.exists(path):
         print(path, 'does not exist!')
         return []
@@ -445,11 +445,12 @@ def _get_af3_contact_maps(path: str, seeds: list) -> list[str]:
     with open(path, 'r') as fh:
         indices = [entry['index'] for entry in csv.DictReader(fh)]
 
-    return [f"data/interim/{name}_{seed}_{sample}_contacts.csv" for name in indices for seed in seeds for sample in range(5)]
+    return [template.format(name=name, seed=seed, sample=sample) for name in indices for seed in seeds for sample in range(5)]
+
 
 rule aggregate_contact_maps:
-    input: _get_af3_contact_maps("data/interim/sequences_sample.csv", [1])
-    output: "data/processed/af3_contact_maps.csv"
+    input: lambda wildcards: _get_af3_contact_maps(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/{name}_{seed}_{sample}_contacts.csv", [1])
+    output: "data/processed/af3_contact_maps_{sample_size}.csv"
     run:
         import pandas as pd
 
@@ -483,8 +484,8 @@ def _get_af3_interactions(path: str, seeds: list) -> list[str]:
     return [f"data/interim/{name}_{seed}_{sample}_interactions.csv" for name in indices for seed in seeds for sample in range(5)]
 
 rule aggregate_af3_interactions:
-    input: _get_af3_interactions("data/interim/sequences_sample.csv", [1])
-    output: "data/processed/af3_interactions.csv"
+    input: lambda wildcards: _get_af3_interactions(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", [1])
+    output: "data/processed/af3_interactions_{sample_size}.csv"
     run:
         import pandas as pd
 

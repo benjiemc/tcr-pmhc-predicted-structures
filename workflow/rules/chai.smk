@@ -18,7 +18,7 @@ rule create_chai_sequences_and_restraints:
     input:
         sequences="data/interim/sequences_full.csv",
         restraints="data/processed/tcr_pmhc_distance_restaints.csv"
-    output: _get_chai_names('data/interim/sequences_sample.csv')
+    output: _get_chai_names('data/interim/sequences_sample_50.csv')
     shell:
         """
         python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
@@ -127,7 +127,7 @@ def _get_chai_names(path: str) -> list[str]:
         return [f"data/interim/structures-chai/{entry['index']}" for entry in csv.DictReader(fh)]
 
 rule create_chai_structures:
-    input: _get_chai_names("data/interim/sequences_sample.csv")
+    input: _get_chai_names("data/interim/sequences_sample_50.csv")
 
 def _get_chai_restraints_names(path: str) -> list[str]:
     if not os.path.exists(path):
@@ -138,4 +138,4 @@ def _get_chai_restraints_names(path: str) -> list[str]:
         return [f"data/interim/structures-chai-restraints/{entry['index']}" for entry in csv.DictReader(fh)]
 
 rule create_chai_structures_with_restraints:
-    input: _get_chai_restraints_names("data/interim/sequences_sample.csv")
+    input: _get_chai_restraints_names("data/interim/sequences_sample_50.csv")

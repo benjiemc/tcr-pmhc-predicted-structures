@@ -7,19 +7,21 @@ envvars:
     "TCRMODEL2_ALPHAFOLD_DATA_DIR",
     "COLABFOLD_DATA_DIR"
 
+wildcard_constraints:
+    sample_size="\d+"
+
 rule sample_sequences:
     input: "data/raw/sequences_pMHC_split.csv"
-    output: "data/interim/sequences_sample.csv"
+    output: "data/interim/sequences_sample_{sample_size}.csv"
     params:
-        seed=123,
-        sample_size=50
+        seed=123
     run:
         import pandas as pd
 
         sequences = pd.read_csv(input[0], index_col='index')
 
         num_folds = len(sequences['fold'].unique())
-        folds_sample_size = params.sample_size // num_folds
+        folds_sample_size = int(wildcards.sample_size) // num_folds
         group_sample_size = folds_sample_size // 2
 
         sequences_sample = sequences.groupby(['fold', 'label']).sample(group_sample_size, random_state=params.seed)
@@ -27,7 +29,7 @@ rule sample_sequences:
 
 rule create_full_length_sequences:
     input:
-        sequences="data/interim/sequences_sample.csv",
+        sequences="data/raw/sequences_pMHC_split.csv",
         mhc_sequences=expand("data/external/hla_sequences/{mhc}.json", mhc=[
                 'h2_d',
                 'h2_k',
@@ -75,7 +77,7 @@ def _get_complex_names(path: str, template: str) -> list[str]:
 
 rule convert_sequences_to_jsons:
     input: "data/interim/sequences_full.csv"
-    output: _get_complex_names("data/interim/sequences_sample.csv", "data/interim/sequences/{name}.json")
+    output: _get_complex_names(f"data/raw/sequences_pMHC_split.csv", "data/interim/sequences/{name}.json")
     run:
         output_dir = os.path.dirname(output[0])
         os.makedirs(output_dir, exist_ok=True)
@@ -98,7 +100,7 @@ def _create_msa_names(path: str, template: list[str]) -> list[str]:
 
 rule create_af3_msa_inputs:
     input: "data/interim/sequence_key.txt"
-    output: _create_msa_names("data/interim/sequence_key.txt", 'data/interim/msa-inputs/{name}.json')
+    output: _create_msa_names(f"data/interim/sequence_key.txt", 'data/interim/msa-inputs/{name}.json')
     run:
         output_dir = os.path.dirname(output[0])
         if not os.path.exists(output_dir):
@@ -139,8 +141,38 @@ rule run_create_af3_msas_and_find_templates:
     threads: 32
     script: "../scripts/create_msas_and_find_templates.py"
 
-rule create_af3_msas_and_find_templates:
-    input: _create_msa_names("data/interim/sequence_key.txt", 'data/interim/msas/{name}_unpaired.a3m')
+def _get_msas_for_sample(sample_path: str, full_sequence_path: str, sequence_key_path: str, template: str) -> list[str]:
+    flag = False
+    for path in sample_path, full_sequence_path, sequence_key_path:
+        if not os.path.exists(path):
+            print(sample_path, 'does not exist!')
+            flag = True
+
+    if flag:
+        return []
+
+    with open(sample_path, 'r') as fh:
+        reader = csv.DictReader(fh)
+        ids = [entry['index'] for entry in reader]
+
+    with open(full_sequence_path, 'r') as fh:
+        reader = csv.DictReader(fh)
+        sequences = [
+            entry[chain_name]
+            for entry in reader
+            if entry['id'] in ids
+            for chain_name in ('tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2')
+        ]
+
+    with open(sequence_key_path, 'r') as fh:
+        sequence_key = {sequence: key for key, sequence in (line.split() for line in fh if line)}
+
+    names = [sequence_key[sequence] for sequence in sequences]
+
+    return expand(template, name=names)
+
+rule create_af3_msas_and_find_templates_sample_size_50:
+    input: _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas/{name}_unpaired.a3m')
 
 rule create_colabfold_msa_inputs:
     input: "data/interim/sequence_key.txt"
@@ -186,8 +218,8 @@ rule run_create_colabfold_msas_and_find_templates:
         mv $working_dir/pdb100_230517.m8 {output.templates}
         """
 
-rule create_colabfold_msas_and_find_templates:
-    input: _create_msa_names("data/interim/sequence_key.txt", 'data/interim/colabfold-msas/{name}.a3m')
+rule create_colabfold_msas_and_find_templates_sample_size_50:
+    input: _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/colabfold-msas/{name}.a3m')
 
 rule run_create_tcrmodel2_msas_and_find_templates:
     input: "data/interim/msa-inputs/{name}.json"
@@ -208,8 +240,8 @@ rule run_create_tcrmodel2_msas_and_find_templates:
         "data/benchmarks/msa-generation_alphafold3_tcrmodel2_{name}.tsv"
     script: "../scripts/create_msas_and_find_templates.py"
 
-rule create_tcrmodel2_msas_and_find_templates:
-    input: _create_msa_names("data/interim/sequence_key.txt", 'data/interim/tcrmodel2-msas/{name}_unpaired.a3m')
+rule create_tcrmodel2_msas_and_find_templates_sample_size_50:
+    input: _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/tcrmodel2-msas/{name}_unpaired.a3m')
 
 def create_paths(summary_file: str, path_name: str) -> list[str]:
     if not os.path.exists(summary_file):
