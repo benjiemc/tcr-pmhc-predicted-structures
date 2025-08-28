@@ -112,7 +112,7 @@ def _create_msa_names(path: str, template: list[str]) -> list[str]:
 
 rule create_af3_msa_inputs:
     input: "data/interim/sequence_key.txt"
-    output: _create_msa_names(f"data/interim/sequence_key.txt", 'data/interim/msa-inputs/{name}.json')
+    output: _create_msa_names(f"data/interim/sequence_key.txt", 'data/interim/msa-inputs_af3_af3/{name}.json')
     resources:
         runtime="10m",
         mem="1GB"
@@ -138,11 +138,11 @@ rule create_af3_msa_inputs:
                 )
 
 rule run_create_af3_msas_and_find_templates:
-    input: "data/interim/msa-inputs/{name}.json"
+    input: "data/interim/msa-inputs_af3/{name}.json"
     output:
-        unpaired_msa='data/interim/msas/{name}_unpaired.a3m',
-        paired_msa='data/interim/msas/{name}_paired.a3m',
-        templates=directory('data/interim/templates/{name}')
+        unpaired_msa='data/interim/msas_af3_af3/{name}_unpaired.a3m',
+        paired_msa='data/interim/msas_af3_af3/{name}_paired.a3m',
+        templates=directory('data/interim/templates_af3_af3/{name}')
     params:
         alphafold_data_dir=os.environ['ALPHAFOLD_DATA_DIR'],
         uniref90_database_path=lambda wildcards: "${DB_DIR}/uniref90_2022_05.fa",
@@ -190,11 +190,11 @@ def _get_msas_for_sample(sample_path: str, full_sequence_path: str, sequence_key
     return expand(template, name=names)
 
 rule create_af3_msas_and_find_templates_sample_size_50:
-    input: _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas/{name}_unpaired.a3m')
+    input: _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_af3/{name}_unpaired.a3m')
 
 rule create_colabfold_msa_inputs:
     input: "data/interim/sequence_key.txt"
-    output: _create_msa_names("data/interim/sequence_key.txt", "data/interim/colabfold-msa-inputs/{name}.fasta")
+    output: _create_msa_names("data/interim/sequence_key.txt", "data/interim/msa-inputs_mmseq/{name}.fasta")
     resources:
         runtime="10m",
         mem="1GB"
@@ -209,10 +209,10 @@ rule create_colabfold_msa_inputs:
                     output_fh.write(f'>{id_}\n{sequence}\n')
 
 rule run_create_colabfold_msas_and_find_templates:
-    input: "data/interim/colabfold-msa-inputs/{name}.fasta"
+    input: "data/interim/msa-inputs_mmseq/{name}.fasta"
     output:
-        msa='data/interim/colabfold-msas/{name}.a3m',
-        templates='data/interim/colabfold-templates/{name}.m8'
+        msa='data/interim/msas_mmseq_colabfold/{name}.a3m',
+        templates='data/interim/templates_mmseq_colabfold/{name}.m8'
     threads: 32
     resources:
         runtime="5h",
@@ -243,14 +243,14 @@ rule run_create_colabfold_msas_and_find_templates:
         """
 
 rule create_colabfold_msas_and_find_templates_sample_size_50:
-    input: _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/colabfold-msas/{name}.a3m')
+    input: _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_mmseq_colabfold/{name}.a3m')
 
 rule run_create_tcrmodel2_msas_and_find_templates:
-    input: "data/interim/msa-inputs/{name}.json"
+    input: "data/interim/msa-inputs_af3/{name}.json"
     output:
-        unpaired_msa='data/interim/tcrmodel2-msas/{name}_unpaired.a3m',
-        paired_msa='data/interim/tcrmodel2-msas/{name}_paired.a3m',
-        templates=directory('data/interim/tcrmodel2-templates/{name}')
+        unpaired_msa='data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m',
+        paired_msa='data/interim/msas_af3_tcrmodel2/{name}_paired.a3m',
+        templates=directory('data/interim/templates_af3_tcrmodel2/{name}')
     params:
         alphafold_data_dir=os.environ['TCRMODEL2_ALPHAFOLD_DATA_DIR'],
         uniref90_database_path=lambda wildcards: "${DB_DIR}/uniref90.tcrmhc.fasta",
@@ -268,7 +268,7 @@ rule run_create_tcrmodel2_msas_and_find_templates:
     script: "../scripts/create_msas_and_find_templates.py"
 
 rule create_tcrmodel2_msas_and_find_templates_sample_size_50:
-    input: _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/tcrmodel2-msas/{name}_unpaired.a3m')
+    input: _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m')
 
 rule create_tcrmodel2_msas_and_find_templates_sample_size_1500:
     input: _get_msas_for_sample("data/interim/sequences_sample_1500.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m')

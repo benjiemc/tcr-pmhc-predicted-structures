@@ -43,9 +43,9 @@ rule run_create_af3_jsons:
     input:
         sequences="data/interim/sequences/{name}.json",
         sequence_key="data/interim/sequence_key.txt",
-        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas/{name}_paired.a3m'),
-        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas/{name}_unpaired.a3m'),
-        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/templates/{name}')
+        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_af3/{name}_paired.a3m'),
+        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_af3/{name}_unpaired.a3m'),
+        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/templates_af3_af3/{name}')
     output: "data/interim/sequences_af3_af3/{name}_{seed}.json"
     resources:
         runtime="5m",
@@ -96,9 +96,9 @@ def _get_required_msas(wildcards, path, sequence_key_path, template) -> list[str
 rule run_alphafold_predictions:
     input:
         sequence="data/interim/sequences_af3_af3/{name}_{seed}.json",
-        unpaired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/msas/{key}_unpaired.a3m"),
-        paired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/msas/{key}_paired.a3m"),
-        templates=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/templates/{key}")
+        unpaired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/msas_af3_af3/{key}_unpaired.a3m"),
+        paired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/msas_af3_af3/{key}_paired.a3m"),
+        templates=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/templates_af3_af3/{key}")
     output:
         structures=expand("data/interim/structures_af3_af3/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5)),
         summary_confidences=expand("data/interim/structures_af3_af3/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5)),
@@ -172,9 +172,9 @@ rule run_create_af3_jsons_tcrmodel2_data:
     input:
         sequences="data/interim/sequences/{name}.json",
         sequence_key="data/interim/sequence_key.txt",
-        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/tcrmodel2-msas/{name}_paired.a3m'),
-        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/tcrmodel2-msas/{name}_unpaired.a3m'),
-        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/tcrmodel2-templates/{name}')
+        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
+        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
+        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/templates_af3_tcrmodel2/{name}')
     output: "data/interim/sequences_af3_tcrmodel2/{name}_{seed}.json"
     resources:
         runtime="5m",
@@ -199,9 +199,9 @@ rule run_create_af3_jsons_tcrmodel2_data:
 rule run_alphafold_predictions_with_tcrmodel2_data:
     input:
         sequence="data/interim/sequences_af3_tcrmodel2/{name}_{seed}.json",
-        unpaired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/tcrmodel2-msas/{key}_unpaired.a3m"),
-        paired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/tcrmodel2-msas/{key}_paired.a3m"),
-        templates=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/tcrmodel2-templates/{key}")
+        unpaired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/msas_af3_tcrmodel2/{key}_unpaired.a3m"),
+        paired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/msas_af3_tcrmodel2/{key}_paired.a3m"),
+        templates=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/templates_af3_tcrmodel2/{key}")
     output:
         structures=expand("data/interim/structures_af3_tcrmodel2/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5)),
         summary_confidences=expand("data/interim/structures_af3_tcrmodel2/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5)),
