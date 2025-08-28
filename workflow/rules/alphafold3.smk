@@ -47,6 +47,9 @@ rule run_create_af3_jsons:
         paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas/{name}_unpaired.a3m'),
         templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/templates/{name}')
     output: "data/interim/sequences_af3_af3/{name}_{seed}.json"
+    resources:
+        runtime="5m",
+        mem="1GB"
     shell:
         """
         out_dir_name=$(dirname {output[0]})
@@ -102,6 +105,10 @@ rule run_alphafold_predictions:
         confidences=expand("data/interim/structures_af3_af3/{{name}}_seed-{{seed}}_sample-{sample}_confidences.json", sample=range(5))
     params:
         alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
+    resources:
+        runtime="10m",
+        mem="64GB",
+        gpu=1
     shell:
         """
         input_dir_abs=$TMPDIR/{wildcards.name}/input
@@ -169,6 +176,9 @@ rule run_create_af3_jsons_tcrmodel2_data:
         paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/tcrmodel2-msas/{name}_unpaired.a3m'),
         templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/tcrmodel2-templates/{name}')
     output: "data/interim/sequences_af3_tcrmodel2/{name}_{seed}.json"
+    resources:
+        runtime="5m",
+        mem="1GB"
     shell:
         """
         out_dir_name=$(dirname {output[0]})
@@ -198,6 +208,10 @@ rule run_alphafold_predictions_with_tcrmodel2_data:
         confidences=expand("data/interim/structures_af3_tcrmodel2/{{name}}_seed-{{seed}}_sample-{sample}_confidences.json", sample=range(5))
     params:
         alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
+    resources:
+        runtime="10m",
+        mem="64GB",
+        gpu=1
     shell:
         """
         input_dir_abs=$TMPDIR/{wildcards.name}/input
@@ -256,6 +270,9 @@ rule aggregate_af3_confidence_scores:
         confidences=lambda wildcards: _get_af3_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/structures_{{method}}_{{data}}/{name}_seed-{seed}_sample-{sample}_confidences.json", seed),
         sequences=lambda wildcards: expand(_get_json_names("data/interim/sequences_{{{{method}}}}_{{{{data}}}}/{name}_{{seed}}.json", "data/interim/sequences_sample_{wildcarsd.sample_size}.csv"), seed=seed)
     output: "data/interim/confidence_scores_{method}_{data}_{sample_size}.csv"
+    resources:
+        runtime=lambda wildcards : f"{max(-(wildcards.sample_size // -5), 300)}m",
+        mem=lambda wildcards : f"{max(-(wildcards.sample_size // -25), 100)}GB"
     shell:
         """
         python -m tcr_pmhc_predicted_structures.apps.extract_confidence_from_af3 \
@@ -275,6 +292,9 @@ rule compute_ipsae_on_af3_structure:
         "data/interim/ipsaes_{method}_{data}/{name}_seed-{seed}_sample-{sample}_model_{distance_cutoff}_{pae_cutoff}_byres.txt",
         "data/interim/ipsaes_{method}_{data}/{name}_seed-{seed}_sample-{sample}_model_{distance_cutoff}_{pae_cutoff}.pml",
         "data/interim/ipsaes_{method}_{data}/{name}_seed-{seed}_sample-{sample}_model_{distance_cutoff}_{pae_cutoff}.txt"
+    resources:
+        runtime="10m",
+        mem="2GB"
     shell:
         """
         output_dir=$(dirname {output[0]})
@@ -312,6 +332,9 @@ rule add_ipsaes_to_confidence_scores:
         confidence_scores="data/interim/confidence_scores_{method}_{data}_{sample_size}.csv",
         ipaes=lambda wildcards: _get_ipsaes_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", seeds=[1], distance_cutoff=10, pae_cutoff=10)
     output: "data/processed/confidence_scores_{method}_{data}_{sample_size}.csv"
+    resources:
+        runtime="10m",
+        mem="2GB"
     run:
         import pandas as pd
 
@@ -354,6 +377,9 @@ rule add_ipsaes_to_confidence_scores:
 rule summarise_af3_structural_features:
     input: "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif"
     output: temp("data/interim/{name}_{seed}_{sample}_structural_summary.json")
+    resources:
+        runtime="10m",
+        mem="2GB"
     script: "../scripts/summarise_structural_features.py"
 
 def _get_af3_structural_features_names(path: str, seeds: list) -> list[str]:
@@ -369,6 +395,9 @@ def _get_af3_structural_features_names(path: str, seeds: list) -> list[str]:
 rule aggregate_af3_structural_features:
     input: lambda wildcards: _get_af3_structural_features_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", [1])
     output: "data/processed/af3_structural_features_{sample_size}.csv"
+    resources:
+        runtime="10m",
+        mem="1GB"
     run:
         import json
         import pandas as pd
@@ -391,6 +420,9 @@ rule aggregate_af3_structural_features:
 rule process_af3_structure:
     input: "data/interim/structures_{method}_{data}/{name}_seed-{seed}_sample-{sample}_model.cif"
     output: "data/processed/structures_{method}_{data}/{name}_{seed}_{sample}.pdb"
+    resources:
+        runtime="10m",
+        mem="1GB"
     run:
         import warnings
 
@@ -434,6 +466,9 @@ rule create_contact_map:
     output: temp("data/interim/{name}_{seed}_{sample}_contacts.csv")
     params:
         contact_distance=5.0
+    resources:
+        runtime="10m",
+        mem="1GB"
     shell:
         """
         python -m tcr_pmhc_predicted_structures.apps.create_contact_map \
@@ -457,6 +492,9 @@ def _get_af3_contact_maps(path: str, template: str, seeds: list) -> list[str]:
 rule aggregate_contact_maps:
     input: lambda wildcards: _get_af3_contact_maps(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/{name}_{seed}_{sample}_contacts.csv", [1])
     output: "data/processed/af3_contact_maps_{sample_size}.csv"
+    resources:
+        runtime="10m",
+        mem="1GB"
     run:
         import pandas as pd
 
@@ -477,6 +515,9 @@ rule aggregate_contact_maps:
 rule profile_af3_interactions:
     input: "data/processed/structures_af3_af3/{name}_{seed}_{sample}.pdb"
     output: temp("data/interim/{name}_{seed}_{sample}_interactions.csv")
+    resources:
+        runtime="10m",
+        mem="2GB"
     script: "../scripts/profile_interactions.py"
 
 def _get_af3_interactions(path: str, seeds: list) -> list[str]:
@@ -492,6 +533,9 @@ def _get_af3_interactions(path: str, seeds: list) -> list[str]:
 rule aggregate_af3_interactions:
     input: lambda wildcards: _get_af3_interactions(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", [1])
     output: "data/processed/af3_interactions_{sample_size}.csv"
+    resources:
+        runtime="10m",
+        mem="1GB"
     run:
         import pandas as pd
 

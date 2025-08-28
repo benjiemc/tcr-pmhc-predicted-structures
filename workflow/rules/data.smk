@@ -15,6 +15,9 @@ rule sample_sequences:
     output: "data/interim/sequences_sample_{sample_size}.csv"
     params:
         seed=123
+    resources:
+        runtime="10m",
+        mem="1GB"
     run:
         import pandas as pd
 
@@ -42,6 +45,9 @@ rule create_full_length_sequences:
                 'hla_g',
             ])
     output: "data/interim/sequences_full.csv"
+    resources:
+        runtime="20m",
+        mem="1GB"
     shell:
         """
         python -m tcr_pmhc_predicted_structures.apps.create_full_length_sequences \
@@ -54,6 +60,9 @@ rule create_full_length_sequences:
 rule create_sequence_key:
     input: "data/interim/sequences_full.csv"
     output: "data/interim/sequence_key.txt"
+    resources:
+        runtime="1m",
+        mem="1GB"
     shell:
         """
         cat \
@@ -78,6 +87,9 @@ def _get_complex_names(path: str, template: str) -> list[str]:
 rule convert_sequences_to_jsons:
     input: "data/interim/sequences_full.csv"
     output: _get_complex_names(f"data/raw/sequences_pMHC_split.csv", "data/interim/sequences/{name}.json")
+    resources:
+        runtime="10m",
+        mem="1GB"
     run:
         output_dir = os.path.dirname(output[0])
         os.makedirs(output_dir, exist_ok=True)
@@ -101,6 +113,9 @@ def _create_msa_names(path: str, template: list[str]) -> list[str]:
 rule create_af3_msa_inputs:
     input: "data/interim/sequence_key.txt"
     output: _create_msa_names(f"data/interim/sequence_key.txt", 'data/interim/msa-inputs/{name}.json')
+    resources:
+        runtime="10m",
+        mem="1GB"
     run:
         output_dir = os.path.dirname(output[0])
         if not os.path.exists(output_dir):
@@ -139,6 +154,9 @@ rule run_create_af3_msas_and_find_templates:
     benchmark:
         "data/benchmarks/msa-generation_alphafold3_{name}.tsv"
     threads: 32
+    resources:
+        runtime="3h",
+        mem="64GB"
     script: "../scripts/create_msas_and_find_templates.py"
 
 def _get_msas_for_sample(sample_path: str, full_sequence_path: str, sequence_key_path: str, template: str) -> list[str]:
@@ -177,6 +195,9 @@ rule create_af3_msas_and_find_templates_sample_size_50:
 rule create_colabfold_msa_inputs:
     input: "data/interim/sequence_key.txt"
     output: _create_msa_names("data/interim/sequence_key.txt", "data/interim/colabfold-msa-inputs/{name}.fasta")
+    resources:
+        runtime="10m",
+        mem="1GB"
     run:
         output_dir = os.path.dirname(output[0])
         if not os.path.exists(output_dir):
@@ -193,6 +214,9 @@ rule run_create_colabfold_msas_and_find_templates:
         msa='data/interim/colabfold-msas/{name}.a3m',
         templates='data/interim/colabfold-templates/{name}.m8'
     threads: 32
+    resources:
+        runtime="5h",
+        mem="64GB"
     params:
         colabfold_data_dir=os.environ['COLABFOLD_DATA_DIR']
     benchmark:
@@ -236,6 +260,9 @@ rule run_create_tcrmodel2_msas_and_find_templates:
         seqres_database_path=lambda wildcards: "${DB_DIR}/pdb_seqres.txt",
         pdb_database_path=lambda wildcards: "${DB_DIR}/pdb_mmcif/mmcif_files"
     threads: 32
+    resources:
+        runtime="1h",
+        mem="64GB"
     benchmark:
         "data/benchmarks/msa-generation_alphafold3_tcrmodel2_{name}.tsv"
     script: "../scripts/create_msas_and_find_templates.py"
@@ -259,11 +286,17 @@ def create_paths(summary_file: str, path_name: str) -> list[str]:
 rule summarise_structural_features:
     input: "data/raw/structures/{name}.pdb"
     output: temp("data/interim/{name}_structural_summary.json")
+    resources:
+        runtime="5m",
+        mem="1GB"
     script: "../scripts/summarise_structural_features.py"
 
 rule aggregate_structural_features:
     input: create_paths("data/raw/structures_summary.csv", "data/interim/{name}_structural_summary.json")
     output: "data/processed/tcr_pmhc_structural_features.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
     run:
         import json
         import pandas as pd
@@ -284,11 +317,17 @@ rule aggregate_structural_features:
 rule profile_interactions:
     input: "data/raw/structures/{name}.pdb"
     output: temp("data/interim/{name}_interactions.csv")
+    resources:
+        runtime="5m",
+        mem="1GB"
     script: "../scripts/profile_interactions.py"
 
 rule aggregate_interactions:
     input: create_paths("data/raw/structures_summary.csv", "data/interim/{name}_interactions.csv")
     output: "data/processed/tcr_pmhc_interactions.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
     run:
         import pandas as pd
 
@@ -309,6 +348,9 @@ rule create_distance_restraints:
         "data/raw/structures_summary.csv",
         "data/raw/structures"
     output: "data/processed/tcr_pmhc_distance_restaints.csv"
+    resources:
+        runtime="15m",
+        mem="2GB"
     shell:
         """
         jupyter nbconvert --to notebook --execute --inplace notebooks/measure_constraint_distances.ipynb
