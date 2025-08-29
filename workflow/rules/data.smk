@@ -10,26 +10,6 @@ envvars:
 wildcard_constraints:
     sample_size="\d+"
 
-rule sample_sequences:
-    input: "data/raw/sequences_pMHC_split.csv"
-    output: "data/interim/sequences_sample_{sample_size}.csv"
-    params:
-        seed=123
-    resources:
-        runtime="10m",
-        mem="1GB"
-    run:
-        import pandas as pd
-
-        sequences = pd.read_csv(input[0], index_col='index')
-
-        num_folds = len(sequences['fold'].unique())
-        folds_sample_size = int(wildcards.sample_size) // num_folds
-        group_sample_size = folds_sample_size // 2
-
-        sequences_sample = sequences.groupby(['fold', 'label']).sample(group_sample_size, random_state=params.seed)
-        sequences_sample.to_csv(output[0])
-
 rule create_full_length_sequences:
     input:
         sequences="data/raw/sequences_pMHC_split.csv",
@@ -53,9 +33,53 @@ rule create_full_length_sequences:
         python -m tcr_pmhc_predicted_structures.apps.create_full_length_sequences \
             --log-level {config[log_level]} \
             --mhc-sequences {input.mhc_sequences} \
-            -o {output} \
+            -o $TMPDIR/sequences_full.csv \
             {input.sequences}
+
+        grep -v '*' $TMPDIR/sequences_full.csv > {output}
         """
+
+rule get_bad_sequence_ids:
+    input:
+        raw_sequences="data/raw/sequences_pMHC_split.csv",
+        full_sequences="data/interim/sequences_full.csv"
+    output: "data/interim/bad_sequences.txt"
+    resources:
+        runtime="1m",
+        mem="100MB"
+    shell:
+        """
+        comm -3 \
+            <(sed 1d {input.raw_sequences} | cut -f1 -d, | sort) \
+            <(sed 1d {input.full_sequences} | cut -f1 -d, | sort) > {output}
+        """
+
+rule sample_sequences:
+    input:
+        sequences="data/raw/sequences_pMHC_split.csv",
+        bad_sequences="data/interim/bad_sequences.txt"
+    output: "data/interim/sequences_sample_{sample_size}.csv"
+    params:
+        seed=123
+    resources:
+        runtime="10m",
+        mem="1GB"
+    run:
+        import pandas as pd
+
+        sequences = pd.read_csv(input.sequences, index_col='index')
+
+        with open(input.bad_sequences, 'r') as fh:
+            bad_sequences = [int(line.strip()) for line in fh if line]
+
+        sequences = sequences.loc[~sequences.index.isin(bad_sequences)]
+
+        num_folds = len(sequences['fold'].unique())
+        folds_sample_size = int(wildcards.sample_size) // num_folds
+        group_sample_size = folds_sample_size // 2
+
+        sequences_sample = sequences.groupby(['fold', 'label']).sample(group_sample_size, random_state=params.seed)
+        sequences_sample.to_csv(output[0])
 
 rule create_sequence_key:
     input: "data/interim/sequences_full.csv"
@@ -74,19 +98,26 @@ rule create_sequence_key:
         paste -d ' ' <(cat $TEMPDIR/sequences.txt | xargs -I {{}} sh -c 'echo -n "{{}}" | sha256sum | cut -c1-8') $TEMPDIR/sequences.txt > {output}
         """
 
-def _get_complex_names(path: str, template: str) -> list[str]:
+def _get_complex_names(path: str, bad_sequences_path: str, template: str) -> list[str]:
+    if not os.path.exists(bad_sequences_path):
+        print(bad_sequences_path, 'does not exist!')
+        return []
+
+    with open(bad_sequences_path, 'r') as fh:
+        bad_sequences = [line.strip() for line in fh if line]
+
     if not os.path.exists(path):
         print(path, 'does not exist!')
         return []
 
     with open(path, 'r') as fh:
-        indices = [entry['index'] for entry in csv.DictReader(fh)]
+        indices = [entry['index'] for entry in csv.DictReader(fh) if entry['index'] not in bad_sequences]
 
     return expand(template, name=indices)
 
 rule convert_sequences_to_jsons:
     input: "data/interim/sequences_full.csv"
-    output: _get_complex_names(f"data/raw/sequences_pMHC_split.csv", "data/interim/sequences/{name}.json")
+    output: _get_complex_names("data/raw/sequences_pMHC_split.csv", "data/interim/bad_sequences.txt", "data/interim/sequences/{name}.json")
     resources:
         runtime="10m",
         mem="1GB"
