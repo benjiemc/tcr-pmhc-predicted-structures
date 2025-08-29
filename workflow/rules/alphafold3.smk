@@ -132,6 +132,8 @@ rule run_alphafold_predictions:
 
         apptainer exec \
             --nv \
+            --cwd=$(pwd) \
+            --bind=$(pwd):$(pwd) \
             --bind $input_dir_abs:/root/input \
             --bind $temp_output_dir_abs:/root/output \
             --bind {params.alphafold3_weights_dir}:/root/models \
@@ -235,6 +237,8 @@ rule run_alphafold_predictions_with_tcrmodel2_data:
 
         apptainer exec \
             --nv \
+            --cwd=$(pwd) \
+            --bind=$(pwd):$(pwd) \
             --bind $input_dir_abs:/root/input \
             --bind $temp_output_dir_abs:/root/output \
             --bind {params.alphafold3_weights_dir}:/root/models \

@@ -11,11 +11,15 @@ from snakemake.script import snakemake
 NUM_PARALLEL_AF_PROCESSES = 4
 '''AF3 runs 4 processes at once for building the MSAs.'''
 
+cwd = os.getcwd()
+
 with tempfile.TemporaryDirectory() as temp_dir:
     subprocess.run(  # noqa: S603
         [
             '/usr/bin/apptainer',
             'exec',
+            f'--cwd={cwd}',
+            f'--bind={cwd}:{cwd}',
             f'--bind={snakemake.params.alphafold_data_dir}:/root/public_databases',
             (
                 f"--bind={snakemake.params.pdb_database_path.replace('${DB_DIR}', snakemake.params.alphafold_data_dir)}"
