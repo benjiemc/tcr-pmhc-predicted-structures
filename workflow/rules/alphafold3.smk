@@ -247,6 +247,9 @@ rule run_alphafold_predictions_with_tcrmodel2_data:
 rule create_af3_structures_with_tcrmodel2_data_sample_size_50:
     input: _get_af3_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
 
+rule create_af3_structures_with_tcrmodel2_data_sample_size_1500:
+    input: _get_af3_names("data/interim/sequences_sample_1500.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
+
 rule aggregate_af3_confidence_scores:
     input:
         summary_confidences=lambda wildcards: _get_af3_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/structures_{{method}}_{{data}}/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", seed),
@@ -422,6 +425,9 @@ rule process_af3_structures_sample_size_50:
 
 rule process_af3_structures_with_tcrmodel2_data_sample_size_50:
     input: _get_processed_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", [1])
+
+rule process_af3_structures_with_tcrmodel2_data_sample_size_1500:
+    input: _get_processed_structure_names("data/interim/sequences_sample_1500.csv", "data/processed/structures_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", [1])
 
 rule create_contact_map:
     input: "data/processed/structures_af3_af3/{name}_{seed}_{sample}.pdb"

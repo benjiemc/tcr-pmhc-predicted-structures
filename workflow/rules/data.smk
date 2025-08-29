@@ -243,6 +243,9 @@ rule run_create_tcrmodel2_msas_and_find_templates:
 rule create_tcrmodel2_msas_and_find_templates_sample_size_50:
     input: _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/tcrmodel2-msas/{name}_unpaired.a3m')
 
+rule create_tcrmodel2_msas_and_find_templates_sample_size_1500:
+    input: _get_msas_for_sample("data/interim/sequences_sample_1500.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m')
+
 def create_paths(summary_file: str, path_name: str) -> list[str]:
     if not os.path.exists(summary_file):
         print(summary_file, 'does not exist!')
