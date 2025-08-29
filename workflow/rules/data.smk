@@ -152,7 +152,7 @@ rule run_create_af3_msas_and_find_templates:
         seqres_database_path=lambda wildcards: "${DB_DIR}/pdb_seqres_2022_09_28.fasta",
         pdb_database_path=lambda wildcards: "${DB_DIR}/mmcif_files"
     benchmark:
-        "data/benchmarks/msa-generation_alphafold3_{name}.tsv"
+        "data/benchmarks/msa-generation_af3_af3_{name}.tsv"
     threads: 32
     resources:
         runtime="3h",
@@ -264,7 +264,7 @@ rule run_create_tcrmodel2_msas_and_find_templates:
         runtime="1h",
         mem="64GB"
     benchmark:
-        "data/benchmarks/msa-generation_alphafold3_tcrmodel2_{name}.tsv"
+        "data/benchmarks/msa-generation_af3_tcrmodel2_{name}.tsv"
     script: "../scripts/create_msas_and_find_templates.py"
 
 rule create_tcrmodel2_msas_and_find_templates_sample_size_50:
