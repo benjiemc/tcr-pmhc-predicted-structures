@@ -4,7 +4,6 @@ import os
 seed = config.get('seed', [1])
 
 envvars:
-    "ALPHAFOLD_DATA_DIR",
     "ALPHAFOLD3_WEIGHTS_DIR"
 
 def _get_json_names(template: str, path: str) -> list[str]:

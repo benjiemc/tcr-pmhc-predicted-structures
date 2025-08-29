@@ -3,6 +3,8 @@ import json
 import os
 
 envvars:
+    "ALPHAFOLD_DATA_DIR",
+    "TCRMODEL2_ALPHAFOLD_DATA_DIR",
     "COLABFOLD_DATA_DIR"
 
 rule sample_sequences:
