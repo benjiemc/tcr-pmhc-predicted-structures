@@ -83,7 +83,7 @@ rule run_alphafold_predictions:
         alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
     resources:
         runtime="10m",
-        mem="64GB",
+        mem="40GB",
         gpu=1
     shell:
         """
@@ -188,7 +188,7 @@ rule run_alphafold_predictions_with_tcrmodel2_data:
         alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
     resources:
         runtime="10m",
-        mem="64GB",
+        mem="40GB",
         gpu=1
     shell:
         """
