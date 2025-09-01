@@ -221,7 +221,10 @@ def _get_msas_for_sample(sample_path: str, full_sequence_path: str, sequence_key
     return expand(template, name=names)
 
 rule create_af3_msas_and_find_templates_sample_size_50:
-    input: _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_af3/{name}_unpaired.a3m')
+    input:
+        unpaired_msas=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_af3/{name}_unpaired.a3m'),
+        paired_msas=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_af3/{name}_paired.a3m'),
+        templates=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/templates_af3_af3/{name}')
 
 rule create_colabfold_msa_inputs:
     input: "data/interim/sequence_key.txt"
@@ -274,7 +277,9 @@ rule run_create_colabfold_msas_and_find_templates:
         """
 
 rule create_colabfold_msas_and_find_templates_sample_size_50:
-    input: _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_mmseq_colabfold/{name}.a3m')
+    input:
+        msas=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_mmseq_colabfold/{name}.a3m'),
+        templates=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/templates_mmseq_colabfold/{name}.m8')
 
 rule run_create_tcrmodel2_msas_and_find_templates:
     input: "data/interim/msa-inputs_af3/{name}.json"
@@ -299,10 +304,16 @@ rule run_create_tcrmodel2_msas_and_find_templates:
     script: "../scripts/create_msas_and_find_templates.py"
 
 rule create_tcrmodel2_msas_and_find_templates_sample_size_50:
-    input: _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m')
+    input:
+        unpaired_msas=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
+        paired_msas=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
+        templates=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/templates_af3_tcrmodel2/{name}')
 
 rule create_tcrmodel2_msas_and_find_templates_sample_size_1500:
-    input: _get_msas_for_sample("data/interim/sequences_sample_1500.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m')
+    input:
+        unpaired_msas=_get_msas_for_sample("data/interim/sequences_sample_1500.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
+        paired_msas=_get_msas_for_sample("data/interim/sequences_sample_1500.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
+        templates=_get_msas_for_sample("data/interim/sequences_sample_1500.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/templates_af3_tcrmodel2/{name}')
 
 def create_paths(summary_file: str, path_name: str) -> list[str]:
     if not os.path.exists(summary_file):
