@@ -9,6 +9,15 @@ envvars:
 wildcard_constraints:
     sample_size="\d+"
 
+sequence_key_path = "data/interim/sequence_key.txt"
+if os.path.exists(sequence_key_path):
+    with open(sequence_key_path, 'r') as fh:
+        sequence_key = {sequence: key for key, sequence in (line.split() for line in fh if line)}
+
+else:
+    print(sequence_key_path, 'does not exist!')
+    sequence_key = {}
+
 def _get_json_names(template: str, path: str) -> list[str]:
     if not os.path.exists(path):
         print(path, 'does not exist!')
@@ -20,20 +29,13 @@ def _get_json_names(template: str, path: str) -> list[str]:
 
     return expand(template, name=indices)
 
-def lookup_sequence_ids(sequence_path: str, sequence_key_path: str, template: str) -> list[str]:
+def lookup_sequence_ids(sequence_path: str, sequence_key: dict[str, str], template: str) -> list[str]:
     if not os.path.exists(sequence_path):
         print(sequence_path, 'does not exist!')
         return []
 
     with open(sequence_path, 'r') as fh:
         sequences = json.load(fh)
-
-    if not os.path.exists(sequence_key_path):
-        print(sequence_key_path, 'does not exist!')
-        return []
-
-    with open(sequence_key_path, 'r') as fh:
-        sequence_key = {sequence: key for key, sequence in (line.split() for line in fh if line)}
 
     ids = [sequence_key[sequence] for sequence in sequences.values() if sequence in sequence_key]
 
@@ -43,9 +45,9 @@ rule run_create_af3_jsons:
     input:
         sequences="data/interim/sequences/{name}.json",
         sequence_key="data/interim/sequence_key.txt",
-        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_af3/{name}_unpaired.a3m'),
-        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_af3/{name}_paired.a3m'),
-        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/templates_af3_af3/{name}')
+        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_af3/{name}_unpaired.a3m'),
+        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_af3/{name}_paired.a3m'),
+        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/templates_af3_af3/{name}')
     output: "data/interim/sequences_af3_af3/{name}_{seed}.json"
     resources:
         runtime="5m",
@@ -67,38 +69,12 @@ rule run_create_af3_jsons:
             {input.sequences}
         """
 
-def _get_required_msas(wildcards, path, sequence_key_path, template) -> list[str]:
-    if not os.path.exists(path):
-        print(path, 'does not exist!')
-        return []
-
-    if not os.path.exists(sequence_key_path):
-        print(sequence_key_path, 'does not exist!')
-        return []
-
-    with open(sequence_key_path, 'r') as fh:
-        sequence_key = {sequence: key for key, sequence in (line.split() for line in fh if line)}
-
-    with open(path, 'r') as fh:
-        reader = csv.DictReader(fh)
-        relevant_entries = [entry for entry in reader if entry['id'] == wildcards.name]
-
-    sequences = [
-        value for entry in relevant_entries for key, value in entry.items()
-        if key in ('tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2')
-    ]
-
-    keys = [sequence_key[sequence] for sequence in sequences]
-
-    return expand(template, key=keys)
-
-
 rule run_alphafold_predictions:
     input:
         sequence="data/interim/sequences_af3_af3/{name}_{seed}.json",
-        unpaired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/msas_af3_af3/{key}_unpaired.a3m"),
-        paired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/msas_af3_af3/{key}_paired.a3m"),
-        templates=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/templates_af3_af3/{key}")
+        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_af3/{name}_unpaired.a3m'),
+        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_af3/{name}_paired.a3m'),
+        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/templates_af3_af3/{name}')
     output:
         structures=expand("data/interim/structures_af3_af3/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5)),
         summary_confidences=expand("data/interim/structures_af3_af3/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5)),
@@ -174,9 +150,9 @@ rule run_create_af3_jsons_tcrmodel2_data:
     input:
         sequences="data/interim/sequences/{name}.json",
         sequence_key="data/interim/sequence_key.txt",
-        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
-        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
-        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/templates_af3_tcrmodel2/{name}')
+        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
+        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
+        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/templates_af3_tcrmodel2/{name}')
     output: "data/interim/sequences_af3_tcrmodel2/{name}_{seed}.json"
     resources:
         runtime="5m",
@@ -201,9 +177,9 @@ rule run_create_af3_jsons_tcrmodel2_data:
 rule run_alphafold_predictions_with_tcrmodel2_data:
     input:
         sequence="data/interim/sequences_af3_tcrmodel2/{name}_{seed}.json",
-        unpaired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/msas_af3_tcrmodel2/{key}_unpaired.a3m"),
-        paired_msas=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/msas_af3_tcrmodel2/{key}_paired.a3m"),
-        templates=lambda wildcards: _get_required_msas(wildcards, "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/interim/templates_af3_tcrmodel2/{key}")
+        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
+        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
+        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/templates_af3_tcrmodel2/{name}')
     output:
         structures=expand("data/interim/structures_af3_tcrmodel2/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5)),
         summary_confidences=expand("data/interim/structures_af3_tcrmodel2/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5)),
