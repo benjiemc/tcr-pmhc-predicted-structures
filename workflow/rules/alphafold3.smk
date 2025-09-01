@@ -43,8 +43,8 @@ rule run_create_af3_jsons:
     input:
         sequences="data/interim/sequences/{name}.json",
         sequence_key="data/interim/sequence_key.txt",
-        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_af3/{name}_paired.a3m'),
-        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_af3/{name}_unpaired.a3m'),
+        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_af3/{name}_unpaired.a3m'),
+        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_af3/{name}_paired.a3m'),
         templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/templates_af3_af3/{name}')
     output: "data/interim/sequences_af3_af3/{name}_{seed}.json"
     resources:
@@ -174,8 +174,8 @@ rule run_create_af3_jsons_tcrmodel2_data:
     input:
         sequences="data/interim/sequences/{name}.json",
         sequence_key="data/interim/sequence_key.txt",
-        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
-        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
+        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
+        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
         templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", "data/interim/sequence_key.txt", 'data/interim/templates_af3_tcrmodel2/{name}')
     output: "data/interim/sequences_af3_tcrmodel2/{name}_{seed}.json"
     resources:
