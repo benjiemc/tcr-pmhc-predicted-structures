@@ -355,14 +355,14 @@ rule add_ipsaes_to_confidence_scores:
         confidence_scores.to_csv(output[0], index=False)
 
 rule summarise_af3_structural_features:
-    input: "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif"
-    output: temp("data/interim/{name}_{seed}_{sample}_structural_summary.json")
+    input: "data/interim/structures_{method}_{data}/{name}_seed-{seed}_sample-{sample}_model.cif"
+    output: temp("data/interim/{method}_{data}_{name}_{seed}_{sample}_structural_summary.json")
     resources:
         runtime="10m",
         mem="2GB"
     script: "../scripts/summarise_structural_features.py"
 
-def _get_af3_structural_features_names(path: str, seeds: list) -> list[str]:
+def _get_af3_structural_features_names(path: str, method_name: str, data_name: str, seeds: list) -> list[str]:
     if not os.path.exists(path):
         print(path, 'does not exist!')
         return []
@@ -370,11 +370,11 @@ def _get_af3_structural_features_names(path: str, seeds: list) -> list[str]:
     with open(path, 'r') as fh:
         indices = [entry['index'] for entry in csv.DictReader(fh)]
 
-    return [f"data/interim/{name}_{seed}_{sample}_structural_summary.json" for name in indices for seed in seeds for sample in range(5)]
+    return [f"data/interim/{method_name}_{data_name}_{name}_{seed}_{sample}_structural_summary.json" for name in indices for seed in seeds for sample in range(5)]
 
 rule aggregate_af3_structural_features:
-    input: lambda wildcards: _get_af3_structural_features_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", [1])
-    output: "data/processed/af3_structural_features_{sample_size}.csv"
+    input: lambda wildcards: _get_af3_structural_features_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", wildcards.method, wildcards.data, [1])
+    output: "data/processed/predicted_{method}_{data}_structural_features_{sample_size}.csv"
     resources:
         runtime="10m",
         mem="1GB"
@@ -442,8 +442,8 @@ rule process_af3_structures_with_tcrmodel2_data_sample_size_1500:
     input: _get_processed_structure_names("data/interim/sequences_sample_1500.csv", "data/processed/structures_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", [1])
 
 rule create_contact_map:
-    input: "data/processed/structures_af3_af3/{name}_{seed}_{sample}.pdb"
-    output: temp("data/interim/{name}_{seed}_{sample}_contacts.csv")
+    input: "data/processed/structures_{method}_{data}/{name}_{seed}_{sample}.pdb"
+    output: temp("data/interim/{method}_{data}_{name}_{seed}_{sample}_contacts.csv")
     params:
         contact_distance=5.0
     resources:
@@ -470,8 +470,8 @@ def _get_af3_contact_maps(path: str, template: str, seeds: list) -> list[str]:
 
 
 rule aggregate_contact_maps:
-    input: lambda wildcards: _get_af3_contact_maps(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/{name}_{seed}_{sample}_contacts.csv", [1])
-    output: "data/processed/af3_contact_maps_{sample_size}.csv"
+    input: lambda wildcards: _get_af3_contact_maps(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_contacts.csv", [1])
+    output: "data/processed/predicted_{method}_{data}_contact_maps_{sample_size}.csv"
     resources:
         runtime="10m",
         mem="1GB"
@@ -493,14 +493,14 @@ rule aggregate_contact_maps:
         contact_maps.to_csv(output[0], index=False)
 
 rule profile_af3_interactions:
-    input: "data/processed/structures_af3_af3/{name}_{seed}_{sample}.pdb"
-    output: temp("data/interim/{name}_{seed}_{sample}_interactions.csv")
+    input: "data/processed/structures_{method}_{data}/{name}_{seed}_{sample}.pdb"
+    output: temp("data/interim/{method}_{data}_{name}_{seed}_{sample}_interactions.csv")
     resources:
         runtime="10m",
         mem="2GB"
     script: "../scripts/profile_interactions.py"
 
-def _get_af3_interactions(path: str, seeds: list) -> list[str]:
+def _get_af3_interactions(path: str, method_name:str, data_name: str, seeds: list) -> list[str]:
     if not os.path.exists(path):
         print(path, 'does not exist!')
         return []
@@ -508,11 +508,11 @@ def _get_af3_interactions(path: str, seeds: list) -> list[str]:
     with open(path, 'r') as fh:
         indices = [entry['index'] for entry in csv.DictReader(fh)]
 
-    return [f"data/interim/{name}_{seed}_{sample}_interactions.csv" for name in indices for seed in seeds for sample in range(5)]
+    return [f"data/interim/{method_name}_{data_name}_{name}_{seed}_{sample}_interactions.csv" for name in indices for seed in seeds for sample in range(5)]
 
 rule aggregate_af3_interactions:
-    input: lambda wildcards: _get_af3_interactions(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", [1])
-    output: "data/processed/af3_interactions_{sample_size}.csv"
+    input: lambda wildcards: _get_af3_interactions(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", wildcards.method, wildcards.data, [1])
+    output: "data/processed/predicted_{method}_{data}_interactions_{sample_size}.csv"
     resources:
         runtime="10m",
         mem="1GB"
