@@ -248,11 +248,11 @@ rule aggregate_af3_confidence_scores:
     input:
         summary_confidences=lambda wildcards: _get_af3_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/structures_{{method}}_{{data}}/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", seed),
         confidences=lambda wildcards: _get_af3_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/structures_{{method}}_{{data}}/{name}_seed-{seed}_sample-{sample}_confidences.json", seed),
-        sequences=lambda wildcards: expand(_get_json_names("data/interim/sequences_{{{{method}}}}_{{{{data}}}}/{name}_{{seed}}.json", "data/interim/sequences_sample_{wildcarsd.sample_size}.csv"), seed=seed)
+        sequences=lambda wildcards: expand(_get_json_names("data/interim/sequences_{{{{method}}}}_{{{{data}}}}/{name}_{{seed}}.json", f"data/interim/sequences_sample_{wildcards.sample_size}.csv"), seed=seed)
     output: "data/interim/confidence_scores_{method}_{data}_{sample_size}.csv"
     resources:
-        runtime=lambda wildcards : f"{max(-(wildcards.sample_size // -5), 300)}m",
-        mem=lambda wildcards : f"{max(-(wildcards.sample_size // -25), 100)}GB"
+        runtime=lambda wildcards : f"{max(-(int(wildcards.sample_size) // -5), 300)}m",
+        mem=lambda wildcards : f"{max(-(int(wildcards.sample_size) // -25), 100)}GB"
     shell:
         """
         python -m tcr_pmhc_predicted_structures.apps.extract_confidence_from_af3 \
