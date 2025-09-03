@@ -451,11 +451,15 @@ rule create_contact_map:
         mem="1GB"
     shell:
         """
+        columns="cdr_type,chain_id_tcr,chain_type_tcr,residue_seq_id_tcr,residue_insert_code_tcr,resi_tcr,residue_name_tcr,"
+        columns+="cdr_tcr,cdr_position,relative_pos_centre_tcr,chain_id_pmhc,residue_seq_id_pmhc,residue_insert_code_pmhc,"
+        columns+="resi_pmhc,residue_name_pmhc,chain_type_pmhc,peptide_position,relative_pos_centre_pmhc,mhc_type"
+
         python -m tcr_pmhc_predicted_structures.apps.create_contact_map \
             --log-level {config[log_level]} \
             --cutoff-distance {params.contact_distance} \
             -o {output} \
-            {input}
+            {input} || echo $columns > {output}
         """
 
 def _get_af3_contact_maps(path: str, template: str, seeds: list) -> list[str]:
