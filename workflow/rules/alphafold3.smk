@@ -112,6 +112,7 @@ rule run_alphafold_predictions:
         cp {input.paired_msas} $input_dir_abs
         cp -r {input.templates} $input_dir_abs
 
+        mkdir -p $TMPDIR/jax_cache
         mkdir -p $(dirname {output.structures[0]})
 
         input_file_name="$(basename {input.sequence})"
@@ -120,12 +121,14 @@ rule run_alphafold_predictions:
             --nv \
             --cwd=$(pwd) \
             --bind=$(pwd):$(pwd) \
+            --bind=$TMPDIR/jax_cache:/root/jax_cache \
             --bind $input_dir_abs:/root/input \
             --bind $temp_output_dir_abs:/root/output \
             --bind {params.alphafold3_weights_dir}:/root/models \
             containers/alphafold3.sif \
             python third_party/alphafold3/run_alphafold.py \
                 --norun_data_pipeline \
+                --jax_compilation_cache_dir=/root/jax_cache \
                 --json_path=/root/input/$input_file_name \
                 --model_dir=/root/models \
                 --output_dir=/root/output
