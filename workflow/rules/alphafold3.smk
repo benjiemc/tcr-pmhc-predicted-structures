@@ -387,7 +387,7 @@ rule aggregate_af3_structural_features:
             with open(path, 'r') as fh:
                 structural_features = json.load(fh)
 
-            name, seed, sample = os.path.basename(path).replace('_structural_summary.json', '').rsplit('_', 2)
+            _, _, name, seed, sample = os.path.basename(path).replace('_structural_summary.json', '').rsplit('_', 4)
             structural_features['name'] = name
             structural_features['seed'] = seed
             structural_features['sample'] = sample
@@ -486,7 +486,7 @@ rule aggregate_contact_maps:
         for path in input:
             contact_map = pd.read_csv(path)
 
-            name, seed, sample = os.path.basename(path).replace('_contacts.csv', '').rsplit('_', 2)
+            _, _, name, seed, sample = os.path.basename(path).replace('_contacts.csv', '').rsplit('_', 4)
             contact_map['name'] = name
             contact_map['seed'] = seed
             contact_map['sample'] = sample
@@ -527,7 +527,7 @@ rule aggregate_af3_interactions:
         for path in input:
             interaction = pd.read_csv(path)
 
-            name, seed, sample = os.path.basename(path).replace('_interactions.csv', '').rsplit('_', 2)
+            _, _, name, seed, sample = os.path.basename(path).replace('_interactions.csv', '').rsplit('_', 4)
             interaction['name'] = name
             interaction['seed'] = seed
             interaction['sample'] = sample
