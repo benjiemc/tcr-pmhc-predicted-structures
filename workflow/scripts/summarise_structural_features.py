@@ -15,9 +15,10 @@ tcr_info = {}
 
 docking_geometry = tcr.calculate_docking_geometry(mode='cys')
 
-tcr_info['pitch_angle'] = float(docking_geometry['pitch_angle'])
-tcr_info['scanning_angle'] = float(docking_geometry['scanning_angle'])
-tcr_info['z_score'] = float(docking_geometry['tcr_com'][0][2])
+if docking_geometry is not None:
+    tcr_info['pitch_angle'] = float(docking_geometry['pitch_angle'])
+    tcr_info['scanning_angle'] = float(docking_geometry['scanning_angle'])
+    tcr_info['z_score'] = float(docking_geometry['tcr_com'][0][2])
 
 with open(snakemake.output[0], 'w') as fh:
     json.dump(tcr_info, fh)
