@@ -308,7 +308,7 @@ def _get_ipsaes_names(path: str, seeds: list[int], distance_cutoff: float, pae_c
 rule add_ipsaes_to_confidence_scores:
     input:
         confidence_scores="data/interim/confidence_scores_{method}_{data}_{sample_size}.csv",
-        ipaes=lambda wildcards: _get_ipsaes_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", seeds=[1], distance_cutoff=10, pae_cutoff=10)
+        ipaes=lambda wildcards: _get_ipsaes_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", seeds=seed, distance_cutoff=10, pae_cutoff=10)
     output: "data/processed/confidence_scores_{method}_{data}_{sample_size}.csv"
     resources:
         runtime="10m",
@@ -361,7 +361,7 @@ rule summarise_af3_structural_features:
     script: "../scripts/summarise_structural_features.py"
 
 rule aggregate_af3_structural_features:
-    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_structural_summary.json", [1])
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_structural_summary.json", seed)
     output: "data/processed/predicted_{method}_{data}_structural_features_{sample_size}.csv"
     resources:
         runtime="10m",
@@ -410,13 +410,13 @@ rule process_af3_structure:
         tcr.save(output[0])
 
 rule process_af3_structures_sample_size_50:
-    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_af3_af3/{name}_{seed}_{sample}.pdb", [1])
+    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_af3_af3/{name}_{seed}_{sample}.pdb", seed)
 
 rule process_af3_structures_with_tcrmodel2_data_sample_size_50:
-    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", [1])
+    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", seed)
 
 rule process_af3_structures_with_tcrmodel2_data_sample_size_1500:
-    input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/processed/structures_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", [1])
+    input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/processed/structures_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", seed)
 
 rule create_contact_map:
     input: "data/processed/structures_{method}_{data}/{name}_{seed}_{sample}.pdb"
@@ -440,7 +440,7 @@ rule create_contact_map:
         """
 
 rule aggregate_contact_maps:
-    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_contacts.csv", [1])
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_contacts.csv", seed)
     output: "data/processed/predicted_{method}_{data}_contact_maps_{sample_size}.csv"
     resources:
         runtime="10m",
@@ -471,7 +471,7 @@ rule profile_af3_interactions:
     script: "../scripts/profile_interactions.py"
 
 rule aggregate_af3_interactions:
-    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_interactions.csv", [1])
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_interactions.csv", seed)
     output: "data/processed/predicted_{method}_{data}_interactions_{sample_size}.csv"
     resources:
         runtime="10m",
