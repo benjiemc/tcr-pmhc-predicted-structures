@@ -55,10 +55,10 @@ rule run_create_af3_jsons:
     input:
         sequences="data/interim/sequences/{name}.json",
         sequence_key="data/interim/sequence_key.txt",
-        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_af3/{name}_unpaired.a3m'),
-        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_af3/{name}_paired.a3m'),
-        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/templates_af3_af3/{name}')
-    output: "data/interim/sequences_af3_af3/{name}_{seed}.json"
+        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_unpaired.a3m'),
+        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_paired.a3m'),
+        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, f'data/interim/templates_{wildcards.method}_{wildcards.data}/{{name}}')
+    output: "data/interim/sequences_{method}_{data}/{name}_{seed}.json"
     resources:
         runtime="5m",
         mem="1GB"
@@ -81,14 +81,14 @@ rule run_create_af3_jsons:
 
 rule run_alphafold_predictions:
     input:
-        sequence="data/interim/sequences_af3_af3/{name}_{seed}.json",
-        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_af3/{name}_unpaired.a3m'),
-        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_af3/{name}_paired.a3m'),
-        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/templates_af3_af3/{name}')
+        sequence="data/interim/sequences_{method}_{data}/{name}_{seed}.json",
+        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_unpaired.a3m'),
+        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_paired.a3m'),
+        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, f'data/interim/templates_{wildcards.method}_{wildcards.data}/{{name}}')
     output:
-        structures=expand("data/interim/structures_af3_af3/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5)),
-        summary_confidences=expand("data/interim/structures_af3_af3/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5)),
-        confidences=expand("data/interim/structures_af3_af3/{{name}}_seed-{{seed}}_sample-{sample}_confidences.json", sample=range(5))
+        structures=expand("data/interim/structures_{{method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5)),
+        summary_confidences=expand("data/interim/structures_{{method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5)),
+        confidences=expand("data/interim/structures_{{method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_confidences.json", sample=range(5))
     params:
         alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
     resources:
@@ -144,97 +144,6 @@ rule run_alphafold_predictions:
 
 rule create_af3_structures_sample_size_50:
     input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
-
-rule run_create_af3_jsons_tcrmodel2_data:
-    input:
-        sequences="data/interim/sequences/{name}.json",
-        sequence_key="data/interim/sequence_key.txt",
-        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
-        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
-        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/templates_af3_tcrmodel2/{name}')
-    output: "data/interim/sequences_af3_tcrmodel2/{name}_{seed}.json"
-    resources:
-        runtime="5m",
-        mem="1GB"
-    shell:
-        """
-        out_dir_name=$(dirname {output[0]})
-
-        python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
-            --log-level {config[log_level]} \
-            --format alphafold3 \
-             --alphafold3-model-seeds {wildcards.seed} \
-            --sequence-key {input.sequence_key} \
-            --relative-paths \
-            --unpaired-msa-paths {input.unpaired_msas} \
-            --paired-msa-paths {input.paired_msas} \
-            --template-paths {input.templates} \
-            -o $out_dir_name \
-            {input.sequences}
-        """
-
-rule run_alphafold_predictions_with_tcrmodel2_data:
-    input:
-        sequence="data/interim/sequences_af3_tcrmodel2/{name}_{seed}.json",
-        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
-        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
-        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, 'data/interim/templates_af3_tcrmodel2/{name}')
-    output:
-        structures=expand("data/interim/structures_af3_tcrmodel2/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5)),
-        summary_confidences=expand("data/interim/structures_af3_tcrmodel2/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5)),
-        confidences=expand("data/interim/structures_af3_tcrmodel2/{{name}}_seed-{{seed}}_sample-{sample}_confidences.json", sample=range(5))
-    params:
-        alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
-    resources:
-        runtime="10m",
-        mem="40GB",
-        gpu=1
-    shell:
-        """
-        input_dir_abs=$TMPDIR/{wildcards.name}/input
-        temp_output_dir_abs=$TMPDIR/{wildcards.name}/output
-        if [ -d $input_dir_abs ]; then
-            rm -r $input_dir_abs
-        fi
-        if [ -d $temp_output_dir_abs ]; then
-            rm -r $temp_output_dir_abs
-        fi
-        mkdir -p $input_dir_abs $temp_output_dir_abs
-
-        cp {input.sequence} $input_dir_abs
-        cp {input.unpaired_msas} $input_dir_abs
-        cp {input.paired_msas} $input_dir_abs
-        cp -r {input.templates} $input_dir_abs
-
-        mkdir -p $(dirname {output.structures[0]})
-
-        input_file_name="$(basename {input.sequence})"
-
-        apptainer exec \
-            --nv \
-            --cwd=$(pwd) \
-            --bind=$(pwd):$(pwd) \
-            --bind $input_dir_abs:/root/input \
-            --bind $temp_output_dir_abs:/root/output \
-            --bind {params.alphafold3_weights_dir}:/root/models \
-            containers/alphafold3.sif \
-            python third_party/alphafold3/run_alphafold.py \
-                --norun_data_pipeline \
-                --json_path=/root/input/$input_file_name \
-                --model_dir=/root/models \
-                --output_dir=/root/output
-
-        output_dir=$(dirname {output.structures[0]})
-        mkdir -p $output_dir
-
-        for sample_num in {{0..4}}; do
-            prediction_dir="${{temp_output_dir_abs}}/{wildcards.name}/seed-{wildcards.seed}_sample-${{sample_num}}"
-
-            mv "$prediction_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_model.cif" $output_dir
-            mv "$prediction_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_summary_confidences.json" $output_dir
-            mv "$prediction_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_confidences.json" $output_dir
-        done
-        """
 
 rule create_af3_structures_with_tcrmodel2_data_sample_size_50:
     input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
