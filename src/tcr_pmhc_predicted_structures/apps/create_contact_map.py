@@ -22,7 +22,7 @@ parser = argparse.ArgumentParser(
 )
 
 inputs = parser.add_argument_group('Inputs')
-inputs.add_argument('structure', help='path to the input structure (mmCIF format)')
+inputs.add_argument('structure', help='path to the input structure')
 
 output = parser.add_argument_group('Output')
 output.add_argument('--output', '-o', required=True, help='path to output CSV')
@@ -31,13 +31,13 @@ parser.add_argument(
     '--cutoff-distance',
     default=5.0,
     type=float,
-    help='maximum distance to consider a contact (default: 5.0 Å)',
+    help='maximum distance to consider a contact (Default: 5.0 Å)',
 )
 parser.add_argument(
     '--even-offset-side',
     choices=['left', 'right'],
     default='left',
-    help="Offset side when relative_pos_centre is selected (Default: 'left')",
+    help="fffset side when relative_pos_centre is selected (Default: 'left')",
 )
 
 add_logging_arguments(parser)
