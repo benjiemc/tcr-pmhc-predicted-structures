@@ -121,6 +121,28 @@ def collect_pae_scores(confidence: dict) -> np.array:
     return np.array(confidence['pae'])[np.ix_(tcr_idxs, pmhc_idxs)]
 
 
+def number_sequences(sequences: dict[str, str]) -> dict[str, list[tuple[tuple[str, str], str]]]:
+    """Numbers sequences with ANARCI."""
+    numbered_sequences = {}
+    for chain_id, sequence in sequences.items():
+        try:
+            numbered_sequence, _ = anarci.number(sequence)
+
+        except:  # noqa: E722 Anarci throws base exception on B2M
+            numbered_sequence = None
+
+        if numbered_sequence:
+            if len(numbered_sequence) == 2:  # noqa: PLR2004 Sometimes anarci will find two valid numberings
+                numbered_sequence = numbered_sequence[0]
+
+            numbered_sequences[chain_id] = [(seq_id, olc) for seq_id, olc in numbered_sequence if olc != '-']
+
+        else:
+            numbered_sequences[chain_id] = [((res_id, ' '), olc) for res_id, olc in enumerate(sequence, 1)]
+
+    return numbered_sequences
+
+
 def collect_specific_pae_scores(confidence: dict, input_sequences: dict) -> np.array:
     pae_numbering = [
         (idx, (chain_id, res_seq_id))
@@ -129,20 +151,7 @@ def collect_specific_pae_scores(confidence: dict, input_sequences: dict) -> np.a
         )
     ]
 
-    # Number sequences using ANARCI
-    numbered_sequences = {}
-    for chain_id, sequence in input_sequences.items():
-        try:
-            numbered_sequence, _ = anarci.number(sequence)
-
-        except:  # noqa: E722 Anarci throws base exception on B2M
-            numbered_sequence = None
-
-        if numbered_sequence:
-            numbered_sequences[chain_id] = [(seq_id, olc) for seq_id, olc in numbered_sequence if olc != '-']
-
-        else:
-            numbered_sequences[chain_id] = [((res_id, ' '), olc) for res_id, olc in enumerate(sequence, 1)]
+    numbered_sequences = number_sequences(input_sequences)
 
     # Calculate offset between anarci sequence and input sequences
     offsets = {
@@ -287,20 +296,7 @@ def collect_specific_plddt_scores(confidence: dict, input_sequences: dict) -> np
         for idx, (chain_id, res_seq_id) in enumerate(zip(confidence['atom_chain_ids'], atom_res_ids, strict=True))
     ]
 
-    # Number sequences using ANARCI
-    numbered_sequences = {}
-    for chain_id, sequence in input_sequences.items():
-        try:
-            numbered_sequence, _ = anarci.number(sequence)
-
-        except:  # noqa: E722 Anarci throws base exception on B2M
-            numbered_sequence = None
-
-        if numbered_sequence:
-            numbered_sequences[chain_id] = [(seq_id, olc) for seq_id, olc in numbered_sequence if olc != '-']
-
-        else:
-            numbered_sequences[chain_id] = [((res_id, ' '), olc) for res_id, olc in enumerate(sequence, 1)]
+    numbered_sequences = number_sequences(input_sequences)
 
     # Calculate offset between anarci sequence and input sequences
     offsets = {
