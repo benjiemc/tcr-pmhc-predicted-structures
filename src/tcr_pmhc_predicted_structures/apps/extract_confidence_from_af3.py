@@ -1,12 +1,14 @@
 """Extract confidence metrics from alphafold3 structures."""
 
 import argparse
+import io
 import json
 import logging
 import os
 import re
 import sys
 from collections import defaultdict
+from contextlib import redirect_stderr
 
 import numpy as np
 import pandas as pd
@@ -126,7 +128,8 @@ def number_sequences(sequences: dict[str, str]) -> dict[str, list[tuple[tuple[st
     numbered_sequences = {}
     for chain_id, sequence in sequences.items():
         try:
-            numbered_sequence, _ = anarci.number(sequence)
+            with redirect_stderr(io.StringIO()):
+                numbered_sequence, _ = anarci.number(sequence)
 
         except:  # noqa: E722 Anarci throws base exception on B2M
             numbered_sequence = None
