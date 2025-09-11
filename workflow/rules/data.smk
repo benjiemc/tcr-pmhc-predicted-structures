@@ -171,9 +171,9 @@ rule create_af3_msa_inputs:
 rule run_create_af3_msas_and_find_templates:
     input: "data/interim/msa-inputs_af3/{name}.json"
     output:
-        unpaired_msa='data/interim/msas_af3_af3/{name}_unpaired.a3m',
-        paired_msa='data/interim/msas_af3_af3/{name}_paired.a3m',
-        templates=directory('data/interim/templates_af3_af3/{name}')
+        unpaired_msa=protected('data/interim/msas_af3_af3/{name}_unpaired.a3m'),
+        paired_msa=protected('data/interim/msas_af3_af3/{name}_paired.a3m'),
+        templates=protected(directory('data/interim/templates_af3_af3/{name}'))
     params:
         alphafold_data_dir=os.environ['ALPHAFOLD_DATA_DIR'],
         uniref90_database_path=lambda wildcards: "${DB_DIR}/uniref90_2022_05.fa",
@@ -245,8 +245,8 @@ rule create_colabfold_msa_inputs:
 rule run_create_colabfold_msas_and_find_templates:
     input: "data/interim/msa-inputs_mmseq/{name}.fasta"
     output:
-        msa='data/interim/msas_mmseq_colabfold/{name}.a3m',
-        templates='data/interim/templates_mmseq_colabfold/{name}.m8'
+        msa=protected('data/interim/msas_mmseq_colabfold/{name}.a3m'),
+        templates=protected('data/interim/templates_mmseq_colabfold/{name}.m8')
     threads: 32
     resources:
         runtime="5h",
@@ -284,9 +284,9 @@ rule create_colabfold_msas_and_find_templates_sample_size_50:
 rule run_create_tcrmodel2_msas_and_find_templates:
     input: "data/interim/msa-inputs_af3/{name}.json"
     output:
-        unpaired_msa='data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m',
-        paired_msa='data/interim/msas_af3_tcrmodel2/{name}_paired.a3m',
-        templates=directory('data/interim/templates_af3_tcrmodel2/{name}')
+        unpaired_msa=protected('data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
+        paired_msa=protected('data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
+        templates=protected(directory('data/interim/templates_af3_tcrmodel2/{name}'))
     params:
         alphafold_data_dir=os.environ['TCRMODEL2_ALPHAFOLD_DATA_DIR'],
         uniref90_database_path=lambda wildcards: "${DB_DIR}/uniref90.tcrmhc.fasta",

@@ -86,9 +86,9 @@ rule run_alphafold_predictions:
         paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_paired.a3m'),
         templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, f'data/interim/templates_{wildcards.method}_{wildcards.data}/{{name}}')
     output:
-        structures=expand("data/interim/structures_{{method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5)),
-        summary_confidences=expand("data/interim/structures_{{method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5)),
-        confidences=expand("data/interim/structures_{{method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_confidences.json", sample=range(5))
+        structures=protected(expand("data/interim/structures_{{method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5))),
+        summary_confidences=protected(expand("data/interim/structures_{{method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5))),
+        confidences=protected(expand("data/interim/structures_{{method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_confidences.json", sample=range(5)))
     params:
         alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
     resources:
