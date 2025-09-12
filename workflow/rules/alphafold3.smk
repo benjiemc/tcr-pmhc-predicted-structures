@@ -148,6 +148,9 @@ rule run_alphafold_predictions:
 rule create_af3_structures_sample_size_50:
     input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
 
+rule create_colabfold_structures_sample_size_50:
+    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_mmseq_colabfold/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
+
 rule create_af3_structures_with_tcrmodel2_data_sample_size_50:
     input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
 
