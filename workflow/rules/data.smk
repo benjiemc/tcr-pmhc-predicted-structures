@@ -287,9 +287,24 @@ rule extract_colabfold_templates:
         number_of_templates=20
     script: '../scripts/extract_colabfold_templates.py'
 
+rule spoof_colabfold_paired_msas:
+    input: "data/interim/msa-inputs_mmseq/{name}.fasta"
+    output: "data/interim/msas_mmseq_colabfold/{name}_paired.a3m"
+    resources:
+        runtime="1m",
+        mem="1MB",
+    run:
+        with open(input[0], 'r') as fh:
+            sequence = next(line.strip() for line in fh if line and not line.startswith('>'))
+
+        os.makedirs(os.path.dirname(output[0]), exist_ok=True)
+        with open(output[0], 'w') as fh:
+            fh.write(f">query\n{sequence}\n")
+
 rule create_colabfold_msas_and_find_templates_sample_size_50:
     input:
-        msas=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_mmseq_colabfold/{name}_unpaired.a3m'),
+        unpaired_msas=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_mmseq_colabfold/{name}_unpaired.a3m'),
+        paired_msas=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_mmseq_colabfold/{name}_paired.a3m'),
         templates=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/templates_mmseq_colabfold/{name}')
 
 rule run_create_tcrmodel2_msas_and_find_templates:
