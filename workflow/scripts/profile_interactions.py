@@ -7,7 +7,16 @@ from snakemake.script import snakemake
 tcr = stcrpy.load_TCR(snakemake.input[0])
 tcr.standardise_chain_names()
 
-interactions = tcr.profile_peptide_interactions()
+try:
+    interactions = tcr.profile_peptide_interactions()
+
+except Exception as err:
+    if type(err).__name__ == 'ArgumentError' and type(err).__module__ == 'Boost.Python':
+        print('Interaction profiling raised an error:', err)
+        interactions = None
+
+    else:
+        raise
 
 if interactions is not None:
     interactions = interactions.query("protein_chain == 'D' or protein_chain == 'E'")
