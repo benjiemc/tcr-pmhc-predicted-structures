@@ -7,6 +7,7 @@ import logging
 import os
 import re
 import sys
+from collections import defaultdict
 
 import pandas as pd
 
@@ -329,21 +330,31 @@ def main() -> None:
             templates = {}
             for path in args.template_paths:
                 name = os.path.basename(path)
+                template_entries = defaultdict(dict)
+                indices_paths = glob.glob(os.path.join(path, '*_indices.json'))
+                structure_paths = glob.glob(os.path.join(path, '*.cif'))
 
-                indices_paths = sorted(glob.glob(os.path.join(path, '*_indices.json')))
-                structure_paths = sorted(glob.glob(os.path.join(path, '*.cif')))
+                for indice_path in indices_paths:
+                    entry_name = re.search(r'(\d+)_indices.json', os.path.basename(indice_path)).group(1)
+                    template_entries[entry_name]['indices_path'] = indice_path
+
+                for structure_path in structure_paths:
+                    entry_name = re.search(r'(\d+).cif', os.path.basename(structure_path)).group(1)
+                    template_entries[entry_name]['structure_path'] = structure_path
+
+                template_entries = sorted(template_entries.items())
 
                 entry_templates = []
-                for indices_path, structure_path in zip(indices_paths, structure_paths, strict=True):
-                    with open(indices_path, 'r') as fh:
+                for _, entry in template_entries:
+                    with open(entry['indices_path'], 'r') as fh:
                         entry_template = json.load(fh)
 
                     if args.relative_paths:
                         dirname = os.path.dirname(path)
-                        entry_template['mmcifPath'] = structure_path.replace(dirname, '').strip('/')
+                        entry_template['mmcifPath'] = entry['structure_path'].replace(dirname, '').strip('/')
 
                     else:
-                        entry_template['mmcifPath'] = structure_path
+                        entry_template['mmcifPath'] = entry['structure_path']
 
                     entry_templates.append(entry_template)
 
