@@ -7,7 +7,7 @@ import os
 import re
 import tempfile
 
-from Bio.PDB import MMCIFIO, MMCIFParser, Model, Structure
+from Bio.PDB import MMCIFIO, Chain, MMCIFParser, Model, Polypeptide, Structure
 from snakemake.script import snakemake
 
 with open(snakemake.input[0]) as fh:
@@ -28,23 +28,47 @@ for i, ((pdb_id, chain_id), cigar) in enumerate(
         structure = parser.get_structure(pdb_id, fh)
         date = parser._mmcif_dict['_pdbx_audit_revision_history.revision_date'][0]  # noqa: SLF001 workaround for dates
 
-    chain = structure[0][chain_id]
-
-    new_model = Model.Model(0)
-    new_model.add(chain.copy())
     new_structure = Structure.Structure(pdb_id + '_' + chain_id)
+    new_model = Model.Model(0)
+    new_chain = Chain.Chain('A')
+
+    for residue in structure[0][chain_id]:
+        if Polypeptide.is_aa(residue):
+            new_chain.add(residue.copy())
+
+    new_model.add(new_chain)
     new_structure.add(new_model)
 
     with tempfile.NamedTemporaryFile(suffix='.cif') as temp_file:
         io = MMCIFIO()
         io.set_structure(new_structure)
+        io.save(temp_file.name)  # Will be overwritten but needed to produce the mmcif dictionary
+        # Hack to set all chain IDs to 'A'
+        mmcif_dict = io.dic
+        mmcif_dict['_atom_site.label_asym_id'] = ['A' for _ in io.dic['_atom_site.label_asym_id']]
+
+        # Hack to set valid seq_ids for all entries
+        idx = 0
+        new_seq_ids = []
+        prev_seq_id = None
+        for seq_id in mmcif_dict['_atom_site.label_seq_id']:
+            if seq_id != prev_seq_id:
+                idx += 1
+                prev_seq_id = seq_id
+
+            new_seq_ids.append(str(idx))
+
+        mmcif_dict['_atom_site.label_seq_id'] = new_seq_ids
+
+        io.set_dict(mmcif_dict)
         io.save(temp_file.name)
 
-        # Hack to add the date fields required by AF3
         with open(temp_file.name, 'r') as fh:
             lines = fh.readlines()
 
+    # Hack to add the date fields required by AF3
     lines.insert(1, f'#\n_pdbx_audit_revision_history.revision_date {date}\n')
+
     with open(os.path.join(snakemake.output[0], f'{i}.cif'), 'w') as fh:
         fh.write(''.join(lines))
 
