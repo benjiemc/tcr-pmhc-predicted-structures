@@ -111,6 +111,7 @@ rule run_alphafold_predictions:
         cp {input.unpaired_msas} $input_dir_abs
         cp {input.paired_msas} $input_dir_abs
         cp -r {input.templates} $input_dir_abs
+        chmod +w -R $input_dir_abs
 
         mkdir -p $TMPDIR/jax_cache
         mkdir -p $(dirname {output.structures[0]})
