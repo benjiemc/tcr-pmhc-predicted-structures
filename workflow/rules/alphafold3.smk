@@ -325,6 +325,9 @@ rule process_af3_structure:
 
         tcr.save(output[0])
 
+rule process_colabfold_structures_sample_size_50:
+    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_mmseq_colabfold/{name}_{seed}_{sample}.pdb", seed)
+
 rule process_af3_structures_sample_size_50:
     input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_af3_af3/{name}_{seed}_{sample}.pdb", seed)
 
