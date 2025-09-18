@@ -20,8 +20,5 @@ dependencies:
   - snakemake
   - pip:
       - chai_lab==0.6.1
-      - matplotlib
-      - numpy
-      - pandas
       - python-pdb
       - stcrpy
