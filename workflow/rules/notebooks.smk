@@ -63,3 +63,58 @@ rule run_investigate_specificity_information_in_chai_scores:
             notebooks/investigate_specificity_information_in_chai_scores.ipynb
         touch {output}
         """
+
+def _get_msas_for_sample(sample_path: str, full_sequence_path: str, sequence_key_path: str, template: str) -> list[str]:
+    flag = False
+    for path in sample_path, full_sequence_path, sequence_key_path:
+        if not os.path.exists(path):
+            print(sample_path, 'does not exist!')
+            flag = True
+
+    if flag:
+        return []
+
+    with open(sample_path, 'r') as fh:
+        reader = csv.DictReader(fh)
+        ids = [entry['index'] for entry in reader]
+
+    with open(full_sequence_path, 'r') as fh:
+        reader = csv.DictReader(fh)
+        sequences = [
+            entry[chain_name]
+            for entry in reader
+            if entry['id'] in ids
+            for chain_name in ('tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2')
+        ]
+
+    with open(sequence_key_path, 'r') as fh:
+        sequence_key = {sequence: key for key, sequence in (line.split() for line in fh if line)}
+
+    names = [sequence_key[sequence] for sequence in sequences]
+
+    return expand(template, name=names)
+
+rule run_compare_msa_generation:
+    input:
+        'data/interim/sequences_sample_50.csv',
+        'data/interim/sequence_key.txt',
+        'data/interim/sequences_full.csv',
+        _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/benchmarks/msa-generation_af3_af3_{name}.tsv"),
+        _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/benchmarks/msa-generation_af3_tcrmodel2_{name}.tsv"),
+        _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/benchmarks/msa-generation_mmseq_colabfold_{name}.tsv"),
+        'data/processed/confidence_scores_af3_af3_50.csv',
+        'data/processed/confidence_scores_af3_tcrmodel2_50.csv',
+        'data/processed/confidence_scores_mmseq_colabfold_50.csv'
+    output: "data/flags/compare_msa_generation_done.flag"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    shell:
+        """
+        jupyter nbconvert \
+            --to notebook \
+            --execute \
+            --inplace \
+            notebooks/compare_msa_generation.ipynb
+        touch {output}
+        """
