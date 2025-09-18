@@ -101,10 +101,10 @@ rule run_compare_msa_generation:
         'data/interim/sequences_full.csv',
         _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/benchmarks/msa-generation_af3_af3_{name}.tsv"),
         _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/benchmarks/msa-generation_af3_tcrmodel2_{name}.tsv"),
-        _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/benchmarks/msa-generation_mmseq_colabfold_{name}.tsv"),
+        _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/benchmarks/msa-generation_mmseqs2_colabfold_{name}.tsv"),
         'data/processed/confidence_scores_af3_af3_50.csv',
         'data/processed/confidence_scores_af3_tcrmodel2_50.csv',
-        'data/processed/confidence_scores_mmseq_colabfold_50.csv'
+        'data/processed/confidence_scores_mmseqs2_colabfold_50.csv'
     output: "data/flags/compare_msa_generation_done.flag"
     resources:
         runtime="5m",

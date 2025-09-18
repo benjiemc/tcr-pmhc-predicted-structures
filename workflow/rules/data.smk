@@ -228,7 +228,7 @@ rule create_af3_msas_and_find_templates_sample_size_50:
 
 rule create_colabfold_msa_inputs:
     input: "data/interim/sequence_key.txt"
-    output: _create_msa_names("data/interim/sequence_key.txt", "data/interim/msa-inputs_mmseq/{name}.fasta")
+    output: _create_msa_names("data/interim/sequence_key.txt", "data/interim/msa-inputs_mmseqs2/{name}.fasta")
     resources:
         runtime="10m",
         mem="1GB"
@@ -243,10 +243,10 @@ rule create_colabfold_msa_inputs:
                     output_fh.write(f'>{id_}\n{sequence}\n')
 
 rule run_create_colabfold_msas_and_find_templates:
-    input: "data/interim/msa-inputs_mmseq/{name}.fasta"
+    input: "data/interim/msa-inputs_mmseqs2/{name}.fasta"
     output:
-        msa=protected('data/interim/msas_mmseq_colabfold/{name}_unpaired.a3m'),
-        templates=protected('data/interim/templates_mmseq_colabfold/{name}.m8')
+        msa=protected('data/interim/msas_mmseqs2_colabfold/{name}_unpaired.a3m'),
+        templates=protected('data/interim/templates_mmseqs2_colabfold/{name}.m8')
     threads: 32
     resources:
         runtime="5h",
@@ -254,7 +254,7 @@ rule run_create_colabfold_msas_and_find_templates:
     params:
         colabfold_data_dir=os.environ['COLABFOLD_DATA_DIR']
     benchmark:
-        "data/benchmarks/msa-generation_mmseq_colabfold_{name}.tsv"
+        "data/benchmarks/msa-generation_mmseqs2_colabfold_{name}.tsv"
     shell:
         """
         working_dir=$TMPDIR/{wildcards.name}
@@ -277,8 +277,8 @@ rule run_create_colabfold_msas_and_find_templates:
         """
 
 rule extract_colabfold_templates:
-    input: "data/interim/templates_mmseq_colabfold/{name}.m8"
-    output: directory("data/interim/templates_mmseq_colabfold/{name}")
+    input: "data/interim/templates_mmseqs2_colabfold/{name}.m8"
+    output: directory("data/interim/templates_mmseqs2_colabfold/{name}")
     resources:
         runtime="3m",
         mem="1GB"
@@ -288,8 +288,8 @@ rule extract_colabfold_templates:
     script: '../scripts/extract_colabfold_templates.py'
 
 rule spoof_colabfold_paired_msas:
-    input: "data/interim/msa-inputs_mmseq/{name}.fasta"
-    output: "data/interim/msas_mmseq_colabfold/{name}_paired.a3m"
+    input: "data/interim/msa-inputs_mmseqs2/{name}.fasta"
+    output: "data/interim/msas_mmseqs2_colabfold/{name}_paired.a3m"
     resources:
         runtime="1m",
         mem="1MB",
@@ -303,9 +303,9 @@ rule spoof_colabfold_paired_msas:
 
 rule create_colabfold_msas_and_find_templates_sample_size_50:
     input:
-        unpaired_msas=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_mmseq_colabfold/{name}_unpaired.a3m'),
-        paired_msas=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_mmseq_colabfold/{name}_paired.a3m'),
-        templates=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/templates_mmseq_colabfold/{name}')
+        unpaired_msas=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_mmseqs2_colabfold/{name}_unpaired.a3m'),
+        paired_msas=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_mmseqs2_colabfold/{name}_paired.a3m'),
+        templates=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/templates_mmseqs2_colabfold/{name}')
 
 rule run_create_tcrmodel2_msas_and_find_templates:
     input: "data/interim/msa-inputs_af3/{name}.json"
