@@ -131,6 +131,60 @@ rule convert_sequences_to_jsons:
                 with open(os.path.join(output_dir, f"{entry['id']}.json"), 'w') as output_fh:
                     json.dump(entry, output_fh)
 
+rule select_benchmark_structures:
+    input:
+        shi_parks_smith_benchmark="data/external/benchmark_set_from_shi_parks_smith.csv",
+        structures="data/raw/structures_no_crop",
+        structures_summary="data/raw/structures_summary_no_crop.csv",
+        stcrdab="data/external/stcrdab"
+    output: "data/interim/benchmark_structures.csv"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    script: "../scripts/select_benchmark_structures.py"
+
+def _get_benchmark_sequence_names(path: str, template: str) -> list[str]:
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
+
+    with open(path, 'r') as fh:
+        ids = [entry['id'] for entry in csv.DictReader(fh)]
+
+    return expand(template, name=ids)
+
+rule extract_benchmark_sequences:
+    input: "data/interim/benchmark_structures.csv"
+    output: _get_benchmark_sequence_names("data/interim/benchmark_structures.csv", "data/interim/sequences/{name}.json")
+    resources:
+        runtime="1m",
+        mem="10MB"
+    run:
+        import pandas as pd
+
+        df = pd.read_csv(input[0])
+        output_df = df[
+            [
+                column_name
+                for column_name in df.columns
+                if column_name.endswith('_sequence') or column_name in ('id', 'mhc_type')
+            ]
+        ]
+
+        output_df.columns = [{
+            'Achain_sequence': 'tcr_alpha_chain',
+            'Bchain_sequence': 'tcr_beta_chain',
+            'antigen_chain_sequence': 'peptide',
+            'mhc_chain1_sequence': 'mhc_chain_1',
+            'mhc_chain2_sequence': 'mhc_chain_2',
+        }.get(column_name, column_name) for column_name in output_df.columns]
+
+        output_dir = os.path.dirname(output[0])
+        os.makedirs(output_dir, exist_ok=True)
+        for entry in [{k: v for k, v in row.items() if pd.notna(v)} for row in output_df.to_dict(orient='records')]:
+            with open(os.path.join(output_dir, f"{entry['id']}.json"), 'w') as fh:
+                json.dump(entry, fh)
+
 def _create_msa_names(path: str, template: list[str]) -> list[str]:
     if not os.path.exists(path):
         print(path, 'does not exist!')
