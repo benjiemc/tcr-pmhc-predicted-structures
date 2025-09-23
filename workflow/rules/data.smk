@@ -143,7 +143,7 @@ def _create_msa_names(path: str, template: list[str]) -> list[str]:
 
 rule create_af3_msa_inputs:
     input: "data/interim/sequence_key.txt"
-    output: _create_msa_names(f"data/interim/sequence_key.txt", 'data/interim/msa-inputs_af3_af3/{name}.json')
+    output: _create_msa_names(f"data/interim/sequence_key.txt", 'data/interim/msa-inputs_af3/{name}.json')
     resources:
         runtime="10m",
         mem="1GB"
