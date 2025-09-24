@@ -356,6 +356,28 @@ rule create_af3_msas_and_find_templates_sample_size_50:
         paired_msas=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_af3/{name}_paired.a3m'),
         templates=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/templates_af3_af3/{name}')
 
+def _get_msas_for_benchmark(path: str, template: str) -> list[str]:
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
+
+    with open(path, 'r') as fh:
+        reader = csv.DictReader(fh)
+        ids = {
+            hashlib.sha256(sequence.encode()).hexdigest()[:8]
+            for entry in reader
+            for sequence_name in ('Achain_sequence', 'Bchain_sequence', 'mhc_chain1_sequence', 'mhc_chain2_sequence')
+            if (sequence := entry[sequence_name])
+        }
+
+    return expand(template, name=ids)
+
+rule create_af3_msas_and_find_templates_benchmark_structures:
+    input:
+        unpaired_msas=_get_msas_for_benchmark('data/interim/benchmark_structures.csv', 'data/interim/msas_af3_af3/{name}_unpaired.a3m'),
+        paired_msas=_get_msas_for_benchmark('data/interim/benchmark_structures.csv', 'data/interim/msas_af3_af3/{name}_paired.a3m'),
+        templates=_get_msas_for_benchmark('data/interim/benchmark_structures.csv', 'data/interim/templates_af3_af3/{name}')
+
 rule create_colabfold_msa_inputs:
     input: "data/interim/sequence_key.txt"
     output: _create_msa_names("data/interim/sequence_key.txt", "data/interim/msa-inputs_mmseqs2/{name}.fasta")
@@ -478,6 +500,12 @@ rule create_colabfold_msas_and_find_templates_sample_size_50:
         paired_msas=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_mmseqs2_colabfold/{name}_paired.a3m'),
         templates=_get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/templates_mmseqs2_colabfold/{name}')
 
+rule create_colabfold_msas_and_find_templates_benchmark_structures:
+    input:
+        unpaired_msas=_get_msas_for_benchmark('data/interim/benchmark_structures.csv', 'data/interim/msas_mmseqs2_colabfold/{name}_unpaired.a3m'),
+        paired_msas=_get_msas_for_benchmark('data/interim/benchmark_structures.csv', 'data/interim/msas_mmseqs2_colabfold/{name}_paired.a3m'),
+        templates=_get_msas_for_benchmark('data/interim/benchmark_structures.csv', 'data/interim/templates_mmseqs2_colabfold/{name}')
+
 rule run_create_tcrmodel2_msas_and_find_templates:
     input: "data/interim/msa-inputs_af3/{name}.json"
     output:
@@ -511,6 +539,12 @@ rule create_tcrmodel2_msas_and_find_templates_sample_size_1500:
         unpaired_msas=_get_msas_for_sample("data/interim/sequences_sample_1500.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
         paired_msas=_get_msas_for_sample("data/interim/sequences_sample_1500.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
         templates=_get_msas_for_sample("data/interim/sequences_sample_1500.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", 'data/interim/templates_af3_tcrmodel2/{name}')
+
+rule create_tcrmodel2_msas_and_find_templates_benchmark_structures:
+    input:
+        unpaired_msas=_get_msas_for_benchmark('data/interim/benchmark_structures.csv', 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
+        paired_msas=_get_msas_for_benchmark('data/interim/benchmark_structures.csv', 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
+        templates=_get_msas_for_benchmark('data/interim/benchmark_structures.csv', 'data/interim/templates_af3_tcrmodel2/{name}')
 
 def create_paths(summary_file: str, path_name: str) -> list[str]:
     if not os.path.exists(summary_file):

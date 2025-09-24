@@ -37,13 +37,13 @@ def get_sequence_ids(sequence_path: str, template: str) -> list[str]:
 
     return expand(template, name=ids)
 
-def get_predicted_structure_names(path: str, template: str, seeds: list) -> list[str]:
+def get_predicted_structure_names(path: str, template: str, seeds: list, column_name: str = 'index') -> list[str]:
     if not os.path.exists(path):
         print(path, 'does not exist!')
         return []
 
     with open(path, 'r') as fh:
-        indices = [entry['index'] for entry in csv.DictReader(fh)]
+        indices = [entry[column_name] for entry in csv.DictReader(fh)]
 
     return expand(template, name=indices, seed=seeds, sample=list(range(5)))
 
@@ -151,14 +151,23 @@ rule run_alphafold_predictions:
 rule create_af3_structures_sample_size_50:
     input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
 
+rule create_af3_structures_benchmark:
+    input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif", seed, column_name='id')
+
 rule create_colabfold_structures_sample_size_50:
     input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_mmseqs2_colabfold/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
+
+rule create_colabfold_structures_benchmark:
+    input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_mmseqs2_colabfold/{name}_seed-{seed}_sample-{sample}_model.cif", seed, column_name='id')
 
 rule create_af3_structures_with_tcrmodel2_data_sample_size_50:
     input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
 
 rule create_af3_structures_with_tcrmodel2_data_sample_size_1500:
     input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
+
+rule create_af3_structures_with_tcrmodel2_data_benchmark:
+    input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", seed, column_name='id')
 
 rule aggregate_af3_confidence_scores:
     input:
