@@ -229,11 +229,15 @@ def format_sequences_for_af3(
             'name': sequence_info['id'],
             'modelSeeds': model_seeds,
             'sequences': [
-                {'protein': {'id': 'D', 'sequence': sequence_info['tcr_alpha_chain']}},
-                {'protein': {'id': 'E', 'sequence': sequence_info['tcr_beta_chain']}},
-                {'protein': {'id': 'C', 'sequence': sequence_info['peptide']}},
-                {'protein': {'id': 'A', 'sequence': sequence_info['mhc_chain_1']}},
-                {'protein': {'id': 'B', 'sequence': sequence_info['mhc_chain_2']}},
+                {'protein': {'id': sequence_id, 'sequence': sequence_info[sequence_type]}}
+                for sequence_id, sequence_type in (
+                    ('D', 'tcr_alpha_chain'),
+                    ('E', 'tcr_beta_chain'),
+                    ('C', 'peptide'),
+                    ('A', 'mhc_chain_1'),
+                    ('B', 'mhc_chain_2'),
+                )
+                if sequence_type in sequence_info
             ],
             'dialect': 'alphafold3',
             'version': 2,
