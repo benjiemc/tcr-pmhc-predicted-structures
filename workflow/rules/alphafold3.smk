@@ -132,12 +132,19 @@ rule run_alphafold_predictions:
         output_dir=$(dirname {output.structures[0]})
         mkdir -p $output_dir
 
+        sanitized_output_name=$(echo {wildcards.name} | tr '[:upper:]' '[:lower:]' | tr ' ' '_')
         for sample_num in {{0..4}}; do
-            prediction_dir="${{temp_output_dir_abs}}/{wildcards.name}/seed-{wildcards.seed}_sample-${{sample_num}}"
+            prediction_dir="${{temp_output_dir_abs}}/${{sanitized_output_name}}/seed-{wildcards.seed}_sample-${{sample_num}}"
 
-            mv "$prediction_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_model.cif" $output_dir
-            mv "$prediction_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_summary_confidences.json" $output_dir
-            mv "$prediction_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_confidences.json" $output_dir
+            mv \
+                "$prediction_dir/${{sanitized_output_name}}_seed-{wildcards.seed}_sample-${{sample_num}}_model.cif" \
+                $output_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_model.cif
+            mv \
+                "$prediction_dir/${{sanitized_output_name}}_seed-{wildcards.seed}_sample-${{sample_num}}_summary_confidences.json" \
+                $output_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_summary_confidences.json
+            mv \
+                "$prediction_dir/${{sanitized_output_name}}_seed-{wildcards.seed}_sample-${{sample_num}}_confidences.json" \
+                $output_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_confidences.json
         done
         """
 
