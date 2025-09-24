@@ -2,6 +2,7 @@
 
 import argparse
 import glob
+import hashlib
 import json
 import logging
 import os
@@ -37,7 +38,7 @@ parser.add_argument(
 parser.add_argument('--chai-restraints', help='restraints file for chai restraints')
 
 paths_group = parser.add_argument_group('Paths')
-paths_group.add_argument('--sequence-key-path', help='path to sequence key file')
+paths_group.add_argument('--add-paths', action='store_true', help='add paths to pre-built MSAs and templates')
 paths_group.add_argument(
     '--relative-paths',
     action='store_true',
@@ -203,7 +204,8 @@ def format_sequences_for_af3(
     sequences: list[dict],
     output_dir: str,
     model_seeds: list[int],
-    sequence_key: dict[str, str] | None = None,
+    *,
+    add_paths: bool = False,
     unpaired_msa_paths: list[str] | None = None,
     paired_msa_paths: list[str] | None = None,
     templates: dict[str, list[dict[str, str]]] | None = None,
@@ -237,7 +239,7 @@ def format_sequences_for_af3(
             'version': 2,
         }
 
-        if sequence_key:
+        if add_paths:
             new_sequence_entries = []
             for sequence_entry in output['sequences']:
                 new_sequence_entry = {**sequence_entry}
@@ -249,46 +251,40 @@ def format_sequences_for_af3(
                     new_sequence_entry['protein']['templates'] = []
 
                 else:
-                    try:
-                        key = sequence_key[sequence_entry['protein']['sequence']]
+                    key = hashlib.sha256(sequence_entry['protein']['sequence'].encode()).hexdigest()[:8]
+                    relevant_unpaired_msas = [msa_path for msa_path in unpaired_msa_paths if key in msa_path]
 
-                    except KeyError:
-                        logger.error('No entry found for sequence: %s', sequence_entry['protein']['sequence'])  # noqa: TRY400
+                    if len(relevant_unpaired_msas) < 1:
+                        logger.error(
+                            'Missing unpaired MSAs for sequence: %s (key: %s)',
+                            sequence_entry['protein']['sequence'],
+                            key,
+                        )
 
                     else:
-                        relevant_unpaired_msas = [msa_path for msa_path in unpaired_msa_paths if key in msa_path]
+                        new_sequence_entry['protein']['unpairedMsaPath'] = relevant_unpaired_msas[0]
 
-                        if len(relevant_unpaired_msas) < 1:
-                            logger.error(
-                                'Missing unpaired MSAs for sequence: %s (key: %s)',
-                                sequence_entry['protein']['sequence'],
-                                key,
-                            )
+                    relevant_paired_msas = [msa_path for msa_path in paired_msa_paths if key in msa_path]
 
-                        else:
-                            new_sequence_entry['protein']['unpairedMsaPath'] = relevant_unpaired_msas[0]
+                    if len(relevant_unpaired_msas) < 1:
+                        logger.warning(
+                            'Missing paired MSAs for sequence: %s (key: %s)',
+                            sequence_entry['protein']['sequence'],
+                            key,
+                        )
 
-                        relevant_paired_msas = [msa_path for msa_path in paired_msa_paths if key in msa_path]
+                    else:
+                        new_sequence_entry['protein']['pairedMsaPath'] = relevant_paired_msas[0]
 
-                        if len(relevant_unpaired_msas) < 1:
-                            logger.warning(
-                                'Missing paired MSAs for sequence: %s (key: %s)',
-                                sequence_entry['protein']['sequence'],
-                                key,
-                            )
+                    try:
+                        new_sequence_entry['protein']['templates'] = templates[key]
 
-                        else:
-                            new_sequence_entry['protein']['pairedMsaPath'] = relevant_paired_msas[0]
-
-                        try:
-                            new_sequence_entry['protein']['templates'] = templates[key]
-
-                        except KeyError:
-                            logger.warning(
-                                'Missing paired MSAs for sequence: %s (key: %s)',
-                                sequence_entry['protein']['sequence'],
-                                key,
-                            )
+                    except KeyError:
+                        logger.warning(
+                            'Missing paired MSAs for sequence: %s (key: %s)',
+                            sequence_entry['protein']['sequence'],
+                            key,
+                        )
 
                 new_sequence_entries.append(new_sequence_entry)
 
@@ -311,11 +307,7 @@ def main() -> None:
         with open(path, 'r') as fh:
             sequences.append(json.load(fh))
 
-    if args.sequence_key_path:
-        logger.info('Loading sequence keys from %s', args.sequence_key_path)
-        with open(args.sequence_key_path, 'r') as fh:
-            sequence_key = {sequence: key for key, sequence in (line.split() for line in fh if line)}
-
+    if args.add_paths:
         unpaired_msa_paths = args.unpaired_msa_paths
         if args.relative_paths and unpaired_msa_paths:
             dirname = os.path.dirname(unpaired_msa_paths[0])
@@ -364,7 +356,6 @@ def main() -> None:
             templates = None
 
     else:
-        sequence_key = None
         unpaired_msa_paths = None
         paired_msa_paths = None
         templates = None
@@ -380,10 +371,10 @@ def main() -> None:
                 sequences,
                 args.output,
                 args.alphafold3_model_seeds,
-                sequence_key,
-                unpaired_msa_paths,
-                paired_msa_paths,
-                templates,
+                add_paths=args.add_paths,
+                unpaired_msa_paths=unpaired_msa_paths,
+                paired_msa_paths=paired_msa_paths,
+                templates=templates,
             )
 
         case 'chai':

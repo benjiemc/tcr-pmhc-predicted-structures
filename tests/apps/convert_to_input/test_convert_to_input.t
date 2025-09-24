@@ -33,7 +33,7 @@ Create AF3 inputs with paths
   $ python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
   > --log-level error \
   > --format alphafold3 \
-  > --sequence-key $TESTDIR/data/sequence_key.txt \
+  > --add-paths \
   > --relative-paths \
   > --unpaired-msa-paths $TESTDIR/data/msas/*_unpaired.a3m \
   > --paired-msa-paths $TESTDIR/data/msas/*_paired.a3m \

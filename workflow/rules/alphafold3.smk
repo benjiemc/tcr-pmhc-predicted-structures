@@ -1,4 +1,5 @@
 import csv
+import hashlib
 import os
 
 seed = config.get('seed', [1])
@@ -8,15 +9,6 @@ envvars:
 
 wildcard_constraints:
     sample_size="\d+"
-
-sequence_key_path = "data/interim/sequence_key.txt"
-if os.path.exists(sequence_key_path):
-    with open(sequence_key_path, 'r') as fh:
-        sequence_key = {sequence: key for key, sequence in (line.split() for line in fh if line)}
-
-else:
-    print(sequence_key_path, 'does not exist!')
-    sequence_key = {}
 
 def _get_json_names(template: str, path: str) -> list[str]:
     if not os.path.exists(path):
@@ -29,7 +21,7 @@ def _get_json_names(template: str, path: str) -> list[str]:
 
     return expand(template, name=indices)
 
-def lookup_sequence_ids(sequence_path: str, sequence_key: dict[str, str], template: str) -> list[str]:
+def get_sequence_ids(sequence_path: str, template: str) -> list[str]:
     if not os.path.exists(sequence_path):
         print(sequence_path, 'does not exist!')
         return []
@@ -37,7 +29,11 @@ def lookup_sequence_ids(sequence_path: str, sequence_key: dict[str, str], templa
     with open(sequence_path, 'r') as fh:
         sequences = json.load(fh)
 
-    ids = [sequence_key[sequence] for sequence in sequences.values() if sequence in sequence_key]
+    ids = [
+        hashlib.sha256(sequence.encode()).hexdigest()[:8]
+        for sequence_type, sequence in sequences.items()
+        if sequence_type in ('tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2')
+    ]
 
     return expand(template, name=ids)
 
@@ -54,10 +50,9 @@ def get_predicted_structure_names(path: str, template: str, seeds: list) -> list
 rule run_create_af3_jsons:
     input:
         sequences="data/interim/sequences/{name}.json",
-        sequence_key="data/interim/sequence_key.txt",
-        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_unpaired.a3m'),
-        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_paired.a3m'),
-        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, f'data/interim/templates_{wildcards.method}_{wildcards.data}/{{name}}')
+        unpaired_msas=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_unpaired.a3m'),
+        paired_msas=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_paired.a3m'),
+        templates=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/templates_{wildcards.method}_{wildcards.data}/{{name}}')
     output: "data/interim/sequences_{method}_{data}/{name}_{seed}.json"
     resources:
         runtime="5m",
@@ -70,7 +65,7 @@ rule run_create_af3_jsons:
             --log-level {config[log_level]} \
             --format alphafold3 \
              --alphafold3-model-seeds {wildcards.seed} \
-            --sequence-key {input.sequence_key} \
+            --add-paths \
             --relative-paths \
             --unpaired-msa-paths {input.unpaired_msas} \
             --paired-msa-paths {input.paired_msas} \
@@ -82,9 +77,9 @@ rule run_create_af3_jsons:
 rule run_alphafold_predictions:
     input:
         sequence="data/interim/sequences_{method}_{data}/{name}_{seed}.json",
-        unpaired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_unpaired.a3m'),
-        paired_msas=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_paired.a3m'),
-        templates=lambda wildcards: lookup_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", sequence_key, f'data/interim/templates_{wildcards.method}_{wildcards.data}/{{name}}')
+        unpaired_msas=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_unpaired.a3m'),
+        paired_msas=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_paired.a3m'),
+        templates=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/templates_{wildcards.method}_{wildcards.data}/{{name}}')
     output:
         structures=protected(expand("data/interim/structures_{{method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5))),
         summary_confidences=protected(expand("data/interim/structures_{{method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5))),
