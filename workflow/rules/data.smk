@@ -1,4 +1,5 @@
 import csv
+import hashlib
 import json
 import os
 
@@ -222,6 +223,81 @@ rule create_af3_msa_inputs:
                     output_fh,
                 )
 
+def get_sequence_ids(path: str, sequence_key_path: str, template: str) -> list[str]:
+    if not os.path.exists(sequence_key_path):
+        print(sequence_key_path, 'does not exist!')
+        return []
+
+    with open(sequence_key_path, 'r') as fh:
+        sequence_key = dict(line.strip().split() for line in fh if line)
+
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
+
+    with open(path, 'r') as fh:
+        reader = csv.DictReader(fh)
+
+        ids = {
+            sequence_id
+            for entry in reader
+            for sequence_name in ('Achain_sequence', 'Bchain_sequence', 'mhc_chain1_sequence', 'mhc_chain2_sequence')
+            if (sequence := entry[sequence_name])
+            and (sequence_id := hashlib.sha256(sequence.encode()).hexdigest()[:8]) not in sequence_key
+        }
+
+    return expand(template, name=ids)
+
+rule create_af3_msa_inputs_from_benchmark:
+    input:
+        benchmark_structures="data/interim/benchmark_structures.csv",
+        sequence_key="data/interim/sequence_key.txt"
+    output: get_sequence_ids('data/interim/benchmark_structures.csv', 'data/interim/sequence_key.txt', 'data/interim/msa-inputs_af3/{name}.json')
+    resources:
+        runtime="10m",
+        mem="10MB"
+    run:
+        output_dir = os.path.dirname(output[0])
+        if not os.path.exists(output_dir):
+            os.mkdir(output_dir)
+
+        with open(input.sequence_key, 'r') as fh:
+            sequence_key = dict(line.strip().split() for line in fh if line)
+
+        past_ids = set()
+        with open(input.benchmark_structures, 'r') as fh:
+            reader = csv.DictReader(fh)
+            for entry in reader:
+                for sequence_name in (
+                    'Achain_sequence', 'Bchain_sequence', 'mhc_chain1_sequence', 'mhc_chain2_sequence'
+                ):
+                    if sequence_name not in entry:
+                        continue
+
+                    sequence = entry[sequence_name]
+                    if not sequence:
+                        continue
+
+                    sequence_id = hashlib.sha256(sequence.encode()).hexdigest()[:8]
+                    if sequence_id in sequence_key or sequence_id in past_ids:
+                        continue
+
+                    with open(os.path.join(output_dir, sequence_id + '.json'), 'w') as output_fh:
+                        json.dump(
+                            {
+                                'name': sequence_id,
+                                'modelSeeds': [1],
+                                'sequences': [
+                                    {'protein': {'id': 'A', 'sequence': sequence}},
+                                ],
+                                'dialect': 'alphafold3',
+                                'version': 1,
+                            },
+                            output_fh,
+                        )
+
+                    past_ids.add(sequence_id)
+
 rule run_create_af3_msas_and_find_templates:
     input: "data/interim/msa-inputs_af3/{name}.json"
     output:
@@ -295,6 +371,47 @@ rule create_colabfold_msa_inputs:
             for id_, sequence in (line.split() for line in fh.readlines() if line):
                 with open(os.path.join(output_dir, id_ + '.fasta'), 'w') as output_fh:
                     output_fh.write(f'>{id_}\n{sequence}\n')
+
+rule create_colabfold_msa_inputs_from_benchmark:
+    input:
+        benchmark_structures="data/interim/benchmark_structures.csv",
+        sequence_key="data/interim/sequence_key.txt"
+    output: get_sequence_ids('data/interim/benchmark_structures.csv', 'data/interim/sequence_key.txt', 'data/interim/msa-inputs_mmseqs2/{name}.fasta')
+    resources:
+        runtime="10m",
+        mem="10MB"
+    run:
+        output_dir = os.path.dirname(output[0])
+        if not os.path.exists(output_dir):
+            print('Creating output dir')
+            os.mkdir(output_dir)
+
+        print('Loading sequence key')
+        with open(input.sequence_key, 'r') as fh:
+            sequence_key = dict(line.strip().split() for line in fh if line)
+
+        past_ids = set()
+        with open(input.benchmark_structures, 'r') as fh:
+            reader = csv.DictReader(fh)
+            for entry in reader:
+                for sequence_name in (
+                    'Achain_sequence', 'Bchain_sequence', 'mhc_chain1_sequence', 'mhc_chain2_sequence'
+                ):
+                    if sequence_name not in entry:
+                        continue
+
+                    sequence = entry[sequence_name]
+                    if not sequence:
+                        continue
+
+                    sequence_id = hashlib.sha256(sequence.encode()).hexdigest()[:8]
+                    if sequence_id in sequence_key or sequence_id in past_ids:
+                        continue
+
+                    with open(os.path.join(output_dir, sequence_id + '.fasta'), 'w') as output_fh:
+                        output_fh.write(f'>{sequence_id}\n{sequence}\n')
+
+                    past_ids.add(sequence_id)
 
 rule run_create_colabfold_msas_and_find_templates:
     input: "data/interim/msa-inputs_mmseqs2/{name}.fasta"
