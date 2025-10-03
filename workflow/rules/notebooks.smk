@@ -1,3 +1,5 @@
+include: "utils.smk"
+
 rule run_compare_structural_features_to_confidence:
     input:
         "data/external/tcr_pmhc_contacts.csv",
@@ -104,7 +106,11 @@ rule run_compare_msa_generation:
         _get_msas_for_sample("data/interim/sequences_sample_50.csv", "data/interim/sequences_full.csv", "data/interim/sequence_key.txt", "data/benchmarks/msa-generation_mmseqs2_colabfold_{name}.tsv"),
         'data/processed/confidence_scores_af3_af3_50.csv',
         'data/processed/confidence_scores_af3_tcrmodel2_50.csv',
-        'data/processed/confidence_scores_mmseqs2_colabfold_50.csv'
+        'data/processed/confidence_scores_mmseqs2_colabfold_50.csv',
+        'data/processed/predicted_af3_af3_dockq_benchmark.csv',
+        'data/processed/predicted_af3_tcrmodel2_dockq_benchmark.csv',
+        get_predicted_structure_names(f"data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", seed, column_name='id'),
+        get_predicted_structure_names(f"data/interim/benchmark_structures.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", seed, column_name='id')
     output: "data/flags/compare_msa_generation_done.flag"
     resources:
         runtime="5m",

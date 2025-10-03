@@ -4,11 +4,18 @@ import os
 
 seed = config.get('seed', [1])
 
+include: "utils.smk"
+
 envvars:
     "ALPHAFOLD3_WEIGHTS_DIR"
 
 wildcard_constraints:
-    sample_size="\d+"
+    sample_size="\d+",
+    seed="\d+",
+    sample="\d+",
+    method="[A-Za-z0-9]+",
+    data="[A-Za-z0-9]+",
+    name="[A-Za-z0-9_]+"
 
 def _get_json_names(template: str, path: str) -> list[str]:
     if not os.path.exists(path):
@@ -36,16 +43,6 @@ def get_sequence_ids(sequence_path: str, template: str) -> list[str]:
     ]
 
     return expand(template, name=ids)
-
-def get_predicted_structure_names(path: str, template: str, seeds: list, column_name: str = 'index') -> list[str]:
-    if not os.path.exists(path):
-        print(path, 'does not exist!')
-        return []
-
-    with open(path, 'r') as fh:
-        indices = [entry[column_name] for entry in csv.DictReader(fh)]
-
-    return expand(template, name=indices, seed=seeds, sample=list(range(5)))
 
 rule run_create_af3_jsons:
     input:
@@ -422,3 +419,72 @@ rule aggregate_af3_interactions:
 
         interactions = pd.concat(interactions)
         interactions.to_csv(output[0], index=False)
+
+rule calculate_dockq_score:
+    input:
+        prediction="data/interim/structures_{method}_{data}/{name}_seed-{seed}_sample-{sample}_model.cif",
+        structure="data/raw/structures_no_crop/{name}.pdb"
+    output: temp("data/interim/{method}_{data}_{name}_{seed}_{sample}_dockq.json")
+    resources:
+        runtime="5m",
+        mem="1GB"
+    run:
+        import json
+
+        import stcrpy
+        from stcrpy.tcr_metrics.tcr_dockq import TCRDockQ
+
+        tcr = stcrpy.load_TCR(input.prediction)
+        tcr_ref = stcrpy.load_TCR(input.structure)
+
+        dockq_result = TCRDockQ().tcr_dockq(tcr, tcr_ref)
+        dockq_result = dockq_result['best_result']['TM']
+
+        with open(output[0], 'w') as fh:
+            json.dump(dockq_result, fh)
+
+rule aggregate_dockq_scores:
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/benchmark_structures.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_dockq.json", seed, column_name='id')
+    output: "data/processed/predicted_{method}_{data}_dockq_benchmark.csv"
+    resources:
+        runtime="1m",
+        mem="10MB"
+    run:
+        import json
+        import pandas as pd
+
+        dockq_scores = []
+        for path in input:
+            with open(path, 'r') as fh:
+                dockq_score = json.load(fh)
+
+            info = re.search(
+                r'[A-Za-z0-9]+_[A-Za-z0-9]+_(?P<name>[A-Za-z0-9_]+)_(?P<seed>\d+)_(?P<sample>\d+)_dockq.json',
+                os.path.basename(path),
+            ).groupdict()
+
+            for key, value in info.items():
+                dockq_score[key] = value
+
+            dockq_scores.append(dockq_score)
+
+        dockq_scores = pd.DataFrame(dockq_scores)
+        dockq_scores = dockq_scores[[
+            'name',
+            'seed',
+            'sample',
+            'DockQ',
+            'F1',
+            'iRMSD',
+            'LRMSD',
+            'fnat',
+            'nat_correct',
+            'nat_total',
+            'fnonnat',
+            'nonnat_count',
+            'model_total',
+            'clashes',
+            'len1',
+            'len2',
+        ]]
+        dockq_scores.to_csv(output[0], index=False)
