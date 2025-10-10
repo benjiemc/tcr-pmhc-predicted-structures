@@ -280,7 +280,7 @@ rule summarise_af3_structural_features:
     input: "data/interim/structures_{method}_{data}/{name}_seed-{seed}_sample-{sample}_model.cif"
     output: temp("data/interim/{method}_{data}_{name}_{seed}_{sample}_structural_summary.json")
     resources:
-        runtime="10m",
+        runtime="20m",
         mem="2GB"
     script: "../scripts/summarise_structural_features.py"
 
