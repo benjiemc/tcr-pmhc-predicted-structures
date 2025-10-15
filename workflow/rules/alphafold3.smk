@@ -1,5 +1,4 @@
 import csv
-import hashlib
 import os
 
 include: "utils.smk"
@@ -25,22 +24,6 @@ def _get_json_names(template: str, path: str) -> list[str]:
         indices = [entry['index'] for entry in reader]
 
     return expand(template, name=indices)
-
-def get_sequence_ids(sequence_path: str, template: str) -> list[str]:
-    if not os.path.exists(sequence_path):
-        print(sequence_path, 'does not exist!')
-        return []
-
-    with open(sequence_path, 'r') as fh:
-        sequences = json.load(fh)
-
-    ids = [
-        hashlib.sha256(sequence.encode()).hexdigest()[:8]
-        for sequence_type, sequence in sequences.items()
-        if sequence_type in ('tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2')
-    ]
-
-    return expand(template, name=ids)
 
 rule run_create_af3_jsons:
     input:
