@@ -1,5 +1,6 @@
 default_config = {
     'log_level': 'info',
+    'seed': [1],
 }
 
 config = {**default_config, **config}

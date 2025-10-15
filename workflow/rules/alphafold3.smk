@@ -2,8 +2,6 @@ import csv
 import hashlib
 import os
 
-seed = config.get('seed', [1])
-
 include: "utils.smk"
 
 envvars:
@@ -146,31 +144,31 @@ rule run_alphafold_predictions:
         """
 
 rule create_af3_structures_sample_size_50:
-    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
+    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'])
 
 rule create_af3_structures_benchmark:
-    input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif", seed, column_name='id')
+    input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
 
 rule create_colabfold_structures_sample_size_50:
-    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_mmseqs2_colabfold/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
+    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_mmseqs2_colabfold/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'])
 
 rule create_colabfold_structures_benchmark:
-    input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_mmseqs2_colabfold/{name}_seed-{seed}_sample-{sample}_model.cif", seed, column_name='id')
+    input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_mmseqs2_colabfold/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
 
 rule create_af3_structures_with_tcrmodel2_data_sample_size_50:
-    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
+    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'])
 
 rule create_af3_structures_with_tcrmodel2_data_sample_size_1500:
-    input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", seed)
+    input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'])
 
 rule create_af3_structures_with_tcrmodel2_data_benchmark:
-    input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", seed, column_name='id')
+    input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
 
 rule aggregate_af3_confidence_scores:
     input:
-        summary_confidences=lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/structures_{{method}}_{{data}}/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", seed),
-        confidences=lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/structures_{{method}}_{{data}}/{name}_seed-{seed}_sample-{sample}_confidences.json", seed),
-        sequences=lambda wildcards: expand(_get_json_names("data/interim/sequences_{{{{method}}}}_{{{{data}}}}/{name}_{{seed}}.json", f"data/interim/sequences_sample_{wildcards.sample_size}.csv"), seed=seed)
+        summary_confidences=lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/structures_{{method}}_{{data}}/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", config['seed']),
+        confidences=lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/structures_{{method}}_{{data}}/{name}_seed-{seed}_sample-{sample}_confidences.json", config['seed']),
+        sequences=lambda wildcards: expand(_get_json_names("data/interim/sequences_{{{{method}}}}_{{{{data}}}}/{name}_{{seed}}.json", f"data/interim/sequences_sample_{wildcards.sample_size}.csv"), seed=config['seed'])
     output: "data/interim/confidence_scores_{method}_{data}_{sample_size}.csv"
     resources:
         runtime=lambda wildcards : f"{max(-(int(wildcards.sample_size) // -5), 300)}m",
@@ -232,7 +230,7 @@ def _get_ipsaes_names(path: str, seeds: list[int], distance_cutoff: float, pae_c
 rule add_ipsaes_to_confidence_scores:
     input:
         confidence_scores="data/interim/confidence_scores_{method}_{data}_{sample_size}.csv",
-        ipaes=lambda wildcards: _get_ipsaes_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", seeds=seed, distance_cutoff=10, pae_cutoff=10)
+        ipaes=lambda wildcards: _get_ipsaes_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", seeds=config['seed'], distance_cutoff=10, pae_cutoff=10)
     output: "data/processed/confidence_scores_{method}_{data}_{sample_size}.csv"
     resources:
         runtime="10m",
@@ -285,7 +283,7 @@ rule summarise_af3_structural_features:
     script: "../scripts/summarise_structural_features.py"
 
 rule aggregate_af3_structural_features:
-    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_structural_summary.json", seed)
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_structural_summary.json", config['seed'])
     output: "data/processed/predicted_{method}_{data}_structural_features_{sample_size}.csv"
     resources:
         runtime="10m",
@@ -334,16 +332,16 @@ rule process_af3_structure:
         tcr.save(output[0])
 
 rule process_colabfold_structures_sample_size_50:
-    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_mmseqs2_colabfold/{name}_{seed}_{sample}.pdb", seed)
+    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_mmseqs2_colabfold/{name}_{seed}_{sample}.pdb", config['seed'])
 
 rule process_af3_structures_sample_size_50:
-    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_af3_af3/{name}_{seed}_{sample}.pdb", seed)
+    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_af3_af3/{name}_{seed}_{sample}.pdb", config['seed'])
 
 rule process_af3_structures_with_tcrmodel2_data_sample_size_50:
-    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", seed)
+    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/processed/structures_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", config['seed'])
 
 rule process_af3_structures_with_tcrmodel2_data_sample_size_1500:
-    input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/processed/structures_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", seed)
+    input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/processed/structures_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", config['seed'])
 
 rule create_contact_map:
     input: "data/processed/structures_{method}_{data}/{name}_{seed}_{sample}.pdb"
@@ -367,7 +365,7 @@ rule create_contact_map:
         """
 
 rule aggregate_contact_maps:
-    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_contacts.csv", seed)
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_contacts.csv", config['seed'])
     output: "data/processed/predicted_{method}_{data}_contact_maps_{sample_size}.csv"
     resources:
         runtime="10m",
@@ -398,7 +396,7 @@ rule profile_af3_interactions:
     script: "../scripts/profile_interactions.py"
 
 rule aggregate_af3_interactions:
-    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_interactions.csv", seed)
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_interactions.csv", config['seed'])
     output: "data/processed/predicted_{method}_{data}_interactions_{sample_size}.csv"
     resources:
         runtime="10m",
@@ -444,7 +442,7 @@ rule calculate_dockq_score:
             json.dump(dockq_result, fh)
 
 rule aggregate_dockq_scores:
-    input: lambda wildcards: get_predicted_structure_names(f"data/interim/benchmark_structures.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_dockq.json", seed, column_name='id')
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/benchmark_structures.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_dockq.json", config['seed'], column_name='id')
     output: "data/processed/predicted_{method}_{data}_dockq_benchmark.csv"
     resources:
         runtime="1m",

@@ -109,8 +109,8 @@ rule run_compare_msa_generation:
         'data/processed/confidence_scores_mmseqs2_colabfold_50.csv',
         'data/processed/predicted_af3_af3_dockq_benchmark.csv',
         'data/processed/predicted_af3_tcrmodel2_dockq_benchmark.csv',
-        get_predicted_structure_names(f"data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", seed, column_name='id'),
-        get_predicted_structure_names(f"data/interim/benchmark_structures.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", seed, column_name='id')
+        get_predicted_structure_names(f"data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", config['seed'], column_name='id'),
+        get_predicted_structure_names(f"data/interim/benchmark_structures.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", config['seed'], column_name='id')
     output: "data/flags/compare_msa_generation_done.flag"
     resources:
         runtime="5m",
