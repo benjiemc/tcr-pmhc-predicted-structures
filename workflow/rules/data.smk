@@ -546,6 +546,26 @@ rule create_tcrmodel2_msas_and_find_templates_benchmark_structures:
         paired_msas=_get_msas_for_benchmark('data/interim/benchmark_structures.csv', 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
         templates=_get_msas_for_benchmark('data/interim/benchmark_structures.csv', 'data/interim/templates_af3_tcrmodel2/{name}')
 
+rule combine_msas_to_parquet:
+    input:
+        unpaired_msa="data/interim/msas_{msa_method}_{data_source}/{name}_unpaired.a3m",
+        paired_msa="data/interim/msas_{msa_method}_{data_source}/{name}_paired.a3m"
+    output: "data/interim/msas_{msa_method}_{data_source}/{name}.aligned.pqt"
+    resources:
+        runtime="5m",
+        mem="5GB"
+    script: '../scripts/combine_msas_to_parquet.py'
+
+rule create_m8_file_from_templates:
+    input:
+        msa_input="data/interim/msa-inputs_{msa_method}/{name}.json",
+        templates="data/interim/templates_{msa_method}_{data_source}/{name}"
+    output: "data/interim/templates_{msa_method}_{data_source}/{name}.m8"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: '../scripts/create_m8_file_from_templates.py'
+
 def create_paths(summary_file: str, path_name: str) -> list[str]:
     if not os.path.exists(summary_file):
         print(summary_file, 'does not exist!')

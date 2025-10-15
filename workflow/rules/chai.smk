@@ -1,6 +1,8 @@
 import csv
 import os
 
+include: "utils.smk"
+
 def _get_chai_names(path: str) -> list[str]:
     if not os.path.exists(path):
         print(path, 'does not exist!')
@@ -14,11 +16,13 @@ def _get_chai_names(path: str) -> list[str]:
             for entry in reader for extension in ('.fasta', '_restraints.csv')
         ]
 
-rule create_chai_sequences_and_restraints:
+rule create_chai_sequence_and_restraints:
     input:
-        sequences="data/interim/sequences_full.csv",
+        sequences="data/interim/sequences/{name}.json",
         restraints="data/processed/tcr_pmhc_distance_restaints.csv"
-    output: _get_chai_names('data/interim/sequences_sample_50.csv')
+    output:
+        sequence="data/interim/sequences_chai/{name}.fasta",
+        restraint="data/interim/sequences_chai/{name}_restraints.csv",
     shell:
         """
         python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
@@ -30,47 +34,29 @@ rule create_chai_sequences_and_restraints:
         """
 
 rule run_chai_1:
-    input: "data/interim/sequences-and-restraints-chai/{name}.fasta"
-    output: directory("data/interim/structures-chai/{name}")
-    run:
-        import logging
-        import shutil
-        from pathlib import Path
+    input:
+        sequences="data/interim/sequences_chai/{name}.fasta",
+        msas=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/msas_{wildcards.msa_method}_{wildcards.data}/{{name}}.aligned.pqt'),
+        templates_summaries=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/templates_{wildcards.msa_method}_{wildcards.data}/{{name}}.m8'),
+        templates=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/templates_{wildcards.msa_method}_{wildcards.data}/{{name}}')
+    output:
+        structures=protected(expand("data/interim/structures_chai_{{msa_method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5))),
+        summary_confidences=protected(expand("data/interim/structures_chai_{{msa_method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5))),
+        confidences=protected(expand("data/interim/structures_chai_{{msa_method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_confidences.json", sample=range(5)))
+    resources:
+        runtime="10m",
+        mem="40GB",
+        gpu=1
+    script: "../scripts/predict_structure_with_chai.py"
 
-        import numpy as np
+rule create_structures_chai_af3_tcrmodel2_sample_size_50:
+    input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_chai_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'])
 
-        from chai_lab.chai1 import run_inference
+rule create_structures_chai_af3_tcrmodel2_sample_size_1500:
+    input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/interim/structures_chai_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'])
 
-        logging.basicConfig(level=logging.INFO)
-
-        if not os.path.exists(os.path.dirname(output[0])):
-            os.mkdir(os.path.dirname(output[0]))
-
-        output_dir = Path(output[0])
-        if output_dir.exists():
-            logging.warning('Removing old output directory: %s', output[0])
-            shutil.rmtree(output_dir)
-
-        output_dir.mkdir()
-
-        candidates = run_inference(
-            fasta_file=Path(input[0]),
-            output_dir=output_dir,
-            num_trunk_recycles=3,
-            num_diffn_timesteps=200,
-            seed=42,
-            use_esm_embeddings=True,
-            use_msa_server=True,
-            use_templates_server=True,
-        )
-
-        for i in range(len(candidates.cif_paths)):
-            np.savez(
-                output_dir.joinpath(f'confidences.model_idx_{i}.npz'),
-                pae=candidates.pae[i].numpy(),
-                pde=candidates.pde[i].numpy(),
-                plddt=candidates.plddt[i].numpy(),
-            )
+rule create_structures_chai_af3_tcrmodel2_benchmark:
+    input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_chai_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
 
 rule run_chai_1_with_restraints:
     input:

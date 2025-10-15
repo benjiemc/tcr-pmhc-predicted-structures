@@ -19,6 +19,6 @@ dependencies:
   - seaborn
   - snakemake
   - pip:
-      - chai_lab==0.6.1
+      - git+https://github.com/chaidiscovery/chai-lab.git@a01bfde
       - python-pdb
       - stcrpy
