@@ -556,6 +556,16 @@ rule combine_msas_to_parquet:
         mem="5GB"
     script: '../scripts/combine_msas_to_parquet.py'
 
+rule combine_msas_to_csv:
+    input:
+        unpaired_msa="data/interim/msas_{msa_method}_{data_source}/{name}_unpaired.a3m",
+        paired_msa="data/interim/msas_{msa_method}_{data_source}/{name}_paired.a3m"
+    output: "data/interim/msas_{msa_method}_{data_source}/{name}.csv"
+    resources:
+        runtime="5m",
+        mem="5GB"
+    script: '../scripts/combine_msas_to_csv.py'
+
 rule create_m8_file_from_templates:
     input:
         msa_input="data/interim/msa-inputs_{msa_method}/{name}.json",
