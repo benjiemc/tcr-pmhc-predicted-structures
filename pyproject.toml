@@ -17,6 +17,7 @@ dependencies = [
 	"scipy",
     "stitchr>1.1.3",
     "tidytcells",
+    "pyyaml",
 ]
 
 [project.optional-dependencies]

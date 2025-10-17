@@ -65,6 +65,23 @@ Create AF3 inputs with paths
   $ jq --sort-keys . $TESTDIR/reference/alphafold3/5_path.json > ref
   $ diff test ref
 
+Create Boltz inputs with paths
+  $ python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
+  > --format boltz \
+  > --add-paths \
+  > --relative-paths \
+  > --unpaired-msa-paths $TESTDIR/data/msas/*.csv \
+  > --template-paths $TESTDIR/data/templates/* \
+  > -o boltz-paths \
+  > $TESTDIR/data/0.json $TESTDIR/data/1.json $TESTDIR/data/2.json $TESTDIR/data/3.json $TESTDIR/data/4.json $TESTDIR/data/5.json
+
+  $ diff boltz-paths/0.yaml $TESTDIR/reference/boltz/0_path.yaml
+  $ diff boltz-paths/1.yaml $TESTDIR/reference/boltz/1_path.yaml
+  $ diff boltz-paths/2.yaml $TESTDIR/reference/boltz/2_path.yaml
+  $ diff boltz-paths/3.yaml $TESTDIR/reference/boltz/3_path.yaml
+  $ diff boltz-paths/4.yaml $TESTDIR/reference/boltz/4_path.yaml
+  $ diff boltz-paths/5.yaml $TESTDIR/reference/boltz/5_path.yaml
+
 Create chai input
   $ python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
   > --format chai \

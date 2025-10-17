@@ -11,6 +11,7 @@ import sys
 from collections import defaultdict
 
 import pandas as pd
+import yaml
 
 from tcr_pmhc_predicted_structures.apps._log import add_logging_arguments, setup_logger
 from tcr_pmhc_predicted_structures.imgt_numbering import IMGT_CDR1, IMGT_CDR2, IMGT_CDR3, MHC_I_IMGT_BETA_HELIX_START
@@ -31,7 +32,9 @@ parser = argparse.ArgumentParser(
 
 parser.add_argument('inputs', nargs='+', help='path to input json files')
 parser.add_argument('--output', '-o', required=True, help='')
-parser.add_argument('--format', required=True, choices=['alphafold3', 'chai'], help='Model to generate input files for')
+parser.add_argument(
+    '--format', required=True, choices=['alphafold3', 'boltz', 'chai'], help='Model to generate input files for'
+)
 parser.add_argument(
     '--alphafold3-model-seeds', nargs='+', type=int, default=[1], help='Seeds for alphafold3 (Default: [1])'
 )
@@ -44,7 +47,14 @@ paths_group.add_argument(
     action='store_true',
     help='use relative path names for MSA and template paths instead of full path names',
 )
-paths_group.add_argument('--unpaired-msa-paths', nargs='+', help='paths to the unpaired MSA files')
+paths_group.add_argument(
+    '--unpaired-msa-paths',
+    nargs='+',
+    help=(
+        'Paths to the unpaired MSA files. If there is just one combined MSA being used (ie. for boltz) then just use '
+        'this one.'
+    ),
+)
 paths_group.add_argument('--paired-msa-paths', nargs='+', help='paths to the paired MSA files')
 paths_group.add_argument('--template-paths', nargs='+', help='path to the templates')
 
@@ -198,6 +208,94 @@ def format_sequences_for_chai(sequences: list[dict], output_dir: str, restraints
                 fh.write(f'>protein|name={name}\n')
                 fh.write(sequence_info[name])
                 fh.write('\n')
+
+
+def format_sequences_for_boltz(
+    sequences: list[dict],
+    output_dir: str,
+    *,
+    add_paths: bool = False,
+    msa_paths: list[str] | None = None,
+    templates: dict[str, list[dict[str, str]]] | None = None,
+) -> None:
+    def _format_path_for_boltz_template(path: str, name: str) -> str:
+        dir_name = os.path.dirname(path)
+        file_name = os.path.basename(path)
+        return os.path.join(dir_name, f'{name}_{file_name}')
+
+    if msa_paths is None:
+        msa_paths = []
+
+    if templates is None:
+        templates = []
+
+    for sequence_info in sequences:
+        logger.debug('Writing yaml for %s', sequence_info['id'])
+        output_name = os.path.join(output_dir, f"{sequence_info['id']}.yaml")
+
+        output = {
+            'sequences': [
+                {'protein': {'id': sequence_id, 'sequence': sequence_info[sequence_type]}}
+                for sequence_id, sequence_type in (
+                    ('D', 'tcr_alpha_chain'),
+                    ('E', 'tcr_beta_chain'),
+                    ('C', 'peptide'),
+                    ('A', 'mhc_chain_1'),
+                    ('B', 'mhc_chain_2'),
+                )
+                if sequence_type in sequence_info
+            ],
+        }
+
+        if add_paths:
+            new_sequence_entries = []
+            template_entries = []
+            for sequence_entry in output['sequences']:
+                new_sequence_entry = {**sequence_entry}
+
+                if sequence_entry['protein']['id'] == 'C':
+                    new_sequence_entry['protein']['msa'] = 'empty'
+
+                else:
+                    key = hashlib.sha256(sequence_entry['protein']['sequence'].encode()).hexdigest()[:8]
+                    relevant_msas = [msa_path for msa_path in msa_paths if key in msa_path]
+
+                    if len(relevant_msas) < 1:
+                        logger.error(
+                            'Missing MSAs for sequence: %s (key: %s)',
+                            sequence_entry['protein']['sequence'],
+                            key,
+                        )
+
+                    else:
+                        new_sequence_entry['protein']['msa'] = relevant_msas[0]
+
+                    try:
+                        template_entries.extend(
+                            [
+                                {
+                                    'cif': _format_path_for_boltz_template(template['mmcifPath'], key),
+                                    'chain_id': sequence_entry['protein']['id'],
+                                }
+                                for template in templates[key]
+                            ]
+                        )
+
+                    except KeyError:
+                        logger.warning(
+                            'Missing template for sequence: %s (key: %s)',
+                            sequence_entry['protein']['sequence'],
+                            key,
+                        )
+
+                new_sequence_entries.append(new_sequence_entry)
+
+            output['sequences'] = new_sequence_entries
+            output['templates'] = template_entries
+
+        with open(output_name, 'w') as output_fh:
+            logger.debug('Writing to %s', output_name)
+            yaml.dump(output, output_fh)
 
 
 def format_sequences_for_af3(
@@ -378,6 +476,16 @@ def main() -> None:
                 add_paths=args.add_paths,
                 unpaired_msa_paths=unpaired_msa_paths,
                 paired_msa_paths=paired_msa_paths,
+                templates=templates,
+            )
+
+        case 'boltz':
+            logger.info('Formatting sequences for Boltz and outputting to %s', args.output)
+            format_sequences_for_boltz(
+                sequences,
+                args.output,
+                add_paths=args.add_paths,
+                msa_paths=unpaired_msa_paths,
                 templates=templates,
             )
 

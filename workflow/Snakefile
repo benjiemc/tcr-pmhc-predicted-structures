@@ -7,6 +7,7 @@ config = {**default_config, **config}
 
 include: "rules/data.smk"
 include: "rules/alphafold3.smk"
+include: "rules/boltz.smk"
 include: "rules/chai.smk"
 include: "rules/tcrmodel2.smk"
 include: "rules/notebooks.smk"
