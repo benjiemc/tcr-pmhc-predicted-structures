@@ -593,8 +593,8 @@ rule convert_template_indices_to_structure:
 rule create_m8_file_from_templates:
     input:
         msa_input="data/interim/msa-inputs_{msa_method}/{name}.json",
-        templates="data/interim/templates_{msa_method}_{data_source}/{name}"
-    output: "data/interim/templates_{msa_method}_{data_source}/{name}.m8"
+        templates="data/interim/templates_{msa_method}_{data_source}_converted_indices/{name}"
+    output: "data/interim/templates_{msa_method}_{data_source}_converted_indices/{name}.m8"
     resources:
         runtime="5m",
         mem="1GB"
