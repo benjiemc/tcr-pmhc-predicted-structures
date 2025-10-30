@@ -566,6 +566,30 @@ rule combine_msas_to_csv:
         mem="5GB"
     script: '../scripts/combine_msas_to_csv.py'
 
+rule convert_template_indices_to_structure:
+    input: "data/interim/templates_{msa_method}_{data_source}/{name}"
+    output: directory("data/interim/templates_{msa_method}_{data_source}_converted_indices/{name}")
+    resources:
+        runtime="1m",
+        mem="1GB"
+    shell:
+        """
+        mkdir {output}
+
+        for template in {input}/*.cif; do
+            template_name=$(basename $template .cif)
+            indices="$(dirname $template)/${{template_name}}_indices.json"
+
+            python -m tcr_pmhc_predicted_structures.apps.convert_index_mapping_from_sequence_to_structure \
+                --log-level {config[log_level]} \
+                -o {output}/${{template_name}}_indices.json \
+                $template \
+                $indices
+
+            cp $template {output}/${{template_name}}.cif
+        done
+        """
+
 rule create_m8_file_from_templates:
     input:
         msa_input="data/interim/msa-inputs_{msa_method}/{name}.json",
