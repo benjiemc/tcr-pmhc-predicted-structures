@@ -63,6 +63,57 @@ add_logging_arguments(parser)
 CHAI_CHAIN_ORDER = ['mhc_chain_1', 'mhc_chain_2', 'peptide', 'tcr_alpha_chain', 'tcr_beta_chain']
 
 
+def number_sequences(sequence_info: dict[str, str]) -> dict[str, list[tuple[tuple[int, str], str]]]:
+    """Assign IMGT numbering the sequences using ANARCI."""
+
+    def number(sequence: str) -> list[tuple[tuple[int, str], str]]:
+        numbering, chain_type = anarci.number(sequence)
+
+        if not numbering:
+            msg = f'Sequence not identified by ANARCI: {sequence}'
+            raise ValueError(msg)
+
+        if len(numbering) == 2:  # noqa: PLR2004 allow magic number here
+            numbering = numbering[0]
+            chain_type = chain_type[0]
+
+            logger.warning(
+                ('Multiple possible chain annotations found for sequence %s. Defaulting to first (%sCHAIN)'),
+                sequence,
+                chain_type,
+            )
+
+        numbering = [(number, olc) for (number, olc) in numbering if olc != '-']
+
+        num_residues_not_numbered = len(sequence) - len(numbering)
+
+        if num_residues_not_numbered > 0:
+            next_seq_id = numbering[-1][0][0] + 1
+
+            for amino_acid in sequence[len(numbering) :]:
+                numbering.append(((next_seq_id, ' '), amino_acid))
+                next_seq_id += 1
+
+        return numbering
+
+    if sequence_info['mhc_type'] == 'MH1':
+        numbered_sequences = {
+            name: number(sequence_info[name]) for name in CHAI_CHAIN_ORDER if name not in {'peptide', 'mhc_chain_2'}
+        }
+
+    else:
+        numbered_sequences = {name: number(sequence_info[name]) for name in CHAI_CHAIN_ORDER if name not in {'peptide'}}
+
+    numbered_sequences = {
+        name: [
+            ((seq_id, insert_code), res_olc) for (seq_id, insert_code), res_olc in numbered_sequence if res_olc != '-'
+        ]
+        for name, numbered_sequence in numbered_sequences.items()
+    }
+
+    return numbered_sequences
+
+
 def create_restraints(sequence_info: dict, restraints: pd.DataFrame) -> pd.DataFrame:
     """Create restraints for a specific sequence.
 
@@ -92,24 +143,7 @@ def create_restraints(sequence_info: dict, restraints: pd.DataFrame) -> pd.DataF
         'A' if 'alpha' in mhc_tcr_contact_mhc else 'B' for mhc_tcr_contact_mhc in restraints['mhc_tcr_contact_mhc']
     ]
 
-    if sequence_info['mhc_type'] == 'MH1':
-        numbered_sequences = {
-            name: anarci.number(sequence_info[name])[0]
-            for name in CHAI_CHAIN_ORDER
-            if name not in {'peptide', 'mhc_chain_2'}
-        }
-
-    else:
-        numbered_sequences = {
-            name: anarci.number(sequence_info[name])[0] for name in CHAI_CHAIN_ORDER if name not in {'peptide'}
-        }
-
-    numbered_sequences = {
-        name: [
-            ((seq_id, insert_code), res_olc) for (seq_id, insert_code), res_olc in numbered_sequence if res_olc != '-'
-        ]
-        for name, numbered_sequence in numbered_sequences.items()
-    }
+    numbered_sequences = number_sequences(sequence_info)
 
     res_idx_a = []
     for cdr_location in restraints['cdr_anchor_tcr']:
@@ -127,6 +161,13 @@ def create_restraints(sequence_info: dict, restraints: pd.DataFrame) -> pd.DataF
                     prev_residue['res_olc'] = res_olc
                     prev_residue['res_pos'] = res_pos
 
+                else:
+                    msg = (
+                        f"Starting anchor of CDR{cdr_num}{chain_type} not found in "
+                        f"{sequence_info[f'tcr_{chain_type}_chain']}"
+                    )
+                    raise ValueError(msg)
+
             case 'end':
                 before_cdr = True
                 in_cdr = False
@@ -139,6 +180,13 @@ def create_restraints(sequence_info: dict, restraints: pd.DataFrame) -> pd.DataF
                     elif seq_id not in cdr_imgt_range and in_cdr:
                         res_idx_a.append(f'{res_olc}{res_pos}')
                         break
+
+                else:
+                    msg = (
+                        f"Ending anchor of CDR{cdr_num}{chain_type} not found in "
+                        f"{sequence_info[f'tcr_{chain_type}_chain']}"
+                    )
+                    raise ValueError(msg)
 
     chai_restraints['res_idxA'] = res_idx_a
 
