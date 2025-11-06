@@ -14,15 +14,15 @@ import pandas as pd
 import yaml
 
 from tcr_pmhc_predicted_structures.apps._log import add_logging_arguments, setup_logger
-from tcr_pmhc_predicted_structures.imgt_numbering import IMGT_CDR1, IMGT_CDR2, IMGT_CDR3, MHC_I_IMGT_BETA_HELIX_START
+from tcr_pmhc_predicted_structures.imgt_numbering import (
+    IMGT_CDR1,
+    IMGT_CDR2,
+    IMGT_CDR3,
+    MHC_I_IMGT_BETA_HELIX_START,
+    number,
+)
 
 logger = logging.getLogger()
-
-try:
-    import anarci
-
-except ImportError:
-    logger.warning('Anarci is unavailable and is required by some functions')
 
 parser = argparse.ArgumentParser(
     prog=f'python -m {sys.modules[__name__].__spec__.name}',
@@ -65,37 +65,6 @@ CHAI_CHAIN_ORDER = ['mhc_chain_1', 'mhc_chain_2', 'peptide', 'tcr_alpha_chain', 
 
 def number_sequences(sequence_info: dict[str, str]) -> dict[str, list[tuple[tuple[int, str], str]]]:
     """Assign IMGT numbering the sequences using ANARCI."""
-
-    def number(sequence: str) -> list[tuple[tuple[int, str], str]]:
-        numbering, chain_type = anarci.number(sequence)
-
-        if not numbering:
-            msg = f'Sequence not identified by ANARCI: {sequence}'
-            raise ValueError(msg)
-
-        if len(numbering) == 2:  # noqa: PLR2004 allow magic number here
-            numbering = numbering[0]
-            chain_type = chain_type[0]
-
-            logger.warning(
-                ('Multiple possible chain annotations found for sequence %s. Defaulting to first (%sCHAIN)'),
-                sequence,
-                chain_type,
-            )
-
-        numbering = [(number, olc) for (number, olc) in numbering if olc != '-']
-
-        num_residues_not_numbered = len(sequence) - len(numbering)
-
-        if num_residues_not_numbered > 0:
-            next_seq_id = numbering[-1][0][0] + 1
-
-            for amino_acid in sequence[len(numbering) :]:
-                numbering.append(((next_seq_id, ' '), amino_acid))
-                next_seq_id += 1
-
-        return numbering
-
     if sequence_info['mhc_type'] == 'MH1':
         numbered_sequences = {
             name: number(sequence_info[name]) for name in CHAI_CHAIN_ORDER if name not in {'peptide', 'mhc_chain_2'}
