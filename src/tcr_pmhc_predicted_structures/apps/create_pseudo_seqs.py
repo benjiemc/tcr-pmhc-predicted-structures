@@ -5,9 +5,7 @@ import argparse
 import anarci
 import pandas as pd
 
-IMGT_CDR1 = set(range(27, 38 + 1))
-IMGT_CDR2 = set(range(56, 65 + 1))
-IMGT_CDR3 = set(range(105, 117 + 1))
+from tcr_pmhc_predicted_structures.imgt_numbering import IMGT_CDR1, IMGT_CDR2, IMGT_CDR3
 
 parser = argparse.ArgumentParser()
 
