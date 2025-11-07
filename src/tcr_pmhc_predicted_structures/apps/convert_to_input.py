@@ -272,7 +272,7 @@ def format_sequences_for_af3(
 
                     if len(relevant_unpaired_msas) < 1:
                         logger.warning(
-                            'Missing paired MSAs for sequence: %s (key: %s)',
+                            'Missing unpaired MSAs for sequence: %s (key: %s)',
                             sequence_entry['protein']['sequence'],
                             key,
                         )
