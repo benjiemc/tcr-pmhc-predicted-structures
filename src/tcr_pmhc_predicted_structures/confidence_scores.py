@@ -195,39 +195,74 @@ def compute_alpha_bridge_scores(
     chain_ids: np.ndarray,
     sequence_ids: np.ndarray,
     insert_codes: np.ndarray,
-    atom_plddt: np.ndarray,
+    plddt: np.ndarray,
     pae: np.ndarray,
     *,
     mhc_type: str,
+    atom_level_plddt: bool = True,
     binding_only: bool = True,
 ) -> np.ndarray:
     """Compute AlphaBridge score.
 
     AlphaBridge is described in `AlphaBridge: tools for the analysis of predicted macromolecular complexes
     <https://www.biorxiv.org/content/10.1101/2024.10.23.619601v1>`__.
+
+    Args:
+        sequences: 1D array of length num_residues of one letter amino acid codes for MHC chain 1, MHC chain 2, peptide,
+            TCR alpha chain, and TCR beta chain
+        chain_ids: 1D array of length num_residues of chain ids. The MHC chain 1 should be 'A', the MHC chain 2 should
+            be 'B', the peptide should be 'C', the TCR alpha chain should be 'D', and the TCR beta chain should be 'E'.
+        sequence_ids: 1D array of length num_residues of sequence ids for each residue in IMGT numbering format for the
+            TCR:pMHC chains
+        insert_codes: 1D array of length num_residues of insert codes for each residue in IMGT numbering format for the
+            TCR:pMHC chains. Blank insert codes are represented as empty strings ('').
+        plddt: 1D array of length num_atoms if atom_level_plddt is True, or else of length num_residues with the plddt
+            scores for each token
+        pae: 2D array of shape num_residues x num_residues of the PAE score for each pairwise residue combination
+        mhc_type: either 'MH1' for class I TCR:pMHC complexes or 'MH2' for class II TCR:pMHC complexes
+        atom_level_plddt: flag to say if the resolution of the plddt array is at atom level (True) or residue level
+            (False)
+        binding_only: Whether to only to consider the binding interface of the TCR:pMHC complex in the score or not. The
+            binding interface is formed of the CDR loops, peptide, and MHC-TCR contact positions.
+
+    Returns:
+        a 2D array of shape num_selected_residues x num_selected_residues with the AlphaBridge score computed for each
+        pairwise residue combination
+
     """
     tcr_mask, peptide_mask, mhc_mask = _create_masks(
         chain_ids, sequence_ids, insert_codes, mhc_type=mhc_type, binding_only=binding_only
     )
     pmhc_mask = peptide_mask | mhc_mask
 
-    extension = _get_extension(sequences, chain_ids)
-
     tcr_indices = np.arange(len(sequences))[tcr_mask]
     pmhc_indices = np.arange(len(sequences))[pmhc_mask]
 
     plddt_agg = np.zeros((len(tcr_indices), len(pmhc_indices)), dtype=np.float64)
-    for i, tcr_idx in enumerate(tcr_indices):
-        tcr_atom_start_idx = np.sum(extension[:tcr_idx], dtype=int)
-        tcr_atom_end_idx = tcr_atom_start_idx + extension[tcr_idx]
-        tcr_plddt = atom_plddt[tcr_atom_start_idx:tcr_atom_end_idx]
 
-        for j, pmhc_idx in enumerate(pmhc_indices):
-            pmhc_atom_start_idx = np.sum(extension[:pmhc_idx], dtype=int)
-            pmhc_atom_end_idx = pmhc_atom_start_idx + extension[pmhc_idx]
-            pmhc_plddt = atom_plddt[pmhc_atom_start_idx:pmhc_atom_end_idx]
+    if atom_level_plddt:
+        extension = _get_extension(sequences, chain_ids)
 
-            plddt_agg[i, j] = 1 / (len(tcr_plddt) + len(pmhc_plddt)) * (np.sum(tcr_plddt) + np.sum(pmhc_plddt)) - 100
+        for i, tcr_idx in enumerate(tcr_indices):
+            tcr_atom_start_idx = np.sum(extension[:tcr_idx], dtype=int)
+            tcr_atom_end_idx = tcr_atom_start_idx + extension[tcr_idx]
+
+            tcr_plddt = plddt[tcr_atom_start_idx:tcr_atom_end_idx]
+
+            for j, pmhc_idx in enumerate(pmhc_indices):
+                pmhc_atom_start_idx = np.sum(extension[:pmhc_idx], dtype=int)
+                pmhc_atom_end_idx = pmhc_atom_start_idx + extension[pmhc_idx]
+
+                pmhc_plddt = plddt[pmhc_atom_start_idx:pmhc_atom_end_idx]
+
+                plddt_agg[i, j] = (
+                    1 / (len(tcr_plddt) + len(pmhc_plddt)) * (np.sum(tcr_plddt) + np.sum(pmhc_plddt)) - 100
+                )
+
+    else:
+        for i, tcr_idx in enumerate(tcr_indices):
+            for j, pmhc_idx in enumerate(pmhc_indices):
+                plddt_agg[i, j] = 1 / 2 * (plddt[tcr_idx] + plddt[pmhc_idx]) - 100
 
     scores = pae[np.ix_(tcr_mask, pmhc_mask)] - 1 / 3 * plddt_agg
 
