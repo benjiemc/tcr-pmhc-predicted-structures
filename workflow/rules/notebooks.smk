@@ -3,11 +3,11 @@ include: "utils.smk"
 rule run_compare_structural_features_to_confidence:
     input:
         "data/external/tcr_pmhc_contacts.csv",
-        "data/interim/sequences_sample_50.csv",
-        "data/processed/confidence_scores_af3_af3_50.csv",
-        "data/processed/predicted_af3_af3_structural_features_50.csv",
-        "data/processed/predicted_af3_af3_contact_maps_50.csv",
-        "data/processed/predicted_af3_af3_interactions_50.csv",
+        "data/interim/sequences_sample_1500.csv",
+        "data/processed/confidence_scores_af3_tcrmodel2_1500.csv",
+        "data/processed/predicted_af3_tcrmodel2_structural_features_1500.csv",
+        "data/processed/predicted_af3_tcrmodel2_contact_maps_1500.csv",
+        "data/processed/predicted_af3_tcrmodel2_interactions_1500.csv",
         "data/processed/tcr_pmhc_structural_features.csv",
         "data/processed/tcr_pmhc_interactions.csv"
     output: "data/flags/compare_structural_features_to_confidence_done.flag"
@@ -26,8 +26,8 @@ rule run_compare_structural_features_to_confidence:
 
 rule run_investigate_specificity_information_in_af3_scores:
     input:
-        "data/processed/confidence_scores_af3_af3_50.csv",
-        "data/interim/sequences_sample_50.csv"
+        "data/processed/confidence_scores_af3_tcrmodel2_1500.csv",
+        "data/interim/sequences_sample_1500.csv"
     output: "data/flags/investigate_specificity_information_in_af3_scores_done.flag"
     resources:
         runtime="5m",
