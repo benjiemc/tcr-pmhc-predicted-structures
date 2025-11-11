@@ -6,6 +6,7 @@ default_config = {
 config = {**default_config, **config}
 
 include: "rules/data.smk"
+include: "rules/msas_and_templates.smk"
 include: "rules/alphafold2.smk"
 include: "rules/alphafold3.smk"
 include: "rules/boltz.smk"
