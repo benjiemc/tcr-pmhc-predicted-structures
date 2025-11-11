@@ -3,6 +3,14 @@ import os
 
 include: "utils.smk"
 
+wildcard_constraints:
+    sample_size="\d+",
+    seed="\d+",
+    sample="\d+",
+    method="[A-Za-z0-9]+",
+    data="[A-Za-z0-9]+",
+    name="[A-Za-z0-9_]+"
+
 def _get_chai_names(path: str) -> list[str]:
     if not os.path.exists(path):
         print(path, 'does not exist!')
@@ -57,6 +65,40 @@ rule create_structures_chai_af3_tcrmodel2_sample_size_1500:
 
 rule create_structures_chai_af3_tcrmodel2_benchmark:
     input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_chai_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
+
+rule extract_chai_confidence_scores:
+    input:
+        summary_confidences="data/interim/structures_chai_{msa_method}_{data}/{name}_seed-{seed}_sample-{sample}_summary_confidences.json",
+        confidences="data/interim/structures_chai_{msa_method}_{data}/{name}_seed-{seed}_sample-{sample}_confidences.json",
+        sequences="data/interim/sequences/{name}.json"
+    output: temp("data/interim/chai_{msa_method}_{data}_{name}_{seed}_{sample}_confidence_scores.csv")
+    resources:
+        runtime="20m",
+        mem="1GB"
+    script: "../scripts/extract_chai_confidence_metrics.py"
+
+rule aggregate_chai_confidence_scores:
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/chai_{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_confidence_scores.csv", config['seed'])
+    output: "data/interim/confidence_scores_chai_{method}_{data}_{sample_size}.csv"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    run:
+        import pandas as pd
+
+        entries = []
+        for path in input:
+            confidence_scores = pd.read_csv(path)
+
+            _, _, name, seed, sample = os.path.basename(path).replace('_confidence_scores.csv', '').rsplit('_', 4)
+            confidence_scores['name'] = name
+            confidence_scores['seed'] = seed
+            confidence_scores['sample'] = sample
+
+            entries.append(confidence_scores)
+
+        df = pd.concat(entries).reset_index(drop=True)
+        df.to_csv(output[0], index=False)
 
 rule run_chai_1_with_restraints:
     input:
