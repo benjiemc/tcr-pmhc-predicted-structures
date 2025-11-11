@@ -10,6 +10,7 @@ include: "rules/alphafold2.smk"
 include: "rules/alphafold3.smk"
 include: "rules/boltz.smk"
 include: "rules/chai.smk"
+include: "rules/post_processing.smk"
 include: "rules/notebooks.smk"
 
 rule lint:
