@@ -147,24 +147,39 @@ rule create_af3_structures_with_tcrmodel2_data_sample_size_1500:
 rule create_af3_structures_with_tcrmodel2_data_benchmark:
     input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
 
-rule aggregate_af3_confidence_scores:
+rule extract_af3_confidence_scores:
     input:
-        summary_confidences=lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/structures_{{method}}_{{data}}/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", config['seed']),
-        confidences=lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", "data/interim/structures_{{method}}_{{data}}/{name}_seed-{seed}_sample-{sample}_confidences.json", config['seed']),
-        sequences=lambda wildcards: expand(_get_json_names("data/interim/sequences_{{{{method}}}}_{{{{data}}}}/{name}_{{seed}}.json", f"data/interim/sequences_sample_{wildcards.sample_size}.csv"), seed=config['seed'])
+        summary_confidences="data/interim/structures_{method}_{data}/{name}_seed-{seed}_sample-{sample}_summary_confidences.json",
+        confidences="data/interim/structures_{method}_{data}/{name}_seed-{seed}_sample-{sample}_confidences.json",
+        sequences="data/interim/sequences/{name}.json"
+    output: temp("data/interim/{method}_{data}_{name}_{seed}_{sample}_confidence_scores.csv")
+    resources:
+        runtime="20m",
+        mem="1GB"
+    script: "../scripts/extract_af3_confidence_metrics.py"
+
+rule aggregate_af3_confidence_scores:
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.method}_{wildcards.data}_{{name}}_{{seed}}_{{sample}}_confidence_scores.csv", config['seed'])
     output: "data/interim/confidence_scores_{method}_{data}_{sample_size}.csv"
     resources:
-        runtime=lambda wildcards : f"{max(-(int(wildcards.sample_size) // -5), 300)}m",
-        mem=lambda wildcards : f"{max(-(int(wildcards.sample_size) // -25), 100)}GB"
-    shell:
-        """
-        python -m tcr_pmhc_predicted_structures.apps.extract_confidence_from_af3 \
-            --log-level {config[log_level]} \
-            -o {output} \
-            --summary-confidence-paths {input.summary_confidences} \
-            --confidence-paths {input.confidences} \
-            --sequence-paths {input.sequences}
-        """
+        runtime="10m",
+        mem="1GB"
+    run:
+        import pandas as pd
+
+        entries = []
+        for path in input:
+            confidence_scores = pd.read_csv(path)
+
+            _, _, name, seed, sample = os.path.basename(path).replace('_confidence_scores.csv', '').rsplit('_', 4)
+            confidence_scores['name'] = name
+            confidence_scores['seed'] = seed
+            confidence_scores['sample'] = sample
+
+            entries.append(confidence_scores)
+
+        df = pd.concat(entries).reset_index(drop=True)
+        df.to_csv(output[0], index=False)
 
 rule compute_ipsae_on_af3_structure:
     input:
