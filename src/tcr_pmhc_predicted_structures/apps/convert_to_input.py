@@ -222,6 +222,10 @@ def format_sequences_for_chai(sequences: list[dict], output_dir: str, restraints
         logger.debug('Writing fasta for %s', sequence_info['id'])
         with open(os.path.join(output_dir, sequence_info['id'] + '.fasta'), 'w') as fh:
             for name in CHAI_CHAIN_ORDER:
+                if name not in sequence_info:
+                    logger.warning('%s was not found in the sequence info. It will be omitted.', name)
+                    continue
+
                 fh.write(f'>protein|name={name}\n')
                 fh.write(sequence_info[name])
                 fh.write('\n')
