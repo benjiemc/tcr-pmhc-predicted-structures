@@ -12,9 +12,11 @@ dependencies:
   - mmseqs2
   - numpy
   - pandas
+  - pingouin
   - pip
   - python=3.11
   - scikit-learn
+  - scipy
   - statsmodels
   - seaborn
   - snakemake
