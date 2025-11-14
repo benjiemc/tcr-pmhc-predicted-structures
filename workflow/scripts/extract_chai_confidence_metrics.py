@@ -19,18 +19,18 @@ def collect_summary_scores(summary_confidences: dict) -> dict:
     """Collect all values from summary score dictionary."""
     scores = {key: val for key, val in summary_confidences.items() if not isinstance(val, list)}
 
-    for chain_name, chain_ptm in zip(CHAIN_ORDER, summary_confidences['per_chain_ptm'], strict=True):
+    for chain_name, chain_ptm in zip(CHAIN_ORDER, summary_confidences['per_chain_ptm'], strict=False):
         scores[chain_name + '_ptm'] = chain_ptm
 
     for i, (chain_name_1, chain_iptms) in enumerate(
-        zip(CHAIN_ORDER, summary_confidences['per_chain_pair_iptm'], strict=True)
+        zip(CHAIN_ORDER, summary_confidences['per_chain_pair_iptm'], strict=False)
     ):
-        for chain_name_2, iptm in zip(CHAIN_ORDER[i + 1 :], chain_iptms[i + 1 :], strict=True):
+        for chain_name_2, iptm in zip(CHAIN_ORDER[i + 1 :], chain_iptms[i + 1 :], strict=False):
             if chain_name_1 != chain_name_2:
                 scores[chain_name_1 + '_' + chain_name_2 + '_iptm'] = iptm
 
-    for chain_name_1, chain_clashes in zip(CHAIN_ORDER, summary_confidences['chain_chain_clashes'], strict=True):
-        for chain_name_2, clash in zip(CHAIN_ORDER, chain_clashes, strict=True):
+    for chain_name_1, chain_clashes in zip(CHAIN_ORDER, summary_confidences['chain_chain_clashes'], strict=False):
+        for chain_name_2, clash in zip(CHAIN_ORDER, chain_clashes, strict=False):
             scores[chain_name_1 + '_' + chain_name_2 + '_clash'] = clash
 
     return scores

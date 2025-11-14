@@ -25,6 +25,9 @@ def get_sequence_information(sequences: dict[str, str]) -> tuple[np.ndarray, np.
     insert_codes = []
 
     for chain_id, chain_name in zip(PDB_CHAIN_IDS, CHAIN_ORDER, strict=False):
+        if chain_name not in sequences:
+            continue
+
         for amino_acid in sequences[chain_name]:
             sequences_flat.append(amino_acid)
             chain_ids.append(chain_id)
