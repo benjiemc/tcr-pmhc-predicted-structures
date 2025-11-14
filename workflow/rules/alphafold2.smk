@@ -55,3 +55,13 @@ rule process_af2_structure:
             os.mkdir(output_dir)
 
         tcr.save(output[0])
+
+rule calculate_af2_dockq_score:
+    input:
+        prediction="data/interim/structures_af2_{msa_method}_{data_source}/{name}_seed-{seed}_sample-{sample}_relaxed.pdb",
+        structure="data/raw/structures_no_crop/{name}.pdb"
+    output: temp("data/interim/af2_{msa_method}_{data_source}_{name}_{seed}_{sample}_dockq.json")
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: "../scripts/calculate_dockq_score.py"

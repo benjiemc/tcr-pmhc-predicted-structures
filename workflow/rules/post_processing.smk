@@ -183,20 +183,7 @@ rule calculate_dockq_score:
     resources:
         runtime="5m",
         mem="1GB"
-    run:
-        import json
-
-        import stcrpy
-        from stcrpy.tcr_metrics.tcr_dockq import TCRDockQ
-
-        tcr = stcrpy.load_TCR(input.prediction)
-        tcr_ref = stcrpy.load_TCR(input.structure)
-
-        dockq_result = TCRDockQ().tcr_dockq(tcr, tcr_ref)
-        dockq_result = dockq_result['best_result']['TM']
-
-        with open(output[0], 'w') as fh:
-            json.dump(dockq_result, fh)
+    script: "../scripts/calculate_dockq_score.py"
 
 rule aggregate_dockq_scores:
     input: lambda wildcards: get_predicted_structure_names(f"data/interim/benchmark_structures.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}_{{name}}_{{seed}}_{{sample}}_dockq.json", config['seed'], column_name='id')
