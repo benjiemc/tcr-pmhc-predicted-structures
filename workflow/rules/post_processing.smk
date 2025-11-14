@@ -43,6 +43,33 @@ rule aggregate_confidence_scores:
         df = pd.concat(entries).reset_index(drop=True)
         df.to_csv(output[0], index=False)
 
+rule aggregate_benchmark_confidence_scores:
+    input: lambda wildcards: get_predicted_structure_names("data/interim/benchmark_structures.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}_{{name}}_{{seed}}_{{sample}}_confidence_scores.csv", config['seed'], column_name='id')
+    output: "data/interim/confidence_scores_{model}_{msa_method}_{data_source}_benchmark.csv"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    run:
+        import pandas as pd
+
+        entries = []
+        for path in input:
+            confidence_scores = pd.read_csv(path)
+
+            info = re.search(
+                r'[A-Za-z0-9]+_[A-Za-z0-9]+_[A-Za-z0-9]+_(?P<name>[A-Za-z0-9_]+)_(?P<seed>\d+)_(?P<sample>\d+)'
+                '_confidence_scores.csv',
+                os.path.basename(path),
+            ).groupdict()
+
+            for key, value in info.items():
+                confidence_scores[key] = value
+
+            entries.append(confidence_scores)
+
+        df = pd.concat(entries).reset_index(drop=True)
+        df.to_csv(output[0], index=False)
+
 rule summarise_predicted_structural_features:
     input: "data/interim/structures_{model}_{msa_method}_{data_source}/{name}_seed-{seed}_sample-{sample}_model.cif"
     output: temp("data/interim/{model}_{msa_method}_{data_source}_{name}_{seed}_{sample}_structural_summary.json")
