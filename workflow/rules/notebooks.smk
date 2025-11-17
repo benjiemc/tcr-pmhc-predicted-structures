@@ -143,3 +143,29 @@ rule run_specificity_predictor:
             notebooks/specificity_predictor.ipynb
         touch {output}
         """
+
+rule run_benchmark_structure_prediction_methods:
+    input:
+        "data/interim/sequences_sample_1500.csv",
+        "data/processed/confidence_scores_af3_af3_tcrmodel2_1500.csv",
+        "data/interim/confidence_scores_chai_af3_tcrmodel2_1500.csv",
+        "data/interim/confidence_scores_af3_af3_tcrmodel2_benchmark.csv",
+        "data/interim/confidence_scores_chai_af3_tcrmodel2_benchmark.csv",
+        "data/interim/confidence_scores_af2_af3_tcrmodel2_benchmark.csv",
+        "data/processed/predicted_af3_af3_tcrmodel2_dockq_benchmark.csv",
+        "data/processed/predicted_chai_af3_tcrmodel2_dockq_benchmark.csv",
+        "data/processed/predicted_af2_af3_tcrmodel2_dockq_benchmark.csv"
+    output:
+        "data/flags/benchmark_structure_prediction_methods_done.flag"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    shell:
+        """
+        jupyter nbconvert \
+            --to notebook \
+            --execute \
+            --inplace \
+            notebooks/benchmark_structure_prediction_methods.ipynb
+        touch {output}
+        """
