@@ -10,3 +10,6 @@
 [submodule "third_party/IPSAE"]
 	path = third_party/IPSAE
 	url = git@github.com:DunbrackLab/IPSAE.git
+[submodule "report"]
+	path = report
+	url = git@github.com:benjiemc/tcr-pmhc-predicted-structures-report.git

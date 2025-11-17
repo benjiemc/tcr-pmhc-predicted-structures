@@ -10,7 +10,22 @@ rule run_compare_structural_features_to_confidence:
         "data/processed/predicted_af3_af3_tcrmodel2_interactions_1500.csv",
         "data/processed/tcr_pmhc_structural_features.csv",
         "data/processed/tcr_pmhc_interactions.csv"
-    output: "data/flags/compare_structural_features_to_confidence_done.flag"
+    output:
+        "report/figures/scanning_angle.svg",
+        "report/figures/pitch_angle.svg",
+        "report/figures/tilt_angle.svg",
+        "report/figures/roll_angle.svg",
+        "report/figures/x_distance.svg",
+        "report/figures/y_distance.svg",
+        "report/figures/z_distance.svg",
+        "report/figures/interaction_numbers.svg",
+        "report/figures/interaction_types.svg",
+        "report/figures/structrual_feature_intra_correlations.svg",
+        "report/figures/ranked_confidence_metric_correlations.svg",
+        "report/figures/structural_feature_inter_correlations.svg",
+        "report/figures/structural_feature_inter_correlations_no_outliers.svg",
+        "report/figures/structural_feature_inter_correlations_no_outliers_bootstrap.svg",
+        "data/flags/compare_structural_features_to_confidence_done.flag"
     resources:
         runtime="10m",
         mem="1GB"
@@ -111,7 +126,12 @@ rule run_compare_msa_generation:
         'data/processed/predicted_af3_af3_tcrmodel2_dockq_benchmark.csv',
         get_predicted_structure_names(f"data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3_af3/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", config['seed'], column_name='id'),
         get_predicted_structure_names(f"data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", config['seed'], column_name='id')
-    output: "data/flags/compare_msa_generation_done.flag"
+    output:
+        "report/figures/msa_strategy_generation_time.svg",
+        "report/figures/msa_strategy_specificity.svg",
+        "report/figures/msa_strategy_dockq_boxplot.svg",
+        "report/figures/msa_strategy_dockq_capri.svg",
+        "data/flags/compare_msa_generation_done.flag"
     resources:
         runtime="5m",
         mem="1GB"
@@ -156,6 +176,8 @@ rule run_benchmark_structure_prediction_methods:
         "data/processed/predicted_chai_af3_tcrmodel2_dockq_benchmark.csv",
         "data/processed/predicted_af2_af3_tcrmodel2_dockq_benchmark.csv"
     output:
+        "report/figures/method_benchmark_dockq_boxplot.svg",
+        "report/figures/method_benchmark_dockq_capri.svg",
         "data/flags/benchmark_structure_prediction_methods_done.flag"
     resources:
         runtime="5m",
