@@ -12,7 +12,6 @@ rule run_alphafold2:
         templates=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/templates_{wildcards.msa_method}_{wildcards.data}_converted_indices/{{name}}')
     output:
         structures_unrelaxed=protected(expand("data/interim/structures_af2_{{msa_method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_unrelaxed.pdb", sample=range(5))),
-        structures_relaxed=protected(expand("data/interim/structures_af2_{{msa_method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_relaxed.pdb", sample=range(5))),
         summary_confidences=protected(expand("data/interim/structures_af2_{{msa_method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5))),
         confidences=protected(expand("data/interim/structures_af2_{{msa_method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_confidences.json", sample=range(5)))
     params:
@@ -22,6 +21,15 @@ rule run_alphafold2:
         mem="40GB",
         gpu=1
     script: "../scripts/predict_structure_with_alphafold_from_tcrmodel2.py"
+
+rule relax_af2_structure:
+    input: "data/interim/structures_af2_{msa_method}_{data}/{name}_seed-{seed}_sample-{sample}_unrelaxed.pdb"
+    output: "data/interim/structures_af2_{msa_method}_{data}/{name}_seed-{seed}_sample-{sample}_relaxed.pdb"
+    resources:
+        runtime="20m",
+        mem="10GB",
+        gpu=1
+    script: "../scripts/relax_structure.py"
 
 rule create_structures_af2_af3_tcrmodel2_sample_size_50:
     input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af2_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_unrelaxed.pdb", config['seed'])

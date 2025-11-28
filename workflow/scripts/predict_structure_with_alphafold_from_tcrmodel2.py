@@ -172,7 +172,7 @@ with tempfile.TemporaryDirectory() as tmp_dir:
                 '--model_preset=multimer',
                 f'--random_seed={seed}',
                 '--num_multimer_predictions_per_model=1',
-                '--models_to_relax=all',
+                '--models_to_relax=none',
                 '--use_gpu_relax',
                 '--use_custom_MSA_database=only',
                 '--MSA_database='  # Needed not to throw an error
@@ -203,10 +203,6 @@ with tempfile.TemporaryDirectory() as tmp_dir:
             shutil.copy(
                 os.path.join(temp_output_dir, 'sequences', f'unrelaxed_model_{sample}_multimer_v3_pred_0.pdb'),
                 os.path.join(output_dir, f'{snakemake.wildcards.name}_seed-{seed}_sample-{sample - 1}_unrelaxed.pdb'),
-            )
-            shutil.copy(
-                os.path.join(temp_output_dir, 'sequences', f'relaxed_model_{sample}_multimer_v3_pred_0.pdb'),
-                os.path.join(output_dir, f'{snakemake.wildcards.name}_seed-{seed}_sample-{sample - 1}_relaxed.pdb'),
             )
 
             confidence_scores = np.load(
