@@ -48,3 +48,6 @@ rule create_structures_boltz_af3_tcrmodel2_sample_size_1500:
 
 rule create_structures_boltz_af3_tcrmodel2_benchmark:
     input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_boltz_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
+
+rule process_boltz_structures_with_tcrmodel2_data_sample_size_1500:
+    input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/processed/structures_boltz_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", config['seed'])

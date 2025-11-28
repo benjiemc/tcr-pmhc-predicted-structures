@@ -73,3 +73,6 @@ rule calculate_af2_dockq_score:
         runtime="5m",
         mem="1GB"
     script: "../scripts/calculate_dockq_score.py"
+
+rule process_af2_structures_with_tcrmodel2_data_sample_size_1500:
+    input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/processed/structures_af2_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", config['seed'])
