@@ -336,7 +336,7 @@ def format_sequences_for_af3(
         paired_msa_paths = []
 
     if templates is None:
-        templates = []
+        templates = {}
 
     for sequence_info in sequences:
         logger.debug('Writing json for %s', sequence_info['id'])
@@ -383,18 +383,20 @@ def format_sequences_for_af3(
                             sequence_entry['protein']['sequence'],
                             key,
                         )
+                        new_sequence_entry['protein']['unpairedMsa'] = ''
 
                     else:
                         new_sequence_entry['protein']['unpairedMsaPath'] = relevant_unpaired_msas[0]
 
                     relevant_paired_msas = [msa_path for msa_path in paired_msa_paths if key in msa_path]
 
-                    if len(relevant_unpaired_msas) < 1:
+                    if len(relevant_paired_msas) < 1:
                         logger.warning(
-                            'Missing unpaired MSAs for sequence: %s (key: %s)',
+                            'Missing paired MSAs for sequence: %s (key: %s)',
                             sequence_entry['protein']['sequence'],
                             key,
                         )
+                        new_sequence_entry['protein']['pairedMsa'] = ''
 
                     else:
                         new_sequence_entry['protein']['pairedMsaPath'] = relevant_paired_msas[0]
@@ -404,10 +406,11 @@ def format_sequences_for_af3(
 
                     except KeyError:
                         logger.warning(
-                            'Missing paired MSAs for sequence: %s (key: %s)',
+                            'Missing templates for sequence: %s (key: %s)',
                             sequence_entry['protein']['sequence'],
                             key,
                         )
+                        new_sequence_entry['protein']['templates'] = []
 
                 new_sequence_entries.append(new_sequence_entry)
 
