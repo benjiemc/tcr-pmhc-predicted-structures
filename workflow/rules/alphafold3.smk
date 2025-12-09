@@ -52,6 +52,79 @@ rule run_create_af3_jsons:
             {input.sequences}
         """
 
+rule run_create_af3_jsons_no_templates:
+    input:
+        sequences="data/interim/sequences/{name}.json",
+        unpaired_msas=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_unpaired.a3m'),
+        paired_msas=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_paired.a3m'),
+    output: "data/interim/sequences_{method}_{data}_no_templates/{name}_{seed}.json"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    shell:
+        """
+        out_dir_name=$(dirname {output[0]})
+
+        python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
+            --log-level {config[log_level]} \
+            --format alphafold3 \
+             --alphafold3-model-seeds {wildcards.seed} \
+            --add-paths \
+            --relative-paths \
+            --unpaired-msa-paths {input.unpaired_msas} \
+            --paired-msa-paths {input.paired_msas} \
+            -o $out_dir_name \
+            {input.sequences}
+        """
+
+rule run_create_af3_jsons_no_paired_msas:
+    input:
+        sequences="data/interim/sequences/{name}.json",
+        unpaired_msas=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_unpaired.a3m'),
+        templates=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/templates_{wildcards.method}_{wildcards.data}/{{name}}')
+    output: "data/interim/sequences_{method}_{data}_no_paired_msas/{name}_{seed}.json"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    shell:
+        """
+        out_dir_name=$(dirname {output[0]})
+
+        python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
+            --log-level {config[log_level]} \
+            --format alphafold3 \
+             --alphafold3-model-seeds {wildcards.seed} \
+            --add-paths \
+            --relative-paths \
+            --unpaired-msa-paths {input.unpaired_msas} \
+            --template-paths {input.templates} \
+            -o $out_dir_name \
+            {input.sequences}
+        """
+
+rule run_create_af3_jsons_no_paired_msas_no_templates:
+    input:
+        sequences="data/interim/sequences/{name}.json",
+        unpaired_msas=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_unpaired.a3m'),
+    output: "data/interim/sequences_{method}_{data}_no_paired_msas_no_templates/{name}_{seed}.json"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    shell:
+        """
+        out_dir_name=$(dirname {output[0]})
+
+        python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
+            --log-level {config[log_level]} \
+            --format alphafold3 \
+             --alphafold3-model-seeds {wildcards.seed} \
+            --add-paths \
+            --relative-paths \
+            --unpaired-msa-paths {input.unpaired_msas} \
+            -o $out_dir_name \
+            {input.sequences}
+        """
+
 rule run_alphafold_predictions:
     input:
         sequence="data/interim/sequences_{method}_{data}/{name}_{seed}.json",
@@ -62,6 +135,56 @@ rule run_alphafold_predictions:
         structures=protected(expand("data/interim/structures_af3_{{method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5))),
         summary_confidences=protected(expand("data/interim/structures_af3_{{method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5))),
         confidences=protected(expand("data/interim/structures_af3_{{method}}_{{data}}/{{name}}_seed-{{seed}}_sample-{sample}_confidences.json", sample=range(5)))
+    params:
+        alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
+    resources:
+        runtime="10m",
+        mem="40GB",
+        gpu=1
+    script: "../scripts/predict_structure_with_alphafold3.py"
+
+rule run_alphafold_predictions_no_templates:
+    input:
+        sequence="data/interim/sequences_{method}_{data}_no_templates/{name}_{seed}.json",
+        unpaired_msas=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_unpaired.a3m'),
+        paired_msas=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_paired.a3m'),
+    output:
+        structures=protected(expand("data/interim/structures_af3_{{method}}_{{data}}_no_templates/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5))),
+        summary_confidences=protected(expand("data/interim/structures_af3_{{method}}_{{data}}_no_templates/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5))),
+        confidences=protected(expand("data/interim/structures_af3_{{method}}_{{data}}_no_templates/{{name}}_seed-{{seed}}_sample-{sample}_confidences.json", sample=range(5)))
+    params:
+        alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
+    resources:
+        runtime="10m",
+        mem="40GB",
+        gpu=1
+    script: "../scripts/predict_structure_with_alphafold3.py"
+
+rule run_alphafold_predictions_no_paired_msas:
+    input:
+        sequence="data/interim/sequences_{method}_{data}_no_paired_msas/{name}_{seed}.json",
+        unpaired_msas=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_unpaired.a3m'),
+        templates=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/templates_{wildcards.method}_{wildcards.data}/{{name}}')
+    output:
+        structures=protected(expand("data/interim/structures_af3_{{method}}_{{data}}_no_paired_msas/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5))),
+        summary_confidences=protected(expand("data/interim/structures_af3_{{method}}_{{data}}_no_paired_msas/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5))),
+        confidences=protected(expand("data/interim/structures_af3_{{method}}_{{data}}_no_paired_msas/{{name}}_seed-{{seed}}_sample-{sample}_confidences.json", sample=range(5)))
+    params:
+        alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
+    resources:
+        runtime="10m",
+        mem="40GB",
+        gpu=1
+    script: "../scripts/predict_structure_with_alphafold3.py"
+
+rule run_alphafold_predictions_no_paired_msas_no_templates:
+    input:
+        sequence="data/interim/sequences_{method}_{data}_no_paired_msas_no_templates/{name}_{seed}.json",
+        unpaired_msas=lambda wildcards: get_sequence_ids(f"data/interim/sequences/{wildcards.name}.json", f'data/interim/msas_{wildcards.method}_{wildcards.data}/{{name}}_unpaired.a3m'),
+    output:
+        structures=protected(expand("data/interim/structures_af3_{{method}}_{{data}}_no_paired_msas_no_templates/{{name}}_seed-{{seed}}_sample-{sample}_model.cif", sample=range(5))),
+        summary_confidences=protected(expand("data/interim/structures_af3_{{method}}_{{data}}_no_paired_msas_no_templates/{{name}}_seed-{{seed}}_sample-{sample}_summary_confidences.json", sample=range(5))),
+        confidences=protected(expand("data/interim/structures_af3_{{method}}_{{data}}_no_paired_msas_no_templates/{{name}}_seed-{{seed}}_sample-{sample}_confidences.json", sample=range(5)))
     params:
         alphafold3_weights_dir=os.environ['ALPHAFOLD3_WEIGHTS_DIR']
     resources:
@@ -90,6 +213,24 @@ rule create_af3_structures_with_tcrmodel2_data_sample_size_1500:
 
 rule create_af3_structures_with_tcrmodel2_data_benchmark:
     input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
+
+rule create_af3_structures_with_tcrmodel2_data_no_templates_sample_size_1500:
+    input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/interim/structures_af3_af3_tcrmodel2_no_templates/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'])
+
+rule create_af3_structures_with_tcrmodel2_data_no_templates_benchmark:
+    input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3_tcrmodel2_no_templates/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
+
+rule create_af3_structures_with_tcrmodel2_data_no_paired_msas_sample_size_1500:
+    input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/interim/structures_af3_af3_tcrmodel2_no_paired_msas/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'])
+
+rule create_af3_structures_with_tcrmodel2_data_no_paired_msas_benchmark:
+    input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3_tcrmodel2_no_paired_msas/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
+
+rule create_af3_structures_with_tcrmodel2_data_no_paired_msas_no_templates_sample_size_1500:
+    input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/interim/structures_af3_af3_tcrmodel2_no_paired_msas_no_templates/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'])
+
+rule create_af3_structures_with_tcrmodel2_data_no_paired_msas_no_templates_benchmark:
+    input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3_tcrmodel2_no_paired_msas_no_templates/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
 
 rule compute_ipsae_on_af3_structure:
     input:

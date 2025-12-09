@@ -22,19 +22,23 @@ if os.path.exists(temp_output_dir_abs):
 os.makedirs(temp_output_dir_abs)
 
 shutil.copy(snakemake.input.sequence, input_dir_abs)
-for msa in snakemake.input.unpaired_msas:
-    shutil.copy(msa, input_dir_abs)
 
-for msa in snakemake.input.paired_msas:
-    shutil.copy(msa, input_dir_abs)
+if hasattr(snakemake.input, 'unpaired_msas'):
+    for msa in snakemake.input.unpaired_msas:
+        shutil.copy(msa, input_dir_abs)
 
-for template_dir in snakemake.input.templates:
-    directory_name = os.path.basename(template_dir)
-    new_directory_path = os.path.join(input_dir_abs, directory_name)
-    os.mkdir(new_directory_path)
+if hasattr(snakemake.input, 'paired_msas'):
+    for msa in snakemake.input.paired_msas:
+        shutil.copy(msa, input_dir_abs)
 
-    for template in glob.glob(os.path.join(template_dir, '*.cif')):
-        shutil.copy(template, os.path.join(new_directory_path, os.path.basename(template)))
+if hasattr(snakemake.input, 'templates'):
+    for template_dir in snakemake.input.templates:
+        directory_name = os.path.basename(template_dir)
+        new_directory_path = os.path.join(input_dir_abs, directory_name)
+        os.mkdir(new_directory_path)
+
+        for template in glob.glob(os.path.join(template_dir, '*.cif')):
+            shutil.copy(template, os.path.join(new_directory_path, os.path.basename(template)))
 
 subprocess.Popen(['/usr/bin/chmod', '+x', '-R', input_dir_abs])  # noqa: S603
 
