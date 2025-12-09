@@ -1,5 +1,23 @@
 include: "utils.smk"
 
+rule run_exploring_dash_dataset:
+    input:
+        "data/external/dash_human.csv",
+    output:
+        "data/flags/exploring_dash_dataset_done.flag"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    shell:
+        """
+        jupyter nbconvert \
+            --to notebook \
+            --execute \
+            --inplace \
+            notebooks/exploring_dash_dataset.ipynb
+        touch {output}
+        """
+
 rule run_compare_structural_features_to_confidence:
     input:
         "data/external/tcr_pmhc_contacts.csv",

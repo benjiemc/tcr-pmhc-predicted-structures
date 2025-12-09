@@ -174,6 +174,43 @@ rule combine_af_training_sequences_with_sample:
         mem="1GB"
     script: "../scripts/combine_sequences_with_af_training_structures.py"
 
+rule download_dash_data:
+    output: "data/external/dash_human.csv"
+    resources:
+        runtime="1m",
+        mem="1GB"
+    shell: "wget -O {output} https://raw.githubusercontent.com/kmayerb/tcrdist3/master/dash_human.csv"
+
+rule create_sequences_from_dash_data:
+    input:
+        sequences="data/external/dash_human.csv",
+        mhc_sequences=expand("data/external/hla_sequences/{mhc}.json", mhc=[
+                'h2_d',
+                'h2_k',
+                'h2_l',
+                'hla_a',
+                'hla_b',
+                'hla_c',
+                'hla_e',
+                'hla_f',
+                'hla_g',
+            ])
+    output: "data/interim/sequences_dash.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: "../scripts/create_sequences_from_dash_data.py"
+
+rule extract_dash_sequences:
+    input: "data/interim/sequences_dash.csv"
+    output: get_sequence_names("data/interim/sequences_dash.csv", "data/interim/sequences/{name}.json")
+    run:
+        output_dir = os.path.dirname(output[0])
+        with open(input[0], 'r') as fh:
+            for entry in csv.DictReader(fh):
+                with open(os.path.join(output_dir, f"{entry['id']}.json"), 'w') as fh:
+                    json.dump(entry, fh)
+
 def create_paths(summary_file: str, path_name: str) -> list[str]:
     if not os.path.exists(summary_file):
         print(summary_file, 'does not exist!')
