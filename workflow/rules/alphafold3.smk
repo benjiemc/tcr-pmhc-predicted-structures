@@ -68,63 +68,7 @@ rule run_alphafold_predictions:
         runtime="10m",
         mem="40GB",
         gpu=1
-    shell:
-        """
-        input_dir_abs=$TMPDIR/{wildcards.name}/input
-        temp_output_dir_abs=$TMPDIR/{wildcards.name}/output
-        if [ -d $input_dir_abs ]; then
-            rm -r $input_dir_abs
-        fi
-        if [ -d $temp_output_dir_abs ]; then
-            rm -r $temp_output_dir_abs
-        fi
-        mkdir -p $input_dir_abs $temp_output_dir_abs
-
-        cp {input.sequence} $input_dir_abs
-        cp {input.unpaired_msas} $input_dir_abs
-        cp {input.paired_msas} $input_dir_abs
-        cp -r {input.templates} $input_dir_abs
-        chmod +w -R $input_dir_abs
-
-        mkdir -p $TMPDIR/jax_cache
-        mkdir -p $(dirname {output.structures[0]})
-
-        input_file_name="$(basename {input.sequence})"
-
-        apptainer exec \
-            --nv \
-            --cwd=$(pwd) \
-            --bind=$(pwd):$(pwd) \
-            --bind=$TMPDIR/jax_cache:/root/jax_cache \
-            --bind $input_dir_abs:/root/input \
-            --bind $temp_output_dir_abs:/root/output \
-            --bind {params.alphafold3_weights_dir}:/root/models \
-            containers/alphafold3.sif \
-            python third_party/alphafold3/run_alphafold.py \
-                --norun_data_pipeline \
-                --jax_compilation_cache_dir=/root/jax_cache \
-                --json_path=/root/input/$input_file_name \
-                --model_dir=/root/models \
-                --output_dir=/root/output
-
-        output_dir=$(dirname {output.structures[0]})
-        mkdir -p $output_dir
-
-        sanitized_output_name=$(echo {wildcards.name} | tr '[:upper:]' '[:lower:]' | tr ' ' '_')
-        for sample_num in {{0..4}}; do
-            prediction_dir="${{temp_output_dir_abs}}/${{sanitized_output_name}}/seed-{wildcards.seed}_sample-${{sample_num}}"
-
-            mv \
-                "$prediction_dir/${{sanitized_output_name}}_seed-{wildcards.seed}_sample-${{sample_num}}_model.cif" \
-                $output_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_model.cif
-            mv \
-                "$prediction_dir/${{sanitized_output_name}}_seed-{wildcards.seed}_sample-${{sample_num}}_summary_confidences.json" \
-                $output_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_summary_confidences.json
-            mv \
-                "$prediction_dir/${{sanitized_output_name}}_seed-{wildcards.seed}_sample-${{sample_num}}_confidences.json" \
-                $output_dir/{wildcards.name}_seed-{wildcards.seed}_sample-${{sample_num}}_confidences.json
-        done
-        """
+    script: "../scripts/predict_structure_with_alphafold3.py"
 
 rule create_af3_structures_sample_size_50:
     input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'])
