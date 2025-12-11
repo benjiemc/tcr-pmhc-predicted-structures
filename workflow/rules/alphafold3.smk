@@ -408,18 +408,8 @@ rule create_af3_structures_with_tcrmodel2_data_no_unpaired_msas_no_paired_msas_n
 rule create_af3_structures_with_tcrmodel2_data_no_unpaired_msas_no_paired_msas_no_templates_benchmark:
     input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3_tcrmodel2_no_unpaired_msas_no_paired_msas_no_templates/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
 
-def _get_dash_names(path: str, template: str, peptide: str, seeds: list) -> list[str]:
-    if not os.path.exists(path):
-        print(path, 'does not exist!')
-        return []
-
-    with open(path, 'r') as fh:
-        ids = [entry['id'] for entry in csv.DictReader(fh) if entry['peptide'] == peptide]
-
-    return expand(template, name=ids, seed=seeds, sample=list(range(5)))
-
 rule create_af3_structures_with_tcrmodel2_data_dash_bmlf:
-    input: _get_dash_names("data/interim/sequences_dash.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", 'GLCTLVAML', config['seed'])
+    input: get_dash_names("data/interim/sequences_dash.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", 'GLCTLVAML', config['seed'])
 
 rule compute_ipsae_on_af3_structure:
     input:
@@ -523,3 +513,6 @@ rule process_af3_structures_with_tcrmodel2_data_sample_size_50:
 
 rule process_af3_structures_with_tcrmodel2_data_sample_size_1500:
     input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/processed/structures_af3_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", config['seed'])
+
+rule process_af3_structures_with_tcrmodel2_data_dash_bmlf:
+    input: get_dash_names("data/interim/sequences_dash.csv", "data/processed/structures_af3_af3_tcrmodel2/{name}_{seed}_{sample}.pdb", 'GLCTLVAML', config['seed'])
