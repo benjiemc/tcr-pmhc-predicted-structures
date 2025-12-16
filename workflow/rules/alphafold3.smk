@@ -42,7 +42,7 @@ rule run_create_af3_jsons:
         python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
             --log-level {config[log_level]} \
             --format alphafold3 \
-             --alphafold3-model-seeds {wildcards.seed} \
+            --alphafold3-model-seeds {wildcards.seed} \
             --add-paths \
             --relative-paths \
             --unpaired-msa-paths {input.unpaired_msas} \
@@ -68,7 +68,7 @@ rule run_create_af3_jsons_no_templates:
         python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
             --log-level {config[log_level]} \
             --format alphafold3 \
-             --alphafold3-model-seeds {wildcards.seed} \
+            --alphafold3-model-seeds {wildcards.seed} \
             --add-paths \
             --relative-paths \
             --unpaired-msa-paths {input.unpaired_msas} \
@@ -93,7 +93,7 @@ rule run_create_af3_jsons_no_paired_msas:
         python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
             --log-level {config[log_level]} \
             --format alphafold3 \
-             --alphafold3-model-seeds {wildcards.seed} \
+            --alphafold3-model-seeds {wildcards.seed} \
             --add-paths \
             --relative-paths \
             --unpaired-msa-paths {input.unpaired_msas} \
@@ -117,7 +117,7 @@ rule run_create_af3_jsons_no_paired_msas_no_templates:
         python -m tcr_pmhc_predicted_structures.apps.convert_to_input \
             --log-level {config[log_level]} \
             --format alphafold3 \
-             --alphafold3-model-seeds {wildcards.seed} \
+            --alphafold3-model-seeds {wildcards.seed} \
             --add-paths \
             --relative-paths \
             --unpaired-msa-paths {input.unpaired_msas} \
