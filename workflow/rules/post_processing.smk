@@ -52,26 +52,7 @@ rule aggregate_dash_bmlf_confidence_scores:
     resources:
         runtime="10m",
         mem="1GB"
-    run:
-        import pandas as pd
-
-        entries = []
-        for path in input:
-            confidence_scores = pd.read_csv(path)
-
-            info = re.search(
-                r'[A-Za-z0-9]+_[A-Za-z0-9]+_[A-Za-z0-9]+_(?P<name>[A-Za-z0-9_]+)_(?P<seed>\d+)_(?P<sample>\d+)'
-                '_confidence_scores.csv',
-                os.path.basename(path),
-            ).groupdict()
-
-            for key, value in info.items():
-                confidence_scores[key] = value
-
-            entries.append(confidence_scores)
-
-        df = pd.concat(entries).reset_index(drop=True)
-        df.to_csv(output[0], index=False)
+    script: "../scripts/aggregate_post_processing.py"
 
 rule summarise_predicted_structural_features:
     input: "data/interim/structures_{model}_{msa_method}_{data_source}{ablations}/{name}_seed-{seed}_sample-{sample}_model.cif"
@@ -95,24 +76,7 @@ rule aggregate_dash_bmlf_predicted_structural_features:
     resources:
         runtime="10m",
         mem="1GB"
-    run:
-        import json
-        import pandas as pd
-
-        entries = []
-        for path in input:
-            with open(path, 'r') as fh:
-                structural_features = json.load(fh)
-
-            _, _, _, name, seed, sample = os.path.basename(path).replace('_structural_summary.json', '').rsplit('_', 5)
-            structural_features['name'] = name
-            structural_features['seed'] = seed
-            structural_features['sample'] = sample
-
-            entries.append(structural_features)
-
-        df = pd.DataFrame(entries)
-        df.to_csv(output[0], index=False)
+    script: "../scripts/aggregate_post_processing.py"
 
 rule process_predicted_structure:
     input: "data/interim/structures_{model}_{msa_method}_{data_source}{ablations}/{name}_seed-{seed}_sample-{sample}_model.cif"
@@ -173,22 +137,7 @@ rule aggregate_dash_bmlf_predicted_contact_maps:
     resources:
         runtime="10m",
         mem="1GB"
-    run:
-        import pandas as pd
-
-        contact_maps = []
-        for path in input:
-            contact_map = pd.read_csv(path)
-
-            _, _, _, name, seed, sample = os.path.basename(path).replace('_contacts.csv', '').rsplit('_', 5)
-            contact_map['name'] = name
-            contact_map['seed'] = seed
-            contact_map['sample'] = sample
-
-            contact_maps.append(contact_map)
-
-        contact_maps = pd.concat(contact_maps)
-        contact_maps.to_csv(output[0], index=False)
+    script: "../scripts/aggregate_post_processing.py"
 
 rule profile_predicted_interactions:
     input: "data/processed/structures_{model}_{msa_method}_{data_source}{ablations}/{name}_{seed}_{sample}.pdb"
@@ -212,22 +161,7 @@ rule aggregate_dash_bmlf_predicted_interactions:
     resources:
         runtime="10m",
         mem="1GB"
-    run:
-        import pandas as pd
-
-        interactions = []
-        for path in input:
-            interaction = pd.read_csv(path)
-
-            _, _, _, name, seed, sample = os.path.basename(path).replace('_interactions.csv', '').rsplit('_', 5)
-            interaction['name'] = name
-            interaction['seed'] = seed
-            interaction['sample'] = sample
-
-            interactions.append(interaction)
-
-        interactions = pd.concat(interactions)
-        interactions.to_csv(output[0], index=False)
+    script: "../scripts/aggregate_post_processing.py"
 
 rule calculate_predicted_sc_and_bsa:
     input: "data/processed/structures_{model}_{msa_method}_{data_source}{ablations}/{name}_{seed}_{sample}.pdb"
