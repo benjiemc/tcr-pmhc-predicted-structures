@@ -28,12 +28,72 @@ parser.add_argument(
     help='score to extract from the input data',
 )
 parser.add_argument(
+    '--aggregate-atom-level-confidence',
+    action='store_true',
+    help='aggregate atom level confidence by averaging per residue',
+)
+parser.add_argument(
     '--binding-only',
     action='store_true',
     help=(
         'extract the confidence scores just isolated to the binding interface (CDRs, peptide, and MHC-TCR contact '
         'positions) rather than the full TCR and MHC chains'
     ),
+)
+
+padding_group = parser.add_argument_group('Padding')
+padding_group.add_argument(
+    '--pad',
+    action='store_true',
+    help='option to add padding to confidence scores being extract',
+)
+padding_group.add_argument(
+    '--cdr1-alpha-length',
+    default=8,
+    type=int,
+    help='Length to pad CDR 1as to (Default: 8)',
+)
+padding_group.add_argument(
+    '--cdr2-alpha-length',
+    default=8,
+    type=int,
+    help='Length to pad CDR 2as to (Default: 8)',
+)
+padding_group.add_argument(
+    '--cdr3-alpha-length',
+    default=24,
+    type=int,
+    help='Length to pad CDR 3as to (Default: 24)',
+)
+padding_group.add_argument(
+    '--cdr1-beta-length',
+    default=8,
+    type=int,
+    help='Length to pad CDR 1bs to (Default: 8)',
+)
+padding_group.add_argument(
+    '--cdr2-beta-length',
+    default=8,
+    type=int,
+    help='Length to pad CDR 2bs to (Default: 8)',
+)
+padding_group.add_argument(
+    '--cdr3-beta-length',
+    default=24,
+    type=int,
+    help='Length to pad CDR 3bs to (Default: 24)',
+)
+padding_group.add_argument(
+    '--peptide-length',
+    default=12,
+    type=int,
+    help='Length to pad peptides to (Default: 12)',
+)
+padding_group.add_argument(
+    '--pad-direction',
+    choices=['centre', 'left', 'right'],
+    default='centre',
+    help="Direction to pad sequences (Default: 'centre')",
 )
 
 add_logging_arguments(parser)
@@ -52,6 +112,22 @@ def main() -> None:
     logger.info('Loading confidence score')
     confidence = np.loadtxt(args.confidence_path)
 
+    if args.pad:
+        logger.debug('Creating padding config')
+        pad_config = {
+            'direction': args.pad_direction,
+            'cdr1_alpha_length': args.cdr1_alpha_length,
+            'cdr2_alpha_length': args.cdr2_alpha_length,
+            'cdr3_alpha_length': args.cdr3_alpha_length,
+            'cdr1_beta_length': args.cdr1_beta_length,
+            'cdr2_beta_length': args.cdr2_beta_length,
+            'cdr3_beta_length': args.cdr3_beta_length,
+            'peptide_length': args.peptide_length,
+        }
+
+    else:
+        pad_config = None
+
     logger.info('Extracting TCR:pMHC confidence scores')
     selected_confidence = extract_confidence_score(
         sequences_flat,
@@ -61,6 +137,8 @@ def main() -> None:
         confidence,
         score_type=args.score,
         mhc_type=sequences['mhc_type'],
+        padding=pad_config,
+        avg_atoms_for_residue=args.aggregate_atom_level_confidence,
     )
 
     logger.info('Outputting confidence to %s', args.output)

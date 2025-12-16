@@ -1,6 +1,7 @@
 """Functions for working with confidence scores from structure predictions."""
 
 import logging
+from collections.abc import Callable
 from functools import cache
 
 import numpy as np
@@ -8,11 +9,17 @@ from Bio.SeqUtils import IUPACData
 
 from tcr_pmhc_predicted_structures.imgt_numbering import (
     IMGT_CDR,
+    IMGT_CDR1,
+    IMGT_CDR2,
+    IMGT_CDR3,
     IMGT_MHC_TCR_CONTACT_POSITIONS,
     MHC_I_IMGT_BETA_HELIX_START,
     number,
 )
+from tcr_pmhc_predicted_structures.padding import centre_pad, left_pad, right_pad
 from tcr_pmhc_predicted_structures.predictions import CHAIN_ORDER, PDB_CHAIN_IDS, RESIDUE_NUMBER_OF_ATOMS
+
+PADDING_FUNCTIONS = {'centre': centre_pad, 'left': left_pad, 'right': right_pad}
 
 logger = logging.getLogger(__name__)
 
@@ -152,6 +159,96 @@ def _create_masks(
     return tcr_mask, peptide_mask, mhc_mask
 
 
+def _add_padding(
+    confidence: np.ndarray,
+    indices: np.ndarray,
+    pad_length: int,
+    padding_function: Callable,
+    adjustment: int = 0,
+    axis: int | None = None,
+) -> tuple[np.ndarray, int]:
+    start = np.min(indices)
+    end = np.max(indices)
+
+    action, left_num, right_num = padding_function(len(indices), pad_length)
+
+    match action:
+        case 'pad':
+            for _ in range(right_num):
+                confidence = np.insert(confidence, end + adjustment + 1, np.nan, axis=axis)
+
+            for _ in range(left_num):
+                confidence = np.insert(confidence, start + adjustment, np.nan, axis=axis)
+
+            adjustment += right_num + left_num
+
+        case 'crop':
+            for _ in range(right_num):
+                confidence = np.delete(confidence, end + adjustment, axis=axis)
+
+            for _ in range(left_num):
+                confidence = np.delete(confidence, start + adjustment, axis=axis)
+
+            adjustment -= right_num + left_num
+
+    return confidence, adjustment
+
+
+def pad_2d_confidence_scores(
+    confidence: np.ndarray,
+    row_chain_ids: np.ndarray,
+    row_sequence_ids: np.ndarray,
+    column_chain_ids: np.ndarray,
+    padding: dict,
+) -> np.ndarray:
+    """Pad 2D confidence scores (PAE, PDE, etc) following the config provided."""
+    padding_function = PADDING_FUNCTIONS[padding['direction']]
+
+    peptide_indices = np.where(column_chain_ids == 'C')[0]
+    confidence, _ = _add_padding(confidence, peptide_indices, padding['peptide_length'], padding_function, axis=1)
+
+    adjustment = 0
+    for chain_id, imgt_numbers, pad_length in (
+        ('D', IMGT_CDR1, padding['cdr1_alpha_length']),
+        ('D', IMGT_CDR2, padding['cdr2_alpha_length']),
+        ('D', IMGT_CDR3, padding['cdr3_alpha_length']),
+        ('E', IMGT_CDR1, padding['cdr1_beta_length']),
+        ('E', IMGT_CDR2, padding['cdr2_beta_length']),
+        ('E', IMGT_CDR3, padding['cdr3_beta_length']),
+    ):
+        cdr_indices = np.where((row_chain_ids == chain_id) & (np.isin(row_sequence_ids, list(imgt_numbers))))[0]
+        confidence, adjustment = _add_padding(
+            confidence, cdr_indices, pad_length, padding_function, adjustment=adjustment, axis=0
+        )
+
+    return confidence
+
+
+def pad_1d_confidence_scores(
+    confidence: np.ndarray, chain_ids: np.ndarray, sequence_ids: np.ndarray, padding: dict
+) -> np.ndarray:
+    """Pad 1D confidence scores (plddt) following the config provided."""
+    padding_function = PADDING_FUNCTIONS[padding['direction']]
+
+    peptide_indices = np.where(chain_ids == 'C')[0]
+    confidence, adjustment = _add_padding(confidence, peptide_indices, padding['peptide_length'], padding_function)
+
+    for chain_id, imgt_numbers, pad_length in (
+        ('D', IMGT_CDR1, padding['cdr1_alpha_length']),
+        ('D', IMGT_CDR2, padding['cdr2_alpha_length']),
+        ('D', IMGT_CDR3, padding['cdr3_alpha_length']),
+        ('E', IMGT_CDR1, padding['cdr1_beta_length']),
+        ('E', IMGT_CDR2, padding['cdr2_beta_length']),
+        ('E', IMGT_CDR3, padding['cdr3_beta_length']),
+    ):
+        cdr_indices = np.where((chain_ids == chain_id) & (np.isin(sequence_ids, list(imgt_numbers))))[0]
+        confidence, adjustment = _add_padding(
+            confidence, cdr_indices, pad_length, padding_function, adjustment=adjustment
+        )
+
+    return confidence
+
+
 def extract_confidence_score(
     sequences: np.ndarray,
     chain_ids: np.ndarray,
@@ -163,20 +260,30 @@ def extract_confidence_score(
     mhc_type: str,
     binding_only: bool = True,
     avg_atoms_for_residue: bool = False,
+    padding: None | dict = None,
 ) -> np.ndarray:
     """Extract TCR:pMHC specific confidence score from given confidence."""
     if score_type.startswith('atom'):
         logger.debug('Extending look up arrays from residue level to atom level')
         extension = _get_extension(sequences, chain_ids)
 
-        chain_ids = _extend_array(chain_ids, extension)
-        sequence_ids = _extend_array(sequence_ids, extension)
-        insert_codes = _extend_array(insert_codes, extension)
+        chain_ids_processed = _extend_array(chain_ids, extension)
+        sequence_ids_processed = _extend_array(sequence_ids, extension)
+        insert_codes_processed = _extend_array(insert_codes, extension)
+
+    else:
+        chain_ids_processed = chain_ids
+        sequence_ids_processed = sequence_ids
+        insert_codes_processed = insert_codes
 
     logger.debug('Selecting relevant portion of the matrix')
     logger.debug('Creating masks')
     tcr_mask, peptide_mask, mhc_mask = _create_masks(
-        chain_ids, sequence_ids, insert_codes, mhc_type=mhc_type, binding_only=binding_only
+        chain_ids_processed,
+        sequence_ids_processed,
+        insert_codes_processed,
+        mhc_type=mhc_type,
+        binding_only=binding_only,
     )
     pmhc_mask = peptide_mask | mhc_mask
 
@@ -184,11 +291,38 @@ def extract_confidence_score(
         case 'pae' | 'pde':
             selected_confidence = confidence[np.ix_(tcr_mask, pmhc_mask)]  # TODO get square version of this
 
+            if padding:
+                row_chain_ids = chain_ids[tcr_mask]
+                row_sequence_ids = sequence_ids[tcr_mask]
+                column_chain_ids = chain_ids[pmhc_mask]
+
+                selected_confidence = pad_2d_confidence_scores(
+                    selected_confidence, row_chain_ids, row_sequence_ids, column_chain_ids, padding
+                )
+
         case 'atom_plddt' | 'plddt':
             selected_confidence = confidence[tcr_mask | pmhc_mask]
 
             if avg_atoms_for_residue:
-                selected_confidence = _aggregate_from_extension(selected_confidence, extension)
+                tcr_mask, peptide_mask, mhc_mask = _create_masks(
+                    chain_ids,
+                    sequence_ids,
+                    insert_codes,
+                    mhc_type=mhc_type,
+                    binding_only=binding_only,
+                )
+                pmhc_mask = peptide_mask | mhc_mask
+
+                selected_confidence = _aggregate_from_extension(selected_confidence, extension[tcr_mask | pmhc_mask])
+
+            if padding:
+                if score_type.startswith('atom') and not avg_atoms_for_residue:
+                    msg = 'Padding is not supported for atom level confidence scores'
+                    raise ValueError(msg)
+
+                selected_confidence = pad_1d_confidence_scores(
+                    selected_confidence, chain_ids[tcr_mask | pmhc_mask], sequence_ids[tcr_mask | pmhc_mask], padding
+                )
 
     return selected_confidence
 
