@@ -14,17 +14,6 @@ wildcard_constraints:
     data="[A-Za-z0-9]+",
     name="[A-Za-z0-9_]+"
 
-def _get_json_names(template: str, path: str) -> list[str]:
-    if not os.path.exists(path):
-        print(path, 'does not exist!')
-        return []
-
-    with open(path, 'r') as fh:
-        reader = csv.DictReader(fh)
-        indices = [entry['index'] for entry in reader]
-
-    return expand(template, name=indices)
-
 rule run_create_af3_jsons:
     input:
         sequences="data/interim/sequences/{name}.json",
