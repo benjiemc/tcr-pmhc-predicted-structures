@@ -10,6 +10,7 @@ authors = [
 ]
 requires-python = ">=3.10"
 dependencies = [
+    "h5py",
 	"numpy",
 	"pandas",
     "pyxdameraulevenshtein",
@@ -18,6 +19,7 @@ dependencies = [
 	"scipy",
     "stitchr>1.1.3",
     "tidytcells",
+    "torch",
 ]
 
 [project.optional-dependencies]

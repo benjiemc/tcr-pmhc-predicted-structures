@@ -5,6 +5,7 @@ channels:
   - nodefaults
 dependencies:
   - colabfold
+  - dvc
   - h5py
   - hmmer
   - jupyter

@@ -164,6 +164,26 @@ rule run_specificity_predictor:
         touch {output}
         """
 
+rule run_evaluating_antigen_specificity_model:
+    input:
+        "data/interim/sequences_sample_1500.csv",
+        "data/processed/confidence_scores_af3_af3_tcrmodel2_1500.csv",
+        "data/processed/af3_af3_tcrmodel2_pae.h5",
+        "models/PAEAggregator_af3_af3_tcrmodel2"
+    output: "data/flags/evaluating_antigen_specificity_model_done.flag"
+    resources:
+        runtime="10m",
+        mem="5GB"
+    shell:
+        """
+        jupyter nbconvert \
+            --to notebook \
+            --execute \
+            --inplace \
+            notebooks/evaluating_antigen_specificity_model.ipynb
+        touch {output}
+        """
+
 rule run_benchmark_structure_prediction_methods:
     input:
         "data/external/stcrdab/db_summary.dat",
