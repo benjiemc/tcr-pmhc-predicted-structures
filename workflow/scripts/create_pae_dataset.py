@@ -43,10 +43,12 @@ paes = np.stack(paes)
 folds = np.array(folds)
 labels = np.array(labels)
 
-logger.info('Inverting and min-max scaling the PAEs')
+logger.info('Inverting and normalising the PAEs')
 max_value = np.nanmax(paes)
-min_value = np.nanmin(paes)
-paes = (max_value - paes) / (max_value - min_value)
+paes = (max_value - paes) / max_value
+
+logger.info('Filling NaNs as zeros')
+paes = np.nan_to_num(paes)
 
 logger.info('Writing dataset to %s', snakemake.output[0])
 with h5py.File(snakemake.output[0], 'w') as fh:

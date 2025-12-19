@@ -28,4 +28,4 @@ class PAEAggregator(nn.Module):
     def forward(self, pae: torch.Tensor) -> torch.Tensor:
         """Forward pass of the model."""
         x = torch.mul(self.weights, pae)
-        return torch.nansum(x, axis=-1) / (1 - torch.isnan(pae).sum(-1) / self.size)
+        return torch.sum(x, dim=-1) / (torch.count_nonzero(pae, dim=-1) / self.size)

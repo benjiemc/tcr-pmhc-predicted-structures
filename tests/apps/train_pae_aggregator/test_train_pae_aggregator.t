@@ -31,7 +31,7 @@ Test training
     warnings.warn(
   *: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case. (glob)
     warnings.warn(
-  * - INFO: Loss: 0.290899 (glob)
+  * - INFO: Loss: * (glob)
   * - INFO: Training ROC-AUC: nan (glob)
   * - INFO: Validation ROC-AUC: nan (glob)
   * - INFO: Saving model to models/model_1.pt (glob)
@@ -44,7 +44,7 @@ Test training
     warnings.warn( (glob)
   *: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case. (glob)
     warnings.warn( (glob)
-  * - INFO: Loss: 0.290899 (glob)
+  * - INFO: Loss: * (glob)
   * - INFO: Training ROC-AUC: nan (glob)
   * - INFO: Validation ROC-AUC: nan (glob)
   * - INFO: Saving model to models/model_2.pt (glob)
@@ -57,7 +57,7 @@ Test training
     warnings.warn(
   *: UndefinedMetricWarning: Only one class is present in y_true. ROC AUC score is not defined in that case. (glob)
     warnings.warn(
-  * - INFO: Loss: 0.580938 (glob)
+  * - INFO: Loss: * (glob)
   * - INFO: Training ROC-AUC: nan (glob)
   * - INFO: Validation ROC-AUC: nan (glob)
   * - INFO: Saving model to models/model_3.pt (glob)
