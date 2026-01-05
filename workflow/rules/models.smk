@@ -57,9 +57,9 @@ rule train_pae_aggregator:
         mem="10GB",
         gpu=1
     params:
-        num_epochs=5,
+        num_epochs=15,
         batch_size=32,
-        learning_rate=0.001,
+        learning_rate=0.00001,
         size=3120,
         eval_batch_size=300,
         eval_interval=50

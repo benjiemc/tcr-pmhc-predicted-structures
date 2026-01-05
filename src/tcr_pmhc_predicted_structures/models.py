@@ -28,4 +28,10 @@ class PAEAggregator(nn.Module):
     def forward(self, pae: torch.Tensor) -> torch.Tensor:
         """Forward pass of the model."""
         x = torch.mul(self.weights, pae)
-        return torch.sum(x, dim=-1) / (torch.count_nonzero(pae, dim=-1) / self.size)
+        x = torch.sum(x, dim=-1) / (torch.count_nonzero(pae, dim=-1) / self.size)
+
+        # ReLu1
+        x = torch.where(torch.le(x, 0), 0, x)
+        x = torch.where(torch.ge(x, 1), 1, x)
+
+        return x

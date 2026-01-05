@@ -121,7 +121,7 @@ def main() -> None:
         logger.debug('Transferring model to %s', str(device))
         model.to(device)
 
-        loss_fn = nn.MSELoss()
+        loss_fn = nn.BCELoss()
         optimizer = optim.Adam(model.parameters(), lr=args.learning_rate)
 
         output_name = os.path.join(args.output, f'model_{fold_idx}.pt')
