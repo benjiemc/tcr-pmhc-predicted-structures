@@ -2,17 +2,22 @@
 """Extract confidence metrics from AF3 predictions."""
 
 import json
+import logging
 import re
 
 import numpy as np
 from snakemake.script import snakemake
 
+from tcr_pmhc_predicted_structures.apps._log import setup_logger
 from tcr_pmhc_predicted_structures.confidence_scores import (
     compute_alpha_bridge_scores,
     extract_confidence_score,
     get_sequence_information,
 )
 from tcr_pmhc_predicted_structures.predictions import CHAIN_ORDER
+
+logger = logging.getLogger()
+setup_logger(logger, 'info')
 
 
 def collect_summary_scores(summary_confidences: dict) -> dict:
@@ -39,18 +44,23 @@ def collect_summary_scores(summary_confidences: dict) -> dict:
     return scores
 
 
+logger.info('Loading sequences from %s', snakemake.input.sequences)
 with open(snakemake.input.sequences, 'r') as fh:
     sequences = json.load(fh)
 
+logger.info('Processing sequences')
 sequences_flat, chain_ids, sequence_ids, insert_codes = get_sequence_information(sequences)
 
+logger.info('Loading summary confidences from %s', snakemake.input.summary_confidences)
 scores = {}
 
 with open(snakemake.input.summary_confidences, 'r') as fh:
     summary_confidences = json.load(fh)
 
+logger.info('Collecting summary confidence scores')
 scores = {**scores, **collect_summary_scores(summary_confidences)}
 
+logger.info('Combining summary confidence scores')
 if sequences['mhc_type'] == 'MH1':
     scores['combined_pae_min'] = np.mean(
         [
@@ -87,9 +97,11 @@ else:
         ]
     )
 
+logger.info('Loading raw confidence scores from %s', snakemake.input.confidences)
 with open(snakemake.input.confidences, 'r') as fh:
     confidences = json.load(fh)
 
+logger.info('Extracting TCR-pMHC PAE Score')
 pae = np.array(confidences['pae'])
 scores['tcr_pmhc_pae_score'] = np.mean(
     extract_confidence_score(
@@ -103,6 +115,8 @@ scores['tcr_pmhc_pae_score'] = np.mean(
         binding_only=False,
     )
 )
+
+logger.info('Extracting CDR-pMHC PAE Score')
 scores['cdr_pmhc_pae_score'] = np.mean(
     extract_confidence_score(
         sequences_flat,
@@ -116,6 +130,7 @@ scores['cdr_pmhc_pae_score'] = np.mean(
     )
 )
 
+logger.info('Extracting TCR-pMHC pLDDT Score')
 atom_plddt = np.array(confidences['atom_plddts'])
 scores['tcr_pmhc_plddt_score'] = np.mean(
     extract_confidence_score(
@@ -129,6 +144,8 @@ scores['tcr_pmhc_plddt_score'] = np.mean(
         binding_only=False,
     )
 )
+
+logger.info('Extracting CDR-pMHC pLDDT Score')
 scores['cdr_pmhc_plddt_score'] = np.mean(
     extract_confidence_score(
         sequences_flat,
@@ -142,6 +159,7 @@ scores['cdr_pmhc_plddt_score'] = np.mean(
     )
 )
 
+logger.info('Computring TCR-pMHC AlphaBridge score')
 scores['tcr_pmhc_alphabridge_score'] = np.mean(
     compute_alpha_bridge_scores(
         sequences_flat,
@@ -154,6 +172,7 @@ scores['tcr_pmhc_alphabridge_score'] = np.mean(
         binding_only=False,
     )
 )
+logger.info('Computring CDR-pMHC AlphaBridge score')
 scores['cdr_pmhc_alphabridge_score'] = np.mean(
     compute_alpha_bridge_scores(
         sequences_flat,
@@ -167,6 +186,7 @@ scores['cdr_pmhc_alphabridge_score'] = np.mean(
     )
 )
 
+logger.info('Writing confidence scores to %s', snakemake.output[0])
 with open(snakemake.output[0], 'w') as fh:
     fh.write(','.join(scores.keys()))
     fh.write('\n')
