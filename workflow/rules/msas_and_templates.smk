@@ -45,51 +45,26 @@ rule create_af3_msa_inputs:
                     output_fh,
                 )
 
-def get_sequence_ids(path: str, sequence_key_path: str, template: str) -> list[str]:
-    if not os.path.exists(sequence_key_path):
-        print(sequence_key_path, 'does not exist!')
-        return []
+def get_sequence_ids(
+    path: str, template: str, sequence_key_path: str | None = None, additional_structures_path: str | None = None
+) -> list[str]:
+    past_ids = set()
 
-    with open(sequence_key_path, 'r') as fh:
-        sequence_key = dict(line.strip().split() for line in fh if line)
+    if sequence_key_path:
+        if not os.path.exists(sequence_key_path):
+            print(sequence_key_path, 'does not exist!')
+            return []
 
-    if not os.path.exists(path):
-        print(path, 'does not exist!')
-        return []
+        with open(sequence_key_path, 'r') as fh:
+            past_ids = past_ids | {line.strip().split()[0] for line in fh if line}
 
-    with open(path, 'r') as fh:
-        reader = csv.DictReader(fh)
+    if additional_structures_path:
+        if not os.path.exists(additional_structures_path):
+            print(additional_structures_path, 'does not exist!')
+            return []
 
-        ids = {
-            sequence_id
-            for entry in reader
-            for sequence_name in ('Achain_sequence', 'Bchain_sequence', 'mhc_chain1_sequence', 'mhc_chain2_sequence')
-            if (sequence := entry[sequence_name])
-            and (sequence_id := hashlib.sha256(sequence.encode()).hexdigest()[:8]) not in sequence_key
-        }
-
-    return expand(template, name=ids)
-
-rule create_af3_msa_inputs_from_benchmark:
-    input:
-        benchmark_structures="data/interim/benchmark_structures.csv",
-        sequence_key="data/interim/sequence_key.txt"
-    output: get_sequence_ids('data/interim/benchmark_structures.csv', 'data/interim/sequence_key.txt', 'data/interim/msa-inputs_af3/{name}.json')
-    resources:
-        runtime="10m",
-        mem="10MB"
-    run:
-        output_dir = os.path.dirname(output[0])
-        if not os.path.exists(output_dir):
-            os.mkdir(output_dir)
-
-        with open(input.sequence_key, 'r') as fh:
-            sequence_key = dict(line.strip().split() for line in fh if line)
-
-        past_ids = set()
-        with open(input.benchmark_structures, 'r') as fh:
-            reader = csv.DictReader(fh)
-            for entry in reader:
+        with open(additional_structures_path, 'r') as fh:
+            for entry in csv.DictReader(fh):
                 for sequence_name in (
                     'Achain_sequence', 'Bchain_sequence', 'mhc_chain1_sequence', 'mhc_chain2_sequence'
                 ):
@@ -100,25 +75,43 @@ rule create_af3_msa_inputs_from_benchmark:
                     if not sequence:
                         continue
 
-                    sequence_id = hashlib.sha256(sequence.encode()).hexdigest()[:8]
-                    if sequence_id in sequence_key or sequence_id in past_ids:
-                        continue
+                    past_ids.add(hashlib.sha256(sequence.encode()).hexdigest()[:8])
 
-                    with open(os.path.join(output_dir, sequence_id + '.json'), 'w') as output_fh:
-                        json.dump(
-                            {
-                                'name': sequence_id,
-                                'modelSeeds': [1],
-                                'sequences': [
-                                    {'protein': {'id': 'A', 'sequence': sequence}},
-                                ],
-                                'dialect': 'alphafold3',
-                                'version': 1,
-                            },
-                            output_fh,
-                        )
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
 
-                    past_ids.add(sequence_id)
+    with open(path, 'r') as fh:
+        ids = {
+            sequence_id
+            for entry in csv.DictReader(fh)
+            for sequence_name in ('Achain_sequence', 'Bchain_sequence', 'mhc_chain1_sequence', 'mhc_chain2_sequence')
+            if (sequence := entry[sequence_name])
+            and (sequence_id := hashlib.sha256(sequence.encode()).hexdigest()[:8]) not in past_ids
+        }
+
+    return expand(template, name=ids)
+
+rule create_af3_msa_inputs_from_benchmark:
+    input:
+        structures="data/interim/benchmark_structures.csv",
+        sequence_key="data/interim/sequence_key.txt"
+    output: get_sequence_ids('data/interim/benchmark_structures.csv', 'data/interim/msa-inputs_af3/{name}.json', sequence_key_path='data/interim/sequence_key.txt')
+    resources:
+        runtime="10m",
+        mem="10MB"
+    script: "../scripts/create_af3_msa_inputs_from_structures.py"
+
+rule create_af3_msa_inputs_from_af_training_structures:
+    input:
+        structures="data/interim/af_training_structures.csv",
+        additional_structures="data/interim/benchmark_structures.csv",
+        sequence_key="data/interim/sequence_key.txt"
+    output: get_sequence_ids('data/interim/af_training_structures.csv', 'data/interim/msa-inputs_af3/{name}.json', sequence_key_path='data/interim/sequence_key.txt', additional_structures_path='data/interim/benchmark_structures.csv')
+    resources:
+        runtime="10m",
+        mem="10MB"
+    script: "../scripts/create_af3_msa_inputs_from_structures.py"
 
 rule run_create_af3_msas_and_find_templates:
     input: "data/interim/msa-inputs_af3/{name}.json"
@@ -220,7 +213,7 @@ rule create_colabfold_msa_inputs_from_benchmark:
     input:
         benchmark_structures="data/interim/benchmark_structures.csv",
         sequence_key="data/interim/sequence_key.txt"
-    output: get_sequence_ids('data/interim/benchmark_structures.csv', 'data/interim/sequence_key.txt', 'data/interim/msa-inputs_mmseqs2/{name}.fasta')
+    output: get_sequence_ids('data/interim/benchmark_structures.csv', 'data/interim/msa-inputs_mmseqs2/{name}.fasta', sequence_key_path='data/interim/sequence_key.txt')
     resources:
         runtime="10m",
         mem="10MB"
@@ -367,6 +360,12 @@ rule create_tcrmodel2_msas_and_find_templates_benchmark_structures:
         unpaired_msas=_get_msas_for_benchmark('data/interim/benchmark_structures.csv', 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
         paired_msas=_get_msas_for_benchmark('data/interim/benchmark_structures.csv', 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
         templates=_get_msas_for_benchmark('data/interim/benchmark_structures.csv', 'data/interim/templates_af3_tcrmodel2/{name}')
+
+rule create_tcrmodel2_msas_and_find_templates_af_training_structures:
+    input:
+        unpaired_msas=_get_msas_for_benchmark('data/interim/af_training_structures.csv', 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m'),
+        paired_msas=_get_msas_for_benchmark('data/interim/af_training_structures.csv', 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m'),
+        templates=_get_msas_for_benchmark('data/interim/af_training_structures.csv', 'data/interim/templates_af3_tcrmodel2/{name}')
 
 rule combine_msas_to_parquet:
     input:
