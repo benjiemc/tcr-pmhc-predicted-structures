@@ -363,6 +363,9 @@ rule create_af3_structures_with_tcrmodel2_data_sample_size_1500:
 rule create_af3_structures_with_tcrmodel2_data_benchmark:
     input: get_predicted_structure_names("data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
 
+rule create_af3_structures_with_tcrmodel2_data_af_training:
+    input: get_predicted_structure_names("data/interim/af_training_structures.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
+
 rule create_af3_structures_with_tcrmodel2_data_no_templates_sample_size_1500:
     input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/interim/structures_af3_af3_tcrmodel2_no_templates/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'])
 
