@@ -124,7 +124,7 @@ rule select_benchmark_structures:
         mem="1GB"
     script: "../scripts/select_benchmark_structures.py"
 
-def _get_benchmark_sequence_names(path: str, template: str) -> list[str]:
+def get_sequence_names(path: str, template: str) -> list[str]:
     if not os.path.exists(path):
         print(path, 'does not exist!')
         return []
@@ -136,35 +136,32 @@ def _get_benchmark_sequence_names(path: str, template: str) -> list[str]:
 
 rule extract_benchmark_sequences:
     input: "data/interim/benchmark_structures.csv"
-    output: _get_benchmark_sequence_names("data/interim/benchmark_structures.csv", "data/interim/sequences/{name}.json")
+    output: get_sequence_names("data/interim/benchmark_structures.csv", "data/interim/sequences/{name}.json")
     resources:
         runtime="1m",
         mem="10MB"
-    run:
-        import pandas as pd
+    script: "../scripts/extract_sequences_from_csv.py"
 
-        df = pd.read_csv(input[0])
-        output_df = df[
-            [
-                column_name
-                for column_name in df.columns
-                if column_name.endswith('_sequence') or column_name in ('id', 'mhc_type')
-            ]
-        ]
+rule select_af_training_structures:
+    input:
+        structures="data/raw/structures_no_crop",
+        structures_summary="data/raw/structures_summary_no_crop.csv",
+        stcrdab="data/external/stcrdab"
+    output: "data/interim/af_training_structures.csv"
+    params:
+        seed=123
+    resources:
+        runtime="10m",
+        mem="1GB"
+    script: "../scripts/select_af_training_structures.py"
 
-        output_df.columns = [{
-            'Achain_sequence': 'tcr_alpha_chain',
-            'Bchain_sequence': 'tcr_beta_chain',
-            'antigen_chain_sequence': 'peptide',
-            'mhc_chain1_sequence': 'mhc_chain_1',
-            'mhc_chain2_sequence': 'mhc_chain_2',
-        }.get(column_name, column_name) for column_name in output_df.columns]
-
-        output_dir = os.path.dirname(output[0])
-        os.makedirs(output_dir, exist_ok=True)
-        for entry in [{k: v for k, v in row.items() if pd.notna(v)} for row in output_df.to_dict(orient='records')]:
-            with open(os.path.join(output_dir, f"{entry['id']}.json"), 'w') as fh:
-                json.dump(entry, fh)
+rule extract_af_training_sequences:
+    input: "data/interim/af_training_structures.csv"
+    output: get_sequence_names("data/interim/af_training_structures.csv", "data/interim/sequences/{name}.json")
+    resources:
+        runtime="5m",
+        mem="100MB"
+    script: "../scripts/extract_sequences_from_csv.py"
 
 def create_paths(summary_file: str, path_name: str) -> list[str]:
     if not os.path.exists(summary_file):
