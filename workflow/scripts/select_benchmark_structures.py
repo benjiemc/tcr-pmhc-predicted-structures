@@ -1,5 +1,5 @@
 #!/usr/bin/env python
-"""Script to select holdout structuers to evaluate AF3 models on."""
+"""Script to select holdout structures to evaluate AF3 models on."""
 
 import os
 
