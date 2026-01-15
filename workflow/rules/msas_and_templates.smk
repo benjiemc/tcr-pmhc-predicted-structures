@@ -140,9 +140,9 @@ def get_dash_sequence_ids(path: str, sequence_key_path: str, template: str) -> l
 
 rule create_af3_msa_inputs_from_dash_dataset:
     input:
-        sequences='data/interim/sequences_dash.csv',
+        sequences="data/interim/sequences_dash_with_negatives.csv",
         sequence_key="data/interim/sequence_key.txt"
-    output: get_dash_sequence_ids('data/interim/sequences_dash.csv', 'data/interim/sequence_key.txt', 'data/interim/msa-inputs_af3/{name}.json')
+    output: get_dash_sequence_ids("data/interim/sequences_dash_with_negatives.csv", "data/interim/sequence_key.txt", "data/interim/msa-inputs_af3/{name}.json")
     resources:
         runtime="10m",
         mem="500MB"
@@ -460,9 +460,9 @@ def _get_msas_for_dash(path: str, template: str, peptide: str) -> list[str]:
 
 rule create_tcrmodel2_msas_and_find_templates_dash_bmlf:
     input:
-        unpaired_msas=_get_msas_for_dash('data/interim/sequences_dash.csv', 'data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m', 'GLCTLVAML'),
-        paired_msas=_get_msas_for_dash('data/interim/sequences_dash.csv', 'data/interim/msas_af3_tcrmodel2/{name}_paired.a3m', 'GLCTLVAML'),
-        templates=_get_msas_for_dash('data/interim/sequences_dash.csv', 'data/interim/templates_af3_tcrmodel2/{name}', 'GLCTLVAML')
+        unpaired_msas=_get_msas_for_dash("data/interim/sequences_dash_with_negatives.csv", "data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m", "GLCTLVAML"),
+        paired_msas=_get_msas_for_dash("data/interim/sequences_dash_with_negatives.csv", "data/interim/msas_af3_tcrmodel2/{name}_paired.a3m", "GLCTLVAML"),
+        templates=_get_msas_for_dash("data/interim/sequences_dash_with_negatives.csv", "data/interim/templates_af3_tcrmodel2/{name}", "GLCTLVAML")
 
 rule combine_msas_to_parquet:
     input:

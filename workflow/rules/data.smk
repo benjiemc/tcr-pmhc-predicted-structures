@@ -201,9 +201,22 @@ rule create_sequences_from_dash_data:
         mem="1GB"
     script: "../scripts/create_sequences_from_dash_data.py"
 
+rule add_negatives_to_dash_sequences:
+    input:
+        dash_sequences="data/interim/sequences_dash.csv",
+        sequences="data/raw/sequences_pMHC_split.csv",
+        sequences_full="data/interim/sequences_full.csv"
+    output: "data/interim/sequences_dash_with_negatives.csv"
+    params:
+        seed=123
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: "../scripts/add_negatives_to_dash_sequences.py"
+
 rule extract_dash_sequences:
-    input: "data/interim/sequences_dash.csv"
-    output: get_sequence_names("data/interim/sequences_dash.csv", "data/interim/sequences/{name}.json")
+    input: "data/interim/sequences_dash_with_negatives.csv"
+    output: get_sequence_names("data/interim/sequences_dash_with_negatives.csv", "data/interim/sequences/{name}.json")
     run:
         output_dir = os.path.dirname(output[0])
         with open(input[0], 'r') as fh:

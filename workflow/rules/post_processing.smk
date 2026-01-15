@@ -47,7 +47,7 @@ rule aggregate_af_training_confidence_scores:
     script: "../scripts/aggregate_post_processing.py"
 
 rule aggregate_dash_bmlf_confidence_scores:
-    input: lambda wildcards: get_dash_names("data/interim/sequences_dash.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}_{{name}}_{{seed}}_{{sample}}_confidence_scores.csv", 'GLCTLVAML', config['seed'])
+    input: lambda wildcards: get_dash_names("data/interim/sequences_dash_with_negatives.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}_{{name}}_{{seed}}_{{sample}}_confidence_scores.csv", 'GLCTLVAML', config['seed'])
     output: "data/interim/confidence_scores_{model}_{msa_method}_{data_source}_dash_bmlf.csv"
     resources:
         runtime="10m",
@@ -71,7 +71,7 @@ rule aggregate_predicted_structural_features:
     script: "../scripts/aggregate_post_processing.py"
 
 rule aggregate_dash_bmlf_predicted_structural_features:
-    input: lambda wildcards: get_dash_names("data/interim/sequences_dash.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}_{{name}}_{{seed}}_{{sample}}_structural_summary.json", 'GLCTLVAML', config['seed'])
+    input: lambda wildcards: get_dash_names("data/interim/sequences_dash_with_negatives.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}_{{name}}_{{seed}}_{{sample}}_structural_summary.json", 'GLCTLVAML', config['seed'])
     output: "data/processed/predicted_{model}_{msa_method}_{data_source}_structural_features_dash_bmlf.csv"
     resources:
         runtime="10m",
@@ -132,7 +132,7 @@ rule aggregate_predicted_contact_maps:
     script: "../scripts/aggregate_post_processing.py"
 
 rule aggregate_dash_bmlf_predicted_contact_maps:
-    input: lambda wildcards: get_dash_names("data/interim/sequences_dash.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}_{{name}}_{{seed}}_{{sample}}_contacts.csv", 'GLCTLVAML', config['seed'])
+    input: lambda wildcards: get_dash_names("data/interim/sequences_dash_with_negatives.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}_{{name}}_{{seed}}_{{sample}}_contacts.csv", 'GLCTLVAML', config['seed'])
     output: "data/processed/predicted_{model}_{msa_method}_{data_source}_contact_maps_dash_bmlf.csv"
     resources:
         runtime="10m",
@@ -156,7 +156,7 @@ rule aggregate_predicted_interactions:
     script: "../scripts/aggregate_post_processing.py"
 
 rule aggregate_dash_bmlf_predicted_interactions:
-    input: lambda wildcards: get_dash_names("data/interim/sequences_dash.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}_{{name}}_{{seed}}_{{sample}}_interactions.csv", 'GLCTLVAML', config['seed'])
+    input: lambda wildcards: get_dash_names("data/interim/sequences_dash_with_negatives.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}_{{name}}_{{seed}}_{{sample}}_interactions.csv", 'GLCTLVAML', config['seed'])
     output: "data/processed/predicted_{model}_{msa_method}_{data_source}_interactions_dash_bmlf.csv"
     resources:
         runtime="10m",
