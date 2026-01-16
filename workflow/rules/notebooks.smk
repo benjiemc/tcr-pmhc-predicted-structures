@@ -184,6 +184,29 @@ rule run_evaluating_antigen_specificity_model:
         touch {output}
         """
 
+rule run_exploring_data_normalisation:
+    input:
+        "data/interim/sequences_sample_1500.csv",
+        "data/processed/confidence_scores_af3_af3_tcrmodel2_1500.csv",
+        "data/interim/af_training_structures.csv",
+        "data/interim/confidence_scores_af3_af3_tcrmodel2_af_training.csv",
+        "models/PAEAggregator_af3_af3_tcrmodel2",
+        get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/interim/pae_padded_af3_af3_tcrmodel2/{name}_{seed}_{sample}_pae.txt", config['seed']),
+        get_predicted_structure_names("data/interim/af_training_structures.csv", "data/interim/pae_padded_af3_af3_tcrmodel2/{name}_{seed}_{sample}_pae.txt", config['seed'], column_name='id')
+    output: "data/flags/exploring_data_normalisation_done.flag"
+    resources:
+        runtime="15m",
+        mem="10GB"
+    shell:
+        """
+        jupyter nbconvert \
+            --to notebook \
+            --execute \
+            --inplace \
+            notebooks/exploring_data_normalisation.ipynb
+        touch {output}
+        """
+
 rule run_benchmark_structure_prediction_methods:
     input:
         "data/external/stcrdab/db_summary.dat",

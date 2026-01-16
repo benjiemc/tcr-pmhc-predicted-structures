@@ -38,6 +38,14 @@ rule aggregate_benchmark_confidence_scores:
         mem="1GB"
     script: "../scripts/aggregate_post_processing.py"
 
+rule aggregate_af_training_confidence_scores:
+    input: lambda wildcards: get_predicted_structure_names("data/interim/af_training_structures.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_confidence_scores.csv", config['seed'], column_name='id')
+    output: "data/interim/confidence_scores_{model}_{msa_method}_{data_source}{ablations}_af_training.csv"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    script: "../scripts/aggregate_post_processing.py"
+
 rule summarise_predicted_structural_features:
     input: "data/interim/structures_{model}_{msa_method}_{data_source}{ablations}/{name}_seed-{seed}_sample-{sample}_model.cif"
     output: temp("data/interim/{model}_{msa_method}_{data_source}{ablations}_{name}_{seed}_{sample}_structural_summary.json")
