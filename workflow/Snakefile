@@ -14,6 +14,23 @@ include: "rules/chai.smk"
 include: "rules/post_processing.smk"
 include: "rules/notebooks.smk"
 
+rule environment:
+    shell:
+        """
+        mamba create -f environment.yml -p ./.venv/
+        conda activate ./.venv/
+        conda env config vars set TCRMODEL2_ALPHAFOLD_DATA_DIR=$TCRMODEL2_ALPHAFOLD_DATA_DIR
+        conda env config vars set ALPHAFOLD3_WEIGHTS_DIR=$ALPHAFOLD3_WEIGHTS_DIR
+        conda env config vars set ALPHAFOLD_DATA_DIR=$ALPHAFOLD_DATA_DIR
+        conda env config vars set COLABFOLD_DATA_DIR=$COLABFOLD_DATA_DIR
+        conda env config vars set LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
+        conda deactivate
+        mamba activate ./.venv
+        pip install .
+        pip install plip==2.4.0
+        ANARCI --build_models
+        """
+
 rule lint:
     shell:
         """
