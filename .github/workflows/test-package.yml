@@ -7,32 +7,27 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-      - uses: mamba-org/setup-micromamba@v2
-      - name: Create Mamba Symlink
-        run: ln -s $(which micromamba) /usr/local/bin/mamba
+      - name: Install miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-activate: true
+          activate-environment: ""
       - name: Setup environment
         run: |
-            mamba create -f environment.yml
-            echo "ALPHAFOLD_DATA_DIR=''" >> $GITHUB_ENV
-            echo "TCRMODEL2_ALPHAFOLD_DATA_DIR=''" >> $GITHUB_ENV
-            echo "ALPHAFOLD3_WEIGHTS_DIR=''" >> $GITHUB_ENV
-            mamba run -n tcr-pmhc-predicted-structures pip install '.[develop]'
-            mamba run -n tcr-pmhc-predicted-structures stitchrdl -s human
-            mamba run -n tcr-pmhc-predicted-structures stitchrdl -s mouse
-            eval $(ssh-agent -s)
-            mkdir -p ~/.ssh
-            echo "${{ secrets.ANARCI_TCR_PMHC_SSH_KEY }}" > ~/.ssh/anarci_tcr_pmhc
-            chmod 600 ~/.ssh/anarci_tcr_pmhc
-            ssh-add ~/.ssh/anarci_tcr_pmhc
-            ssh-add -L
-            wget https://gist.githubusercontent.com/mpdude/e56fcae5bc541b95187fa764aafb5e6d/raw/676626f0f8009d8b47743417dba436483cd929c6/ssh-deploy-key-wrapper.sh && chmod +x ssh-deploy-key-wrapper.sh
-            export GIT_SSH="$(pwd)/ssh-deploy-key-wrapper.sh"
-            git submodule init
-            git submodule update --remote third_party/anarci
-            mamba_prefix=$(mamba run -n tcr-pmhc-predicted-structures mamba info --json | jq '."env location"' | sed s/\"//g)
-            python_version=$(mamba run -n tcr-pmhc-predicted-structures python --version | cut -d " " -f2 | cut -d "." -f1-2)
-            cp -r third_party/anarci $mamba_prefix/lib/python$python_version/site-packages
+          conda install -c conda-forge -c nodefaults mamba -y
+          pip install snakemake
+          eval $(ssh-agent -s)
+          mkdir -p ~/.ssh
+          echo "${{ secrets.ANARCI_MHC_SSH_KEY }}" > ~/.ssh/anarci
+          chmod 600 ~/.ssh/anarci
+          ssh-add ~/.ssh/anarci
+          ssh-add -L
+          export ALPHAFOLD3_WEIGHTS_DIR=''
+          export ALPHAFOLD_DATA_DIR=''
+          export COLABFOLD_DATA_DIR=''
+          export TCRMODEL2_ALPHAFOLD_DATA_DIR=''
+          snakemake environment --cores 1
       - name: Lint package
-        run: mamba run -n tcr-pmhc-predicted-structures snakemake lint  --cores 1 --quiet all
+        run: mamba run -p ./.venv snakemake lint  --cores 1 --quiet all
       - name: Test package
-        run: mamba run -n tcr-pmhc-predicted-structures snakemake test --cores 1 --quiet all
+        run: mamba run -p ./.venv snakemake test --cores 1 --quiet all
