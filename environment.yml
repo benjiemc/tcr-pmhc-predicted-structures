@@ -13,15 +13,17 @@ dependencies:
   - numpy
   - pandas
   - pingouin
-  - pip
+  - pip=25.2
   - python=3.11
+  - pymol-open-source
   - scikit-learn
   - scipy
   - statsmodels
   - seaborn
   - snakemake
   - pip:
+      - git+ssh://git@github.com/benjiemc/anarci-mhc.git@pre-release
       - boltz[cuda]==2.2.1
       - git+https://github.com/chaidiscovery/chai-lab.git@a01bfde
       - python-pdb
-      - stcrpy
+      - git+ssh://git@github.com/benjiemc/STCRpy.git@pre-release
