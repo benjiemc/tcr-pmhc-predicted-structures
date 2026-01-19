@@ -20,7 +20,7 @@ Z_AXIS = np.array([0, 0, 1])
 
 with warnings.catch_warnings():
     warnings.simplefilter('ignore', UserWarning)
-    tcr = stcrpy.load_TCR(snakemake.input[0])
+    tcr = stcrpy.load_TCR(snakemake.input[0], include_symmetry_mates=False)
 
 tcr_info = {}
 

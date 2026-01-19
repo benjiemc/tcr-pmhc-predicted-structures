@@ -4,7 +4,7 @@
 import stcrpy
 from snakemake.script import snakemake
 
-tcr = stcrpy.load_TCR(snakemake.input[0])
+tcr = stcrpy.load_TCR(snakemake.input[0], include_symmetry_mates=False)
 tcr.standardise_chain_names()
 
 try:
