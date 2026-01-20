@@ -23,7 +23,6 @@ rule environment:
         conda env config vars set ALPHAFOLD3_WEIGHTS_DIR=$ALPHAFOLD3_WEIGHTS_DIR
         conda env config vars set ALPHAFOLD_DATA_DIR=$ALPHAFOLD_DATA_DIR
         conda env config vars set COLABFOLD_DATA_DIR=$COLABFOLD_DATA_DIR
-        conda env config vars set LD_LIBRARY_PATH=$CONDA_PREFIX/lib:$LD_LIBRARY_PATH
         conda deactivate
         mamba activate ./.venv
         pip install .
