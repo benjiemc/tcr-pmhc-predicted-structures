@@ -40,8 +40,8 @@ rule extract_padded_pae_matrices:
 
 rule create_pae_dataset:
     input:
-        sequences="data/interim/sequences_sample_1500.csv",
-        confidences=lambda wildcards: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", f"data/interim/pae_padded_{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}/{{name}}_{{seed}}_{{sample}}_pae.txt", config['seed'])
+        sequences="data/interim/sequences_sample_1500_af_training.csv",
+        confidences=lambda wildcards: get_predicted_structure_names("data/interim/sequences_sample_1500_af_training.csv", f"data/interim/pae_padded_{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}/{{name}}_{{seed}}_{{sample}}_pae.txt", config['seed'], column_name='id')
     output: "data/processed/{model}_{msa_method}_{data_source}_pae.h5"
     resources:
         runtime="10m",

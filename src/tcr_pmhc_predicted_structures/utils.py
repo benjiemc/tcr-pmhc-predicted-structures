@@ -5,6 +5,7 @@ import re
 import warnings
 from functools import lru_cache
 
+import numpy as np
 import pandas as pd
 from Bio.PDB import Entity
 from Stitchr import stitchr as st
@@ -239,3 +240,85 @@ def stcrpy_to_pandas(structure: Entity.Entity) -> pd.DataFrame:
     ]
 
     return pd.DataFrame(records, columns=column_names)
+
+
+def _merge_groups(groups: list[set[int]]) -> list[set[int]]:
+    merged_groups = []
+
+    for group in groups:
+        merged = False
+
+        for i, merged_group in enumerate(merged_groups):
+            if len(group & merged_group) > 0:
+                merged_groups[i] = group | merged_group
+                merged = True
+                break
+
+        if not merged:
+            merged_groups.append(group)
+
+    return merged_groups
+
+
+def find_common_groups(data: pd.DataFrame, columns: list[str]) -> np.ndarray:
+    """Find common groups in a data frame based on input columns.
+
+    Examples:
+        >>> data
+          col_a col_b  col_c
+        0     a     l      1
+        1     a     m      1
+        2     b     l      2
+        3     c     o      3
+        4     c     p      0
+        5     c     q      1
+        6     d     q      5
+        7     d     r      6
+        8     e     s      1
+        9     e     t     10
+        >>> find_common_groups(data, ['col_a', 'col_b'])
+        array([1, 1, 1, 2, 2, 2, 2, 2, 3, 3])
+
+    Args:
+        data: data frame containing the data to be grouped
+        columns: columns to group based on shared values
+
+    Returns:
+        array with numbers corresponding to shared group ids
+
+    Raises:
+        ValueError: if no columns are input
+
+    """
+    if len(columns) == 0:
+        msg = 'No columns input. Please input at least one column.'
+        raise ValueError(msg)
+
+    initial_groups = list(data.groupby(columns[0]))
+
+    merge_matrix = np.zeros((len(initial_groups), len(initial_groups)), dtype=int)
+    for i in range(len(initial_groups)):
+        merge_matrix[i, i] = 1
+
+    for i, (_, group_i) in enumerate(initial_groups):
+        for j, (_, group_j) in enumerate(initial_groups[i + 1 :], i + 1):
+            for column in columns[1:]:
+                group_i_other = set(group_i[column].tolist())
+                group_j_other = set(group_j[column].tolist())
+
+                if len(group_i_other & group_j_other) > 0:
+                    merge_matrix[i, j] = 1
+                    break
+
+    merge_matrix = np.maximum(merge_matrix, merge_matrix.T)
+
+    group_indicies = np.arange(len(initial_groups))
+    groups = [set(group_indicies[row > 0]) for row in merge_matrix]
+    combined_groups = _merge_groups(groups)
+
+    converted_groups = [
+        {initial_groups[group_idx][0] for group_idx in grouped_groups} for grouped_groups in combined_groups
+    ]
+    group_map = {val: group_id for group_id, grouped_groups in enumerate(converted_groups, 1) for val in grouped_groups}
+
+    return data[columns[0]].map(group_map).to_numpy()

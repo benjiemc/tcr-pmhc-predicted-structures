@@ -163,6 +163,17 @@ rule extract_af_training_sequences:
         mem="100MB"
     script: "../scripts/extract_sequences_from_csv.py"
 
+rule combine_af_training_sequences_with_sample:
+    input:
+        raw_sequences="data/raw/sequences_pMHC_split.csv",
+        sequences_sample="data/interim/sequences_sample_{sample_size}.csv",
+        af_training_sequences="data/interim/af_training_structures.csv"
+    output: "data/interim/sequences_sample_{sample_size}_af_training.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: "../scripts/combine_sequences_with_af_training_structures.py"
+
 def create_paths(summary_file: str, path_name: str) -> list[str]:
     if not os.path.exists(summary_file):
         print(summary_file, 'does not exist!')
