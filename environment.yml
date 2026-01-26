@@ -32,3 +32,4 @@ dependencies:
       - pyxDamerauLevenshtein
       - git+ssh://git@github.com/t-whalley/SCASA.git
       - git+ssh://git@github.com/benjiemc/STCRpy.git@pre-release
+      - tidytcells
