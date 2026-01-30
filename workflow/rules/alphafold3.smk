@@ -353,6 +353,9 @@ rule create_colabfold_structures_benchmark:
 rule create_af3_structures_with_tcrmodel2_data_sample_size_50:
     input: get_predicted_structure_names("data/interim/sequences_sample_50.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'])
 
+rule create_af3_structures_with_tcrmodel2_data_sample_size_100_unbalanced:
+    input: get_predicted_structure_names("data/interim/sequences_sample_100_unbalanced.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'])
+
 rule create_af3_structures_with_tcrmodel2_data_sample_size_1500:
     input: get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'])
 
