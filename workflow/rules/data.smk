@@ -3,6 +3,7 @@ import json
 import os
 
 wildcard_constraints:
+    unbalance="(_unbalanced)?",
     sample_size="\d+"
 
 rule create_full_length_sequences:
@@ -53,28 +54,13 @@ rule sample_sequences:
     input:
         sequences="data/raw/sequences_pMHC_split.csv",
         bad_sequences="data/interim/bad_sequences.txt"
-    output: "data/interim/sequences_sample_{sample_size}.csv"
+    output: "data/interim/sequences_sample_{sample_size}{unbalance}.csv"
     params:
         seed=123
     resources:
         runtime="10m",
         mem="1GB"
-    run:
-        import pandas as pd
-
-        sequences = pd.read_csv(input.sequences, index_col='index')
-
-        with open(input.bad_sequences, 'r') as fh:
-            bad_sequences = [int(line.strip()) for line in fh if line]
-
-        sequences = sequences.loc[~sequences.index.isin(bad_sequences)]
-
-        num_folds = len(sequences['fold'].unique())
-        folds_sample_size = int(wildcards.sample_size) // num_folds
-        group_sample_size = folds_sample_size // 2
-
-        sequences_sample = sequences.groupby(['fold', 'label']).sample(group_sample_size, random_state=params.seed)
-        sequences_sample.to_csv(output[0])
+    script: "../scripts/sample_sequences.py"
 
 rule create_sequence_key:
     input: "data/interim/sequences_full.csv"
