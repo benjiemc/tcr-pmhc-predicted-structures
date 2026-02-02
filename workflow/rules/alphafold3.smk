@@ -8,6 +8,7 @@ envvars:
 
 wildcard_constraints:
     sample_size="\d+",
+    unbalance="(_unbalanced)?",
     seed="\d+",
     sample="\d+",
     method="[A-Za-z0-9]+",
@@ -450,9 +451,9 @@ def _get_ipsaes_names(path: str, seeds: list[int], distance_cutoff: float, pae_c
 
 rule add_ipsaes_to_confidence_scores:
     input:
-        confidence_scores="data/interim/confidence_scores_af3_{method}_{data}_{sample_size}.csv",
-        ipaes=lambda wildcards: _get_ipsaes_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", seeds=config['seed'], distance_cutoff=10, pae_cutoff=10)
-    output: "data/processed/confidence_scores_af3_{method}_{data}_{sample_size}.csv"
+        confidence_scores="data/interim/confidence_scores_af3_{method}_{data}_{sample_size}{unbalance}.csv",
+        ipaes=lambda wildcards: _get_ipsaes_names(f"data/interim/sequences_sample_{wildcards.sample_size}{wildcards.unbalance}.csv", seeds=config['seed'], distance_cutoff=10, pae_cutoff=10)
+    output: "data/processed/confidence_scores_af3_{method}_{data}_{sample_size}{unbalance}.csv"
     resources:
         runtime="10m",
         mem="2GB"

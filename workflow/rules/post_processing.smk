@@ -8,6 +8,7 @@ wildcard_constraints:
     msa_method="[A-Za-z0-9]+",
     data_source="[A-Za-z0-9]+",
     ablations="(_no_unpaired_msas|_no_paired_msas|_no_templates)*",
+    unbalance="(_unbalanced)?",
     sample_size="\d+"
 
 rule extract_confidence_scores:
@@ -22,8 +23,8 @@ rule extract_confidence_scores:
     script: "../scripts/extract_{wildcards.model}_confidence_metrics.py"
 
 rule aggregate_confidence_scores:
-    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_confidence_scores.csv", config['seed'])
-    output: "data/interim/confidence_scores_{model}_{msa_method}_{data_source}{ablations}_{sample_size}.csv"
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}{wildcards.unbalance}.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_confidence_scores.csv", config['seed'])
+    output: "data/interim/confidence_scores_{model}_{msa_method}_{data_source}{ablations}_{sample_size}{unbalance}.csv"
     resources:
         runtime="10m",
         mem="1GB"
@@ -46,8 +47,8 @@ rule summarise_predicted_structural_features:
     script: "../scripts/summarise_structural_features.py"
 
 rule aggregate_predicted_structural_features:
-    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_structural_summary.json", config['seed'])
-    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_structural_features_{sample_size}.csv"
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}{wildcards.unbalance}.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_structural_summary.json", config['seed'])
+    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_structural_features_{sample_size}{unbalance}.csv"
     resources:
         runtime="10m",
         mem="1GB"
@@ -99,8 +100,8 @@ rule create_predicted_contact_map:
         """
 
 rule aggregate_predicted_contact_maps:
-    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_contacts.csv", config['seed'])
-    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_contact_maps_{sample_size}.csv"
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}{wildcards.unbalance}.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_contacts.csv", config['seed'])
+    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_contact_maps_{sample_size}{unbalance}.csv"
     resources:
         runtime="10m",
         mem="1GB"
@@ -115,8 +116,8 @@ rule profile_predicted_interactions:
     script: "../scripts/profile_interactions.py"
 
 rule aggregate_predicted_interactions:
-    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_interactions.csv", config['seed'])
-    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_interactions_{sample_size}.csv"
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}{wildcards.unbalance}.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_interactions.csv", config['seed'])
+    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_interactions_{sample_size}{unbalance}.csv"
     resources:
         runtime="10m",
         mem="1GB"
