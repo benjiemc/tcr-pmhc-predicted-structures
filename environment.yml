@@ -23,6 +23,7 @@ dependencies:
   - statsmodels
   - seaborn
   - snakemake
+  - umap-learn
   - pip:
       - git+ssh://git@github.com/benjiemc/anarci-mhc.git@pre-release
       - boltz[cuda]==2.2.1
