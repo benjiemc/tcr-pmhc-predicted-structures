@@ -10,6 +10,7 @@ dependencies:
   - hmmer
   - jupyter
   - kalign3
+  - mafft
   - matplotlib
   - mmseqs2
   - numpy
@@ -28,6 +29,7 @@ dependencies:
       - git+ssh://git@github.com/benjiemc/anarci-mhc.git@pre-release
       - boltz[cuda]==2.2.1
       - git+https://github.com/chaidiscovery/chai-lab.git@a01bfde
+      - logomaker
       - python-pdb
       - pyxDamerauLevenshtein
       - git+ssh://git@github.com/t-whalley/SCASA.git
