@@ -234,6 +234,17 @@ def create_paths(summary_file: str, path_name: str) -> list[str]:
 
     return expand(path_name, name=names)
 
+rule cluster_dash_sequences:
+    input: "data/external/dash_human.csv"
+    output: "data/interim/dash_{epitope,(all)|(M1)|(BMLF)|(pp65)}_sequence_clusters.txt"
+    params:
+        distance_threshold=6,
+        min_cluster_size=4
+    resources:
+        runtime="10m",
+        mem="10GB"
+    script: "../scripts/cluster_dash_sequences.py"
+
 rule summarise_structural_features:
     input: "data/raw/structures/{name}.pdb"
     output: temp("data/interim/{name}_structural_summary.json")
