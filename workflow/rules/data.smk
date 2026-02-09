@@ -275,6 +275,24 @@ rule process_coeliac_sequences:
         mem="1GB"
     script: "../scripts/process_coeliac_sequences.py"
 
+rule extract_coeliac_sequences:
+    input: "data/interim/sequences_coeliac.csv"
+    output: get_sequence_names("data/interim/sequences_coeliac.csv", "data/interim/sequences/{name}.json")
+    run:
+        output_dir = os.path.dirname(output[0])
+        with open(input[0], 'r') as fh:
+            for entry in csv.DictReader(fh):
+                with open(os.path.join(output_dir, f"{entry['id']}.json"), 'w') as fh:
+                    json.dump({
+                        'id': entry['id'],
+                        'tcr_alpha_chain': entry['tcr_alpha_chain'],
+                        'tcr_beta_chain': entry['tcr_beta_chain'],
+                        'peptide': entry['peptide'],
+                        'mhc_chain_1': entry['mhc_chain_1'],
+                        'mhc_chain_2': entry['mhc_chain_2'],
+                        'mhc_type': entry['mhc_type']
+                    }, fh)
+
 rule summarise_structural_features:
     input: "data/raw/structures/{name}.pdb"
     output: temp("data/interim/{name}_structural_summary.json")
