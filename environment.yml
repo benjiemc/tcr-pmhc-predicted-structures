@@ -30,6 +30,7 @@ dependencies:
       - boltz[cuda]==2.2.1
       - git+https://github.com/chaidiscovery/chai-lab.git@a01bfde
       - logomaker
+      - openpyxl
       - python-pdb
       - pyxDamerauLevenshtein
       - git+ssh://git@github.com/t-whalley/SCASA.git

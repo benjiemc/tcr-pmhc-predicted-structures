@@ -267,6 +267,14 @@ rule extract_mutated_dash_sequences:
                 with open(os.path.join(output_dir, f"{entry['id']}.json"), 'w') as fh:
                     json.dump(entry, fh)
 
+rule process_coeliac_sequences:
+    input: "data/raw/CeD study clonotype TCR.xlsx"
+    output: "data/interim/sequences_coeliac.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: "../scripts/process_coeliac_sequences.py"
+
 rule summarise_structural_features:
     input: "data/raw/structures/{name}.pdb"
     output: temp("data/interim/{name}_structural_summary.json")
