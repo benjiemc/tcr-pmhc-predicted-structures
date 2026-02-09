@@ -414,6 +414,9 @@ rule create_af3_structures_with_tcrmodel2_data_dash_bmlf:
 rule create_af3_structures_with_tcrmodel2_data_mutated_dash_bmlf:
     input: get_predicted_structure_names("data/interim/sequences_dash_BMLF_mutated.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
 
+rule create_af3_structures_with_tcrmodel2_data_coeliac:
+    input: get_predicted_structure_names("data/interim/sequences_coeliac.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
+
 rule compute_ipsae_on_af3_structure:
     input:
         confidences="data/interim/structures_af3_{method}_{data}/{name}_seed-{seed}_sample-{sample}_confidences.json",
