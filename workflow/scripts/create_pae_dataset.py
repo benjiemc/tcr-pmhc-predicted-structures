@@ -43,7 +43,7 @@ for path in snakemake.input.confidences:
     seeds.append(int(entry_name['seed']))
     samples.append(int(entry_name['sample']))
 
-    sources.append(info['source'])
+    sources.append(int(info['source'] == 'Sequences'))
     folds.append(info['fold'])
     labels.append(info['label'])
 

@@ -25,6 +25,7 @@ parser = argparse.ArgumentParser(
 parser.add_argument('training_data', help='path to the training data (HDF5 file)')
 parser.add_argument('-o', '--output', required=True, help='path to output models to')
 parser.add_argument('--seed', default=None, type=int, help='seed for random processes (Default: None)')
+parser.add_argument('--label-name', default='label', help="name to use access label in dataset (Default: 'label')")
 parser.add_argument('--num-epochs', type=int, default=5, help='number of epochs (Default: 5)')
 parser.add_argument('--batch-size', type=int, default=32, help='training batch size (Default: 32)')
 parser.add_argument('--learning-rate', type=float, default=1e-3, help='optimizer learning rate (Default: 1e-3)')
@@ -92,7 +93,7 @@ def main() -> None:
     logger.info('Loading training data from %s', args.training_data)
     with h5py.File(args.training_data) as fh:
         paes = fh['pae'][:]
-        labels = fh['label'][:]
+        labels = fh[args.label_name][:]
         folds = fh['fold'][:]
 
     indices = np.arange(len(labels))
