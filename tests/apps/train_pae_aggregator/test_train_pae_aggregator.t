@@ -125,4 +125,25 @@ Test training
   >     torch.tensor(paes, dtype=torch.float32), torch.tensor(scaling_data, dtype=torch.float32)
   > )
   > np.testing.assert_array_almost_equal(test_predictions2.detach().numpy(), ref_predictions2.detach().numpy())
+  > ref_model3 = PAEAggregator(3120)
+  > ref_model3.load_state_dict(torch.load(
+  >     os.path.join(os.environ['TESTDIR'], 'reference', 'models', 'model_3.pt'),
+  >     map_location=torch.device('cpu'),
+  >     weights_only=True,
+  > ))
+  > ref_model3.eval()
+  > ref_predictions3 = ref_model3(
+  >     torch.tensor(paes, dtype=torch.float32), torch.tensor(scaling_data, dtype=torch.float32)
+  > )
+  > test_model3 = PAEAggregator(3120)
+  > test_model3.load_state_dict(torch.load(
+  >     os.path.join('models', 'model_3.pt'),
+  >     map_location=torch.device('cpu'),
+  >     weights_only=True,
+  > ))
+  > test_model3.eval()
+  > test_predictions3 = test_model3(
+  >     torch.tensor(paes, dtype=torch.float32), torch.tensor(scaling_data, dtype=torch.float32)
+  > )
+  > np.testing.assert_array_almost_equal(test_predictions3.detach().numpy(), ref_predictions3.detach().numpy())
   > EOF
