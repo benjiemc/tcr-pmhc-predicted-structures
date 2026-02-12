@@ -207,6 +207,27 @@ rule run_exploring_data_normalisation:
         touch {output}
         """
 
+rule run_evaluating_out_of_distribution_detector:
+    input:
+        "data/interim/sequences_sample_1500_af_training.csv",
+        "data/processed/confidence_scores_af3_af3_tcrmodel2_1500.csv",
+        "data/interim/confidence_scores_af3_af3_tcrmodel2_af_training.csv",
+        "data/processed/af3_af3_tcrmodel2_pae.h5",
+        "models/PAEAggregator_af3_af3_tcrmodel2_source_detection"
+    output: "data/flags/evaluating_out_of_distribution_detector_done.flag"
+    resources:
+        runtime="15m",
+        mem="10GB"
+    shell:
+        """
+        jupyter nbconvert \
+            --to notebook \
+            --execute \
+            --inplace \
+            notebooks/evaluating_out_of_distribution_detector.ipynb
+        touch {output}
+        """
+
 rule run_benchmark_structure_prediction_methods:
     input:
         "data/external/stcrdab/db_summary.dat",
