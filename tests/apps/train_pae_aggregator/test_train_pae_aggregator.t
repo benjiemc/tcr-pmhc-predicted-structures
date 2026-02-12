@@ -5,7 +5,6 @@ Test training
   > --num-epochs 1 \
   > --batch-size 1 \
   > --eval-batch-size 1 \
-  > --size 3120 \
   > -o models \
   > --scaling-data $TESTDIR/data/scaling_data.csv \
   > $TESTDIR/data/data.h5
@@ -18,7 +17,6 @@ Test training
   * - INFO: Parameter: num_epochs=1 (glob)
   * - INFO: Parameter: batch_size=1 (glob)
   * - INFO: Parameter: learning_rate=0.001 (glob)
-  * - INFO: Parameter: size=3120 (glob)
   * - INFO: Parameter: eval_batch_size=1 (glob)
   * - INFO: Parameter: eval_interval=50 (glob)
   * - INFO: Parameter: log_level='info' (glob)

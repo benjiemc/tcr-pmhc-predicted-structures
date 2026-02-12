@@ -62,7 +62,6 @@ rule train_pae_aggregator:
         num_epochs=15,
         batch_size=32,
         learning_rate=0.00001,
-        size=3120,
         eval_batch_size=300,
         eval_interval=50
     shell:
@@ -74,7 +73,6 @@ rule train_pae_aggregator:
             --num-epochs {params.num_epochs} \
             --batch-size {params.batch_size} \
             --learning-rate {params.learning_rate} \
-            --size {params.size} \
             --eval-batch-size {params.eval_batch_size} \
             --eval-interval {params.eval_interval} \
             --scaling-data {input.pcas} \

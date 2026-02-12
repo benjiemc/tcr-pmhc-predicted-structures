@@ -31,7 +31,6 @@ parser.add_argument('--scaling-data', required=True, help='path to scaling data'
 parser.add_argument('--num-epochs', type=int, default=5, help='number of epochs (Default: 5)')
 parser.add_argument('--batch-size', type=int, default=32, help='training batch size (Default: 32)')
 parser.add_argument('--learning-rate', type=float, default=1e-3, help='optimizer learning rate (Default: 1e-3)')
-parser.add_argument('--size', type=int, default=3120, help='length of the flattened PAE matrices (Default: 3120)')
 parser.add_argument(
     '--eval-batch-size', type=int, default=300, help='batch size for evaluating the model (Default: 300)'
 )
@@ -138,7 +137,7 @@ def main() -> None:
         logger.debug('Number of validation data points: %d', len(validation_indices))
 
         logger.info('Initialising model')
-        model = PAEAggregator(args.size, scaling_data.shape[-1])
+        model = PAEAggregator(paes.shape[-1], scaling_data.shape[-1])
         model.train()
 
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
