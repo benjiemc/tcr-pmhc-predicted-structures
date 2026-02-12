@@ -169,6 +169,7 @@ rule run_evaluating_antigen_specificity_model:
         "data/interim/sequences_sample_1500.csv",
         "data/processed/confidence_scores_af3_af3_tcrmodel2_1500.csv",
         "data/processed/af3_af3_tcrmodel2_pae.h5",
+        "data/interim/af3_af3_tcrmodel2_full_pae_pca.csv",
         "models/PAEAggregator_af3_af3_tcrmodel2"
     output: "data/flags/evaluating_antigen_specificity_model_done.flag"
     resources:
@@ -190,6 +191,7 @@ rule run_exploring_data_normalisation:
         "data/processed/confidence_scores_af3_af3_tcrmodel2_1500.csv",
         "data/interim/af_training_structures.csv",
         "data/interim/confidence_scores_af3_af3_tcrmodel2_af_training.csv",
+        "data/interim/af3_af3_tcrmodel2_full_pae_pca.csv",
         "models/PAEAggregator_af3_af3_tcrmodel2",
         get_predicted_structure_names("data/interim/sequences_sample_1500.csv", "data/interim/pae_padded_af3_af3_tcrmodel2/{name}_{seed}_{sample}_pae.txt", config['seed']),
         get_predicted_structure_names("data/interim/af_training_structures.csv", "data/interim/pae_padded_af3_af3_tcrmodel2/{name}_{seed}_{sample}_pae.txt", config['seed'], column_name='id')

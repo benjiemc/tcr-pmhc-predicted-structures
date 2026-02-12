@@ -49,7 +49,9 @@ rule create_pae_dataset:
     script: "../scripts/create_pae_dataset.py"
 
 rule train_pae_aggregator:
-    input: "data/processed/{model}_{msa_method}_{data_source}_pae.h5"
+    input:
+        paes="data/processed/{model}_{msa_method}_{data_source}_pae.h5",
+        pcas="data/interim/{model}_{msa_method}_{data_source}_full_pae_pca.csv"
     output: directory("models/PAEAggregator_{model}_{msa_method}_{data_source}")
     log: "data/logs/train_PAEAggregator_{model}_{msa_method}_{data_source}.log"
     resources:
@@ -75,8 +77,9 @@ rule train_pae_aggregator:
             --size {params.size} \
             --eval-batch-size {params.eval_batch_size} \
             --eval-interval {params.eval_interval} \
+            --scaling-data {input.pcas} \
             -o {output} \
-            {input}
+            {input.paes}
         """
 
 rule create_full_pae_dataset:
