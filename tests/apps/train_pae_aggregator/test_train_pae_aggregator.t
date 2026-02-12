@@ -12,6 +12,7 @@ Test training
   * - INFO: Parameter: training_data='*/data/data.h5' (glob)
   * - INFO: Parameter: output='models' (glob)
   * - INFO: Parameter: seed=123 (glob)
+  * - INFO: Parameter: label_name='label' (glob)
   * - INFO: Parameter: num_epochs=1 (glob)
   * - INFO: Parameter: batch_size=1 (glob)
   * - INFO: Parameter: learning_rate=0.001 (glob)
