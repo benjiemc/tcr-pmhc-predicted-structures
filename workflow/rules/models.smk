@@ -79,6 +79,16 @@ rule train_pae_aggregator:
             {input}
         """
 
+rule create_full_pae_dataset:
+    input:
+        sequences="data/interim/sequences_sample_1500_af_training.csv",
+        confidences=lambda wildcards: get_predicted_structure_names("data/interim/sequences_sample_1500_af_training.csv", f"data/interim/structures_{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}/{{name}}_seed-{{seed}}_sample-{{sample}}_confidences.json", config['seed'], column_name='id')
+    output: "data/processed/{model}_{msa_method}_{data_source}_full_pae.h5"
+    resources:
+        runtime="3h",
+        mem="10GB"
+    script: "../scripts/create_pae_dataset_full.py"
+
 rule train_pae_aggregator_source_detection:
     input: "data/processed/{model}_{msa_method}_{data_source}_pae.h5"
     output: directory("models/PAEAggregator_{model}_{msa_method}_{data_source}_source_detection")
