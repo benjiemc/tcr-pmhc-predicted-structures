@@ -210,10 +210,7 @@ rule run_exploring_data_normalisation:
 rule run_evaluating_out_of_distribution_detector:
     input:
         "data/interim/sequences_sample_1500_af_training.csv",
-        "data/processed/confidence_scores_af3_af3_tcrmodel2_1500.csv",
-        "data/interim/confidence_scores_af3_af3_tcrmodel2_af_training.csv",
-        "data/processed/af3_af3_tcrmodel2_pae.h5",
-        "models/PAEAggregator_af3_af3_tcrmodel2_source_detection"
+        "data/interim/af3_af3_tcrmodel2_full_pae_pca.csv"
     output: "data/flags/evaluating_out_of_distribution_detector_done.flag"
     resources:
         runtime="15m",

@@ -89,34 +89,14 @@ rule create_full_pae_dataset:
         mem="10GB"
     script: "../scripts/create_pae_dataset_full.py"
 
-rule train_pae_aggregator_source_detection:
-    input: "data/processed/{model}_{msa_method}_{data_source}_pae.h5"
-    output: directory("models/PAEAggregator_{model}_{msa_method}_{data_source}_source_detection")
-    log: "data/logs/train_PAEAggregator_{model}_{msa_method}_{data_source}_source_detection.log"
+rule decompose_pae_dataset:
+    input: "data/processed/{model}_{msa_method}_{data_source}{portion}_pae.h5"
+    output: "data/interim/{model}_{msa_method}_{data_source}{portion}_pae_pca.csv"
+    wildcard_constraints:
+        portion="(_full)?"
+    params:
+        num_components=2
     resources:
         runtime="1h",
-        mem="10GB",
-        gpu=1
-    params:
-        num_epochs=15,
-        batch_size=32,
-        learning_rate=0.00001,
-        size=3120,
-        eval_batch_size=300,
-        eval_interval=50
-    shell:
-        """
-        python -m tcr_pmhc_predicted_structures.apps.train_pae_aggregator \
-            --log-level {config[log_level]} \
-            --log-file {log} \
-            --seed {config[seed]} \
-            --label-name "source" \
-            --num-epochs {params.num_epochs} \
-            --batch-size {params.batch_size} \
-            --learning-rate {params.learning_rate} \
-            --size {params.size} \
-            --eval-batch-size {params.eval_batch_size} \
-            --eval-interval {params.eval_interval} \
-            -o {output} \
-            {input}
-        """
+        mem="80GB"
+    script: "../scripts/decompose_pae_dataset.py"
