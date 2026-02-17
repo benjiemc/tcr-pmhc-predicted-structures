@@ -22,6 +22,27 @@ rule run_exploring_dash_dataset:
         touch {output}
         """
 
+rule run_exploring_coeliac_tcrs:
+    input:
+        "data/interim/sequences_coeliac.csv",
+        "data/processed/predicted_af3_af3_tcrmodel2_structural_features_sequences_coeliac.csv",
+        "data/processed/predicted_af3_af3_tcrmodel2_contact_maps_coeliac.csv",
+        "data/processed/predicted_af3_af3_tcrmodel2_interactions_coeliac.csv"
+    output:
+        "data/flags/exploring_coeliac_tcrs_done.flag"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    shell:
+        """
+        jupyter nbconvert \
+            --to notebook \
+            --execute \
+            --inplace \
+            notebooks/exploring_coeliac_tcrs.ipynb
+        touch {output}
+        """
+
 rule run_compare_structural_features_to_confidence:
     input:
         "data/external/tcr_pmhc_contacts.csv",
