@@ -245,6 +245,28 @@ rule cluster_dash_sequences:
         mem="10GB"
     script: "../scripts/cluster_dash_sequences.py"
 
+rule create_dash_mutations:
+    input:
+        sequences="data/interim/sequences_dash.csv",
+        clusters="data/interim/dash_BMLF_sequence_clusters.txt"
+    output: "data/interim/sequences_dash_BMLF_mutated.csv"
+    params:
+        peptide="GLCTLVAML"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    script: "../scripts/create_dash_mutations.py"
+
+rule extract_mutated_dash_sequences:
+    input: "data/interim/sequences_dash_BMLF_mutated.csv"
+    output: get_sequence_names("data/interim/sequences_dash_BMLF_mutated.csv", "data/interim/sequences/{name}.json")
+    run:
+        output_dir = os.path.dirname(output[0])
+        with open(input[0], 'r') as fh:
+            for entry in csv.DictReader(fh):
+                with open(os.path.join(output_dir, f"{entry['id']}.json"), 'w') as fh:
+                    json.dump(entry, fh)
+
 rule summarise_structural_features:
     input: "data/raw/structures/{name}.pdb"
     output: temp("data/interim/{name}_structural_summary.json")
