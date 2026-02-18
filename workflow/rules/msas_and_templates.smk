@@ -188,6 +188,101 @@ rule create_af3_msa_inputs_from_dash_dataset:
 
                     past_ids.add(sequence_id)
 
+def get_mutated_dash_sequence_ids(
+    path: str, sequence_key_path: str, dash_sequences_path: str, template: str
+) -> list[str]:
+    past_ids = set()
+    if not os.path.exists(sequence_key_path):
+        print(sequence_key_path, 'does not exist!')
+        return []
+
+    with open(sequence_key_path, 'r') as fh:
+        past_ids = past_ids | {line.strip().split()[0] for line in fh if line}
+
+    if not os.path.exists(dash_sequences_path):
+        print(dash_sequences_path, 'does not exist!')
+        return []
+
+    with open(dash_sequences_path, 'r') as fh:
+        for entry in csv.DictReader(fh):
+            for chain_name in 'tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2':
+                if chain_name in entry:
+                    past_ids.add(hashlib.sha256(entry[chain_name].encode()).hexdigest()[:8])
+
+    if not os.path.exists(path):
+        print(path, 'does not exist!')
+        return []
+
+    with open(path, 'r') as fh:
+        reader = csv.DictReader(fh)
+
+        ids = {
+            sequence_id
+            for entry in reader
+            for sequence_name in ('tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2')
+            if (sequence := entry[sequence_name])
+            and (sequence_id := hashlib.sha256(sequence.encode()).hexdigest()[:8]) not in past_ids
+        }
+
+    return expand(template, name=ids)
+
+rule create_af3_msa_inputs_from_mutated_dash_dataset:
+    input:
+        sequences="data/interim/sequences_dash_BMLF_mutated.csv",
+        sequence_key="data/interim/sequence_key.txt",
+        dash_sequences="data/interim/sequences_dash_with_negatives.csv"
+    output: get_mutated_dash_sequence_ids("data/interim/sequences_dash_BMLF_mutated.csv", "data/interim/sequence_key.txt", "data/interim/sequences_dash_with_negatives.csv", "data/interim/msa-inputs_af3/{name}.json")
+    resources:
+        runtime="10m",
+        mem="500MB"
+    run:
+        output_dir = os.path.dirname(output[0])
+        if not os.path.exists(output_dir):
+            os.mkdir(output_dir)
+
+        past_ids = set()
+        with open(input.sequence_key, 'r') as fh:
+            past_ids = past_ids | {line.strip().split()[0] for line in fh if line}
+
+        with open(input.dash_sequences, 'r') as fh:
+            for entry in csv.DictReader(fh):
+                for chain_name in 'tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2':
+                    if chain_name in entry:
+                        past_ids.add(hashlib.sha256(entry[chain_name].encode()).hexdigest()[:8])
+
+        with open(input.sequences, 'r') as fh:
+            reader = csv.DictReader(fh)
+            for entry in reader:
+                for sequence_name in (
+                    'tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2'
+                ):
+                    if sequence_name not in entry:
+                        continue
+
+                    sequence = entry[sequence_name]
+                    if not sequence:
+                        continue
+
+                    sequence_id = hashlib.sha256(sequence.encode()).hexdigest()[:8]
+                    if sequence_id in past_ids:
+                        continue
+
+                    with open(os.path.join(output_dir, sequence_id + '.json'), 'w') as output_fh:
+                        json.dump(
+                            {
+                                'name': sequence_id,
+                                'modelSeeds': [1],
+                                'sequences': [
+                                    {'protein': {'id': 'A', 'sequence': sequence}},
+                                ],
+                                'dialect': 'alphafold3',
+                                'version': 1,
+                            },
+                            output_fh,
+                        )
+
+                    past_ids.add(sequence_id)
+
 rule run_create_af3_msas_and_find_templates:
     input: "data/interim/msa-inputs_af3/{name}.json"
     output:
@@ -463,6 +558,12 @@ rule create_tcrmodel2_msas_and_find_templates_dash_bmlf:
         unpaired_msas=_get_msas_for_dash("data/interim/sequences_dash_with_negatives.csv", "data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m", "GLCTLVAML"),
         paired_msas=_get_msas_for_dash("data/interim/sequences_dash_with_negatives.csv", "data/interim/msas_af3_tcrmodel2/{name}_paired.a3m", "GLCTLVAML"),
         templates=_get_msas_for_dash("data/interim/sequences_dash_with_negatives.csv", "data/interim/templates_af3_tcrmodel2/{name}", "GLCTLVAML")
+
+rule create_tcrmodel2_msas_and_find_templates_mutated_dash_bmlf:
+    input:
+        unpaired_msas=_get_msas_for_dash("data/interim/sequences_dash_BMLF_mutated.csv", "data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m", "GLCTLVAML"),
+        paired_msas=_get_msas_for_dash("data/interim/sequences_dash_BMLF_mutated.csv", "data/interim/msas_af3_tcrmodel2/{name}_paired.a3m", "GLCTLVAML"),
+        templates=_get_msas_for_dash("data/interim/sequences_dash_BMLF_mutated.csv", "data/interim/templates_af3_tcrmodel2/{name}", "GLCTLVAML")
 
 rule combine_msas_to_parquet:
     input:
