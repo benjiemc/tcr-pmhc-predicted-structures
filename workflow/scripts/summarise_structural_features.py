@@ -2,11 +2,17 @@
 """Calculate structural properties of TCR:pMHC structures."""
 
 import json
+import logging
 import warnings
 
 import numpy as np
 import stcrpy
 from snakemake.script import snakemake
+
+from tcr_pmhc_predicted_structures.apps._log import setup_logger
+
+logger = logging.getLogger()
+setup_logger(logger, snakemake.config['log_level'])
 
 
 def proj(a: np.ndarray, b: np.ndarray) -> np.ndarray:
@@ -24,7 +30,11 @@ with warnings.catch_warnings():
 
 tcr_info = {}
 
-docking_geometry = tcr.calculate_docking_geometry(mode='cys')
+try:
+    docking_geometry = tcr.calculate_docking_geometry(mode='cys')
+except ValueError:
+    logger.warning("Cannot compute docking geometry for %s using 'cys' method", snakemake.input[0])
+    docking_geometry = None
 
 if docking_geometry is not None:
     tcr_info['pitch_angle'] = float(docking_geometry['pitch_angle'])
