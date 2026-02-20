@@ -168,8 +168,8 @@ rule run_evaluating_antigen_specificity_model:
     input:
         "data/interim/sequences_sample_1500.csv",
         "data/processed/confidence_scores_af3_af3_tcrmodel2_1500.csv",
-        "data/processed/af3_af3_tcrmodel2_pae.h5",
-        "data/interim/af3_af3_tcrmodel2_full_pae_pca.csv",
+        "data/processed/af3_af3_tcrmodel2_pae_aggregator_predictions_untrained.csv",
+        "data/processed/af3_af3_tcrmodel2_pae_aggregator_predictions_trained.csv",
         "models/PAEAggregator_af3_af3_tcrmodel2"
     output: "data/flags/evaluating_antigen_specificity_model_done.flag"
     resources:
@@ -185,16 +185,16 @@ rule run_evaluating_antigen_specificity_model:
         touch {output}
         """
 
-rule run_exploring_data_normalisation:
+rule run_exploring_specificity_prediction_normalisation:
     input:
-        "data/interim/sequences_sample_1500.csv",
+        "data/interim/sequences_sample_1500_af_training.csv",
         "data/processed/confidence_scores_af3_af3_tcrmodel2_1500.csv",
-        "data/interim/af_training_structures.csv",
         "data/interim/confidence_scores_af3_af3_tcrmodel2_af_training.csv",
-        "data/interim/af3_af3_tcrmodel2_full_pae_pca.csv",
+        "data/processed/af3_af3_tcrmodel2_pae_aggregator_predictions_untrained.csv",
+        "data/processed/af3_af3_tcrmodel2_pae_aggregator_predictions_trained.csv",
         "data/processed/af3_af3_tcrmodel2_pae.h5",
         "models/PAEAggregator_af3_af3_tcrmodel2",
-    output: "data/flags/exploring_data_normalisation_done.flag"
+    output: "data/flags/exploring_specificity_prediction_normalisation_done.flag"
     resources:
         runtime="15m",
         mem="10GB"
@@ -204,7 +204,7 @@ rule run_exploring_data_normalisation:
             --to notebook \
             --execute \
             --inplace \
-            notebooks/exploring_data_normalisation.ipynb
+            notebooks/exploring_specificity_prediction_normalisation.ipynb
         touch {output}
         """
 

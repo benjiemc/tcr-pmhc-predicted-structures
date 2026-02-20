@@ -80,6 +80,21 @@ rule train_pae_aggregator:
             {input.paes}
         """
 
+rule run_pae_aggregator:
+    input:
+        paes="data/processed/{model}_{msa_method}_{data_source}_pae.h5",
+        pcas="data/interim/{model}_{msa_method}_{data_source}_full_pae_pca.csv",
+        model="models/PAEAggregator_{model}_{msa_method}_{data_source}"
+    output: "data/processed/{model}_{msa_method}_{data_source}_pae_aggregator_predictions_{training_status}.csv"
+    wildcard_constraints:
+        training_status="(untrained)|(trained)"
+    params:
+        model_size=3120
+    resources:
+        runtime="10m",
+        mem="5GB"
+    script: "../scripts/run_pae_aggregator.py"
+
 rule create_full_pae_dataset:
     input:
         sequences="data/interim/sequences_sample_1500_af_training.csv",
