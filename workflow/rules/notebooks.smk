@@ -145,25 +145,6 @@ rule run_compare_msa_generation:
         touch {output}
         """
 
-rule run_specificity_predictor:
-    input:
-        "data/processed/confidence_scores_af3_af3_tcrmodel2_1500.csv",
-        "data/processed/predicted_af3_af3_tcrmodel2_structural_features_1500.csv",
-        "data/interim/sequences_sample_1500.csv"
-    output: "data/flags/specificity_predictor_done.flag"
-    resources:
-        runtime="15m",
-        mem="5GB"
-    shell:
-        """
-        jupyter nbconvert \
-            --to notebook \
-            --execute \
-            --inplace \
-            notebooks/specificity_predictor.ipynb
-        touch {output}
-        """
-
 rule run_evaluating_antigen_specificity_model:
     input:
         "data/interim/sequences_sample_1500.csv",
