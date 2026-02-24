@@ -275,9 +275,19 @@ rule process_coeliac_sequences:
         mem="1GB"
     script: "../scripts/process_coeliac_sequences.py"
 
-rule extract_coeliac_sequences:
+rule add_negatives_to_coeliac_sequences:
     input: "data/interim/sequences_coeliac.csv"
-    output: get_sequence_names("data/interim/sequences_coeliac.csv", "data/interim/sequences/{name}.json")
+    output: "data/interim/sequences_coeliac_with_negatives.csv"
+    params:
+        seed=123
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: "../scripts/add_negatives_to_coeliac_sequences.py"
+
+rule extract_coeliac_sequences:
+    input: "data/interim/sequences_coeliac_with_negatives.csv"
+    output: get_sequence_names("data/interim/sequences_coeliac_with_negatives.csv", "data/interim/sequences/{name}.json")
     run:
         output_dir = os.path.dirname(output[0])
         with open(input[0], 'r') as fh:

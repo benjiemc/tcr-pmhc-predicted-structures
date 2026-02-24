@@ -63,7 +63,7 @@ rule aggregate_mutated_dash_bmlf_confidence_scores:
     script: "../scripts/aggregate_post_processing.py"
 
 rule aggregate_coeliac_confidence_scores:
-    input: lambda wildcards: get_predicted_structure_names("data/interim/sequences_coeliac.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_confidence_scores.csv", config['seed'], column_name='id')
+    input: lambda wildcards: get_predicted_structure_names("data/interim/sequences_coeliac_with_negatives.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_confidence_scores.csv", config['seed'], column_name='id')
     output: "data/interim/confidence_scores_{model}_{msa_method}_{data_source}{ablations}_coeliac.csv"
     resources:
         runtime="10m",
@@ -95,7 +95,7 @@ rule aggregate_dash_bmlf_predicted_structural_features:
     script: "../scripts/aggregate_post_processing.py"
 
 rule aggregate_coeliac_predicted_structural_features:
-    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_coeliac.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_structural_summary.json", config['seed'], column_name='id')
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_coeliac_with_negatives.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_structural_summary.json", config['seed'], column_name='id')
     output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_structural_features_sequences_coeliac.csv"
     resources:
         runtime="10m",
@@ -164,7 +164,7 @@ rule aggregate_dash_bmlf_predicted_contact_maps:
     script: "../scripts/aggregate_post_processing.py"
 
 rule aggregate_coeliac_predicted_contact_maps:
-    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_coeliac.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_contacts.csv", config['seed'], column_name='id')
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_coeliac_with_negatives.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_contacts.csv", config['seed'], column_name='id')
     output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_contact_maps_coeliac.csv"
     resources:
         runtime="10m",
@@ -196,7 +196,7 @@ rule aggregate_dash_bmlf_predicted_interactions:
     script: "../scripts/aggregate_post_processing.py"
 
 rule aggregate_coeliac_predicted_interactions:
-    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_coeliac.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_interactions.csv", config['seed'], column_name='id')
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_coeliac_with_negatives.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_interactions.csv", config['seed'], column_name='id')
     output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_interactions_coeliac.csv"
     resources:
         runtime="10m",

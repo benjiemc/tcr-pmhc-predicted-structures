@@ -321,10 +321,10 @@ rule create_af3_msa_inputs_from_mutated_dash_dataset:
 
 rule create_af3_msa_inputs_from_coeliac_dataset:
     input:
-        sequences="data/interim/sequences_coeliac.csv",
+        sequences="data/interim/sequences_coeliac_with_negatives.csv",
         sequence_key="data/interim/sequence_key.txt",
         dash_sequences="data/interim/sequences_dash_with_negatives.csv"
-    output: get_coeliac_sequence_ids("data/interim/sequences_coeliac.csv", "data/interim/sequence_key.txt", "data/interim/sequences_dash_with_negatives.csv", "data/interim/msa-inputs_af3/{name}.json")
+    output: get_coeliac_sequence_ids("data/interim/sequences_coeliac_with_negatives.csv", "data/interim/sequence_key.txt", "data/interim/sequences_dash_with_negatives.csv", "data/interim/msa-inputs_af3/{name}.json")
     resources:
         runtime="10m",
         mem="500MB"
@@ -676,9 +676,9 @@ def _get_msas_for_coeliac(path: str, template: str) -> list[str]:
 
 rule create_tcrmodel2_msas_and_find_templates_coeliac:
     input:
-        unpaired_msas=_get_msas_for_coeliac("data/interim/sequences_coeliac.csv", "data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m"),
-        paired_msas=_get_msas_for_coeliac("data/interim/sequences_coeliac.csv", "data/interim/msas_af3_tcrmodel2/{name}_paired.a3m"),
-        templates=_get_msas_for_coeliac("data/interim/sequences_coeliac.csv", "data/interim/templates_af3_tcrmodel2/{name}")
+        unpaired_msas=_get_msas_for_coeliac("data/interim/sequences_coeliac_with_negatives.csv", "data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m"),
+        paired_msas=_get_msas_for_coeliac("data/interim/sequences_coeliac_with_negatives.csv", "data/interim/msas_af3_tcrmodel2/{name}_paired.a3m"),
+        templates=_get_msas_for_coeliac("data/interim/sequences_coeliac_with_negatives.csv", "data/interim/templates_af3_tcrmodel2/{name}")
 
 rule combine_msas_to_parquet:
     input:
