@@ -43,6 +43,25 @@ rule run_exploring_coeliac_tcrs:
         touch {output}
         """
 
+rule run_coeliac_antigen_specificity_with_alphafold3:
+    input:
+        "data/interim/sequences_coeliac_with_negatives.csv",
+        "data/processed/confidence_scores_af3_af3_tcrmodel2_coeliac.csv"
+    output:
+        "data/flags/coeliac_antigen_specificity_with_alphafold3_done.flag"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    shell:
+        """
+        jupyter nbconvert \
+            --to notebook \
+            --execute \
+            --inplace \
+            notebooks/coeliac_antigen_specificity_with_alphafold3.ipynb
+        touch {output}
+        """
+
 rule run_compare_structural_features_to_confidence:
     input:
         "data/external/tcr_pmhc_contacts.csv",
