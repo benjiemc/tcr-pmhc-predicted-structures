@@ -2,6 +2,8 @@ include: "utils.smk"
 
 wildcard_constraints:
     name="[A-Za-z0-9_]+",
+    coeliac_name="[A-Za-z0-9_]+",
+    structure_name="[A-Za-z0-9_]+",
     seed="\d+",
     sample="\d+",
     model="[A-Za-z0-9]+",
@@ -283,60 +285,40 @@ rule calculate_dockq_score:
         mem="1GB"
     script: "../scripts/calculate_dockq_score.py"
 
+rule calculate_coeliac_dockq_score:
+    input:
+        prediction="data/interim/structures_{model}_{msa_method}_{data_source}{ablations}/{coeliac_name}_seed-{seed}_sample-{sample}_model.cif",
+        structure="data/raw/external_structures/{structure_name}.pdb"
+    output: temp("data/interim/{model}_{msa_method}_{data_source}{ablations}_{coeliac_name}-{structure_name}_{seed}_{sample}_dockq.json")
+    resources:
+        runtime="10m",
+        mem="1GB"
+    script: "../scripts/calculate_dockq_score.py"
+
 rule aggregate_dockq_scores:
     input: lambda wildcards: get_predicted_structure_names(f"data/interim/benchmark_structures.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_dockq.json", config['seed'], column_name='id')
     output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_dockq_benchmark.csv"
     resources:
         runtime="10m",
         mem="500MB"
-    run:
-        import json
-        import pandas as pd
+    script: "../scripts/aggregate_dockq_scores.py"
 
-        DOCKQ_COLUMNS = [
-            'name',
-            'seed',
-            'sample',
-            'DockQ',
-            'F1',
-            'iRMSD',
-            'LRMSD',
-            'fnat',
-            'nat_correct',
-            'nat_total',
-            'fnonnat',
-            'nonnat_count',
-            'model_total',
-            'clashes',
-            'len1',
-            'len2',
-        ]
+def _get_coeliac_comparisons(template: str, seeds: list[int]):
+    name_pairs = (
+        ('coeliac_a1_mut_original', 'DQ2_5a1_572G2_DECAB'), ('coeliac_w1_mut_original', 'DQ2_5w1_572G2_DECAB')
+    )
 
-        dockq_scores = []
-        for path in input:
-            with open(path, 'r') as fh:
-                dockq_score = json.load(fh)
+    return [
+        template.format(coeliac_name=coeliac_name, structure_name=structure_name, seed=seed, sample=sample)
+        for coeliac_name, structure_name in name_pairs
+        for seed in seeds
+        for sample in range(5)
+    ]
 
-            info = re.search(
-                r'[A-Za-z0-9]+'
-                r'_[A-Za-z0-9]+'
-                r'_[A-Za-z0-9]+'
-                r'(?:_no_unpaired_msas|_no_paired_msas|_no_templates)*'
-                r'_(?P<name>[A-Za-z0-9_]+)_(?P<seed>\d+)_(?P<sample>\d+)'
-                '_dockq.json',
-                os.path.basename(path),
-            ).groupdict()
-
-            for key, value in info.items():
-                dockq_score[key] = value
-
-            dockq_scores.append(dockq_score)
-
-        dockq_scores = pd.DataFrame(dockq_scores)
-
-        for column_name in DOCKQ_COLUMNS:
-            if column_name not in dockq_scores.columns:
-                dockq_scores[column_name] = None
-
-        dockq_scores = dockq_scores[DOCKQ_COLUMNS]
-        dockq_scores.to_csv(output[0], index=False)
+rule aggregate_coeliac_dockq_scores:
+    input: lambda wildcards: _get_coeliac_comparisons(f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{coeliac_name}}-{{structure_name}}_{{seed}}_{{sample}}_dockq.json", config['seed'])
+    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_dockq_coeliac.csv"
+    resources:
+        runtime="10m",
+        mem="500MB"
+    script: "../scripts/aggregate_dockq_scores.py"

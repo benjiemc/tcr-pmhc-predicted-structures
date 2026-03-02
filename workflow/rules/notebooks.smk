@@ -65,6 +65,7 @@ rule run_coeliac_antigen_specificity_with_alphafold3:
 rule run_coeliac_mutagenesis_analysis:
     input:
         "data/interim/sequences_coeliac_mutations.csv",
+        "data/processed/predicted_af3_af3_tcrmodel2_dockq_coeliac.csv",
         "data/processed/confidence_scores_af3_af3_tcrmodel2_coeliac_mutations.csv"
     output:
         "data/flags/coeliac_mutagenesis_analysis_done.flag"
