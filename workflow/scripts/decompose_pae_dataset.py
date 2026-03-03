@@ -25,15 +25,9 @@ with h5py.File(snakemake.input[0], 'r') as fh:
 logger.info('Decomposing dataset into %d component', snakemake.params.num_components)
 pca = PCA(n_components=snakemake.params.num_components).fit_transform(paes)
 
-pca_df = pd.DataFrame(
-    {
-        'name': names,
-        'seed': seeds,
-        'sample': samples,
-        'pc1': pca[:, 0],
-        'pc2': pca[:, 1],
-    }
-)
+pca_df = pd.DataFrame({'name': names, 'seed': seeds, 'sample': samples})
+for i in range(snakemake.params.num_components):
+    pca_df[f'pc{i + 1}'] = pca[:, i]
 
 logger.info('Saving PCA components to %s', snakemake.output[0])
 pca_df.to_csv(snakemake.output[0], index=False)
