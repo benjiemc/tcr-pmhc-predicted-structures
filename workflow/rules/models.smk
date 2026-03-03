@@ -50,6 +50,7 @@ rule create_pae_dataset:
         """
         python -m tcr_pmhc_predicted_structures.apps.create_pae_dataset \
             --log-level {config[log_level]} \
+            --include-training-metadata \
             --sequences {input.sequences} \
             --confidences {input.confidences} \
             -o {output}
@@ -114,6 +115,7 @@ rule create_full_pae_dataset:
         """
         python -m tcr_pmhc_predicted_structures.apps.create_pae_dataset \
             --log-level {config[log_level]} \
+            --include-training-metadata \
             --sequences {input.sequences} \
             --format json \
             --confidences {input.confidences} \

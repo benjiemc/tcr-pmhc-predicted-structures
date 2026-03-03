@@ -26,6 +26,11 @@ parser.add_argument(
     default='txt',
     help="format the PAE confidence scores are stored in, either 'txt' or 'json' (Default: 'txt')",
 )
+parser.add_argument(
+    '--include-training-metadata',
+    action='store_true',
+    help='include label, fold, and source in final dataset',
+)
 
 inputs = parser.add_argument_group('Inputs')
 inputs.add_argument(
@@ -83,9 +88,12 @@ def main():
         ids = fh.create_dataset('id', shape=(num_confidences,), dtype=str_dt)
         seeds = fh.create_dataset('seed', shape=(num_confidences,), dtype=np.int32)
         samples = fh.create_dataset('sample', shape=(num_confidences,), dtype=np.int32)
-        sources = fh.create_dataset('source', shape=(num_confidences,), dtype=np.int8)
-        folds = fh.create_dataset('fold', shape=(num_confidences,), dtype=np.int32)
-        labels = fh.create_dataset('label', shape=(num_confidences,), dtype=np.int8)
+
+        if args.include_training_metadata:
+            sources = fh.create_dataset('source', shape=(num_confidences,), dtype=np.int8)
+            folds = fh.create_dataset('fold', shape=(num_confidences,), dtype=np.int32)
+            labels = fh.create_dataset('label', shape=(num_confidences,), dtype=np.int8)
+
         paes = fh.create_dataset(
             'pae',
             shape=(num_confidences, max_num_rows * max_num_cols),
@@ -132,9 +140,10 @@ def main():
             seeds[i] = int(entry_name['seed'])
             samples[i] = int(entry_name['sample'])
 
-            sources[i] = int(info['source'] == 'Sequences')
-            folds[i] = info['fold']
-            labels[i] = info['label']
+            if args.include_training_metadata:
+                sources[i] = int(info['source'] == 'Sequences')
+                folds[i] = info['fold']
+                labels[i] = info['label']
 
             paes[i, :] = pae
 
