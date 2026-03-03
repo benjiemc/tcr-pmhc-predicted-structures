@@ -22,8 +22,6 @@ with h5py.File(snakemake.input[0], 'r') as fh:
     seeds = fh['seed'][:]
     samples = fh['sample'][:]
 
-    folds = fh['fold'][:]
-
 logger.info('Decomposing dataset into %d component', snakemake.params.num_components)
 pca = PCA(n_components=snakemake.params.num_components).fit_transform(paes)
 
