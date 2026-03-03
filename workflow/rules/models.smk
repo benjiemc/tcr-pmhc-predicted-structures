@@ -110,7 +110,15 @@ rule create_full_pae_dataset:
     resources:
         runtime="3h",
         mem="10GB"
-    script: "../scripts/create_pae_dataset_full.py"
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.apps.create_pae_dataset \
+            --log-level {config[log_level]} \
+            --sequences {input.sequences} \
+            --format json \
+            --confidences {input.confidences} \
+            -o {output}
+        """
 
 rule decompose_pae_dataset:
     input: "data/processed/{model}_{msa_method}_{data_source}{portion}_pae.h5"
