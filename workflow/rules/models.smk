@@ -46,7 +46,14 @@ rule create_pae_dataset:
     resources:
         runtime="10m",
         mem="5GB"
-    script: "../scripts/create_pae_dataset.py"
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.apps.create_pae_dataset \
+            --log-level {config[log_level]} \
+            --sequences {input.sequences} \
+            --confidences {input.confidences} \
+            -o {output}
+        """
 
 rule train_pae_aggregator:
     input:
