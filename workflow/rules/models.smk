@@ -7,6 +7,7 @@ wildcard_constraints:
     model="[A-Za-z0-9]+",
     msa_method="[A-Za-z0-9]+",
     data_source="[A-Za-z0-9]+",
+    dataset_name="(_[A-Za-z0-9_]+)?",
     sample_size="\d+"
 
 rule extract_padded_pae_matrices:
@@ -38,7 +39,7 @@ rule extract_padded_pae_matrices:
             {input.sequences}
         """
 
-rule create_pae_dataset:
+rule create_training_pae_dataset:
     input:
         sequences="data/interim/sequences_sample_1500_af_training.csv",
         confidences=lambda wildcards: get_predicted_structure_names("data/interim/sequences_sample_1500_af_training.csv", f"data/interim/pae_padded_{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}/{{name}}_{{seed}}_{{sample}}_pae.txt", config['seed'], column_name='id')
@@ -51,6 +52,23 @@ rule create_pae_dataset:
         python -m tcr_pmhc_predicted_structures.apps.create_pae_dataset \
             --log-level {config[log_level]} \
             --include-training-metadata \
+            --sequences {input.sequences} \
+            --confidences {input.confidences} \
+            -o {output}
+        """
+
+rule create_pae_dataset:
+    input:
+        sequences="data/interim/sequences{dataset_name}.csv",
+        confidences=lambda wildcards: get_predicted_structure_names(f"data/interim/sequences{wildcards.dataset_name}.csv", f"data/interim/pae_padded_{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}/{{name}}_{{seed}}_{{sample}}_pae.txt", config['seed'], column_name='id')
+    output: "data/processed/{model}_{msa_method}_{data_source}_pae{dataset_name}.h5"
+    resources:
+        runtime="10m",
+        mem="5GB"
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.apps.create_pae_dataset \
+            --log-level {config[log_level]} \
             --sequences {input.sequences} \
             --confidences {input.confidences} \
             -o {output}
@@ -90,10 +108,10 @@ rule train_pae_aggregator:
 
 rule run_pae_aggregator_untrained:
     input:
-        paes="data/processed/{model}_{msa_method}_{data_source}_pae.h5",
-        pcas="data/interim/{model}_{msa_method}_{data_source}_full_pae_pca.csv",
+        paes="data/processed/{model}_{msa_method}_{data_source}_pae{dataset_name}.h5",
+        pcas="data/interim/{model}_{msa_method}_{data_source}_full_pae_pca{dataset_name}.csv",
         model="models/PAEAggregator_{model}_{msa_method}_{data_source}"
-    output: "data/processed/{model}_{msa_method}_{data_source}_pae_aggregator_predictions_untrained.csv"
+    output: "data/processed/{model}_{msa_method}_{data_source}{dataset_name}_pae_aggregator_predictions_untrained.csv"
     resources:
         runtime="10m",
         mem="5GB"
@@ -128,7 +146,27 @@ rule run_pae_aggregator_evaluation:
             -o {output}
         """
 
-rule create_full_pae_dataset:
+rule run_pae_aggregator:
+    input:
+        paes="data/processed/{model}_{msa_method}_{data_source}_pae{dataset_name}.h5",
+        pcas="data/interim/{model}_{msa_method}_{data_source}_full_pae_pca{dataset_name}.csv",
+        model="models/PAEAggregator_{model}_{msa_method}_{data_source}"
+    output: "data/processed/{model}_{msa_method}_{data_source}{dataset_name}_pae_aggregator_predictions.csv"
+    resources:
+        runtime="10m",
+        mem="5GB"
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.apps.run_pae_aggregator \
+            --log-level {config[log_level]} \
+            --mode run \
+            --paes {input.paes} \
+            --pcas {input.pcas} \
+            --model {input.model} \
+            -o {output}
+        """
+
+rule create_training_full_pae_dataset:
     input:
         sequences="data/interim/sequences_sample_1500_af_training.csv",
         confidences=lambda wildcards: get_predicted_structure_names("data/interim/sequences_sample_1500_af_training.csv", f"data/interim/structures_{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}/{{name}}_seed-{{seed}}_sample-{{sample}}_confidences.json", config['seed'], column_name='id')
@@ -147,9 +185,27 @@ rule create_full_pae_dataset:
             -o {output}
         """
 
+rule create_full_pae_dataset:
+    input:
+        sequences="data/interim/sequences{dataset_name}.csv",
+        confidences=lambda wildcards: get_predicted_structure_names(f"data/interim/sequences{wildcards.dataset_name}.csv", f"data/interim/structures_{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}/{{name}}_seed-{{seed}}_sample-{{sample}}_confidences.json", config['seed'], column_name='id')
+    output: "data/processed/{model}_{msa_method}_{data_source}_full_pae{dataset_name}.h5"
+    resources:
+        runtime="3h",
+        mem="10GB"
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.apps.create_pae_dataset \
+            --log-level {config[log_level]} \
+            --sequences {input.sequences} \
+            --format json \
+            --confidences {input.confidences} \
+            -o {output}
+        """
+
 rule decompose_pae_dataset:
-    input: "data/processed/{model}_{msa_method}_{data_source}{portion}_pae.h5"
-    output: "data/interim/{model}_{msa_method}_{data_source}{portion}_pae_pca.csv"
+    input: "data/processed/{model}_{msa_method}_{data_source}{portion}_pae{dataset_name}.h5"
+    output: "data/interim/{model}_{msa_method}_{data_source}{portion}_pae_pca{dataset_name}.csv"
     wildcard_constraints:
         portion="(_full)?"
     params:
