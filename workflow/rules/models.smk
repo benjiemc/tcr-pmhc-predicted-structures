@@ -88,20 +88,45 @@ rule train_pae_aggregator:
             {input.paes}
         """
 
-rule run_pae_aggregator:
+rule run_pae_aggregator_untrained:
     input:
         paes="data/processed/{model}_{msa_method}_{data_source}_pae.h5",
         pcas="data/interim/{model}_{msa_method}_{data_source}_full_pae_pca.csv",
         model="models/PAEAggregator_{model}_{msa_method}_{data_source}"
-    output: "data/processed/{model}_{msa_method}_{data_source}_pae_aggregator_predictions_{training_status}.csv"
-    wildcard_constraints:
-        training_status="(untrained)|(trained)"
-    params:
-        model_size=3040
+    output: "data/processed/{model}_{msa_method}_{data_source}_pae_aggregator_predictions_untrained.csv"
     resources:
         runtime="10m",
         mem="5GB"
-    script: "../scripts/run_pae_aggregator.py"
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.apps.run_pae_aggregator \
+            --log-level {config[log_level]} \
+            --mode untrained \
+            --paes {input.paes} \
+            --pcas {input.pcas} \
+            --model {input.model} \
+            -o {output}
+        """
+
+rule run_pae_aggregator_evaluation:
+    input:
+        paes="data/processed/{model}_{msa_method}_{data_source}_pae.h5",
+        pcas="data/interim/{model}_{msa_method}_{data_source}_full_pae_pca.csv",
+        model="models/PAEAggregator_{model}_{msa_method}_{data_source}"
+    output: "data/processed/{model}_{msa_method}_{data_source}_pae_aggregator_predictions_trained.csv"
+    resources:
+        runtime="10m",
+        mem="5GB"
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.apps.run_pae_aggregator \
+            --log-level {config[log_level]} \
+            --mode evaluation \
+            --paes {input.paes} \
+            --pcas {input.pcas} \
+            --model {input.model} \
+            -o {output}
+        """
 
 rule create_full_pae_dataset:
     input:
