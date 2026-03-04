@@ -140,7 +140,7 @@ def _create_masks(
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     tcr_mask = np.isin(chain_ids, np.array(['D', 'E']))
     peptide_mask = chain_ids == 'C'
-    mhc_mask = chain_ids == 'A'
+    mhc_1_mask = chain_ids == 'A'
 
     if binding_only:
         tcr_mask = tcr_mask & np.isin(sequence_ids, np.array(sorted(IMGT_CDR)))
@@ -148,13 +148,33 @@ def _create_masks(
             _get_mhc_tcr_contact_positions(mhc_type)
         )
 
-        mhc_mask = mhc_mask & np.isin(sequence_ids, mhc_alpha_seq_ids) & np.isin(insert_codes, mhc_alpha_insert_codes)
+        combined_ids = np.array(
+            [f'{seq_id}{insert_code}' for seq_id, insert_code in zip(sequence_ids, insert_codes, strict=True)]
+        )
+        mhc_alpha = np.array(
+            [
+                f'{seq_id}{insert_code}'
+                for seq_id, insert_code in zip(mhc_alpha_seq_ids, mhc_alpha_insert_codes, strict=True)
+            ]
+        )
+
+        mhc_1_mask = mhc_1_mask & np.isin(combined_ids, mhc_alpha)
 
     if mhc_type == 'MH2':
-        mhc_mask = mhc_mask | (chain_ids == 'B')
+        mhc_2_mask = chain_ids == 'B'
 
         if binding_only:
-            mhc_mask = mhc_mask & np.isin(sequence_ids, mhc_beta_seq_ids) & np.isin(insert_codes, mhc_beta_insert_codes)
+            mhc_beta = np.array(
+                [
+                    f'{seq_id}{insert_code}'
+                    for seq_id, insert_code in zip(mhc_beta_seq_ids, mhc_beta_insert_codes, strict=True)
+                ]
+            )
+            mhc_2_mask = mhc_2_mask & np.isin(combined_ids, mhc_beta)
+    else:
+        mhc_2_mask = np.array([False for _ in sequence_ids])
+
+    mhc_mask = mhc_1_mask | mhc_2_mask
 
     return tcr_mask, peptide_mask, mhc_mask
 
