@@ -89,7 +89,7 @@ rule run_pae_aggregator:
     wildcard_constraints:
         training_status="(untrained)|(trained)"
     params:
-        model_size=3120
+        model_size=3040
     resources:
         runtime="10m",
         mem="5GB"
