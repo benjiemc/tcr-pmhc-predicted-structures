@@ -331,8 +331,50 @@ rule extract_coeliac_mutations_sequences:
                         'mhc_type': entry['mhc_type']
                     }, fh)
 
+rule remove_hetatom_from_external_structure:
+    input: "data/raw/external_structures/{name}.pdb"
+    output: "data/interim/external_structures_clean/{name}.pdb"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    run:
+        from Bio.PDB import Chain, Model, PDBIO, PDBParser, Structure
+
+        dirname = os.path.dirname(output[0])
+        if not os.path.exists(dirname):
+            os.mkdir(dirname)
+
+        parser = PDBParser(QUIET=True)
+        structure = parser.get_structure('', input[0])
+
+        new_structure = Structure.Structure(structure.id)
+        for model in structure:
+            new_model = Model.Model(model.id)
+
+            for chain in model:
+                new_chain = Chain.Chain(chain.id)
+
+                for residue in chain:
+                    if residue.id[0] == ' ':
+                        new_chain.add(residue.copy())
+
+                new_model.add(new_chain)
+            new_structure.add(new_model)
+
+        io = PDBIO()
+        io.set_structure(new_structure)
+        io.save(output[0])
+
 rule summarise_structural_features:
     input: "data/raw/structures/{name}.pdb"
+    output: temp("data/interim/{name}_structural_summary.json")
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: "../scripts/summarise_structural_features.py"
+
+rule summarise_external_structures_structural_features:
+    input: "data/interim/external_structures_clean/{name}.pdb"
     output: temp("data/interim/{name}_structural_summary.json")
     resources:
         runtime="5m",
@@ -362,8 +404,39 @@ rule aggregate_structural_features:
         df = pd.DataFrame(entries)
         df.to_csv(output[0], index=False)
 
+rule aggregate_coeliac_structure_structural_features:
+    input: ["data/interim/DQ2_5a1_572G2_DECAB_structural_summary.json", "data/interim/DQ2_5w1_572G2_DECAB_structural_summary.json"]
+    output: "data/processed/coeliac_structure_structural_features.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    run:
+        import json
+        import pandas as pd
+
+        entries = []
+        for path in input:
+            with open(path, 'r') as fh:
+                structural_features = json.load(fh)
+
+            name = os.path.basename(path).replace('_structural_summary.json', '')
+            structural_features['name'] = name
+
+            entries.append(structural_features)
+
+        df = pd.DataFrame(entries)
+        df.to_csv(output[0], index=False)
+
 rule profile_interactions:
     input: "data/raw/structures/{name}.pdb"
+    output: temp("data/interim/{name}_interactions.csv")
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: "../scripts/profile_interactions.py"
+
+rule profile_external_structures_interactions:
+    input: "data/interim/external_structures_clean/{name}.pdb"
     output: temp("data/interim/{name}_interactions.csv")
     resources:
         runtime="5m",
@@ -373,6 +446,27 @@ rule profile_interactions:
 rule aggregate_interactions:
     input: create_paths("data/raw/structures_summary.csv", "data/interim/{name}_interactions.csv")
     output: "data/processed/tcr_pmhc_interactions.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    run:
+        import pandas as pd
+
+        interactions = []
+        for path in input:
+            interaction = pd.read_csv(path)
+
+            name = os.path.basename(path).replace('_interactions.csv', '')
+            interaction['name'] = name
+
+            interactions.append(interaction)
+
+        interactions = pd.concat(interactions)
+        interactions.to_csv(output[0], index=False)
+
+rule aggregate_coeliac_structure_interactions:
+    input: ["data/interim/DQ2_5a1_572G2_DECAB_interactions.csv", "data/interim/DQ2_5w1_572G2_DECAB_interactions.csv"]
+    output: "data/processed/coeliac_structure_interactions.csv"
     resources:
         runtime="5m",
         mem="1GB"
@@ -401,6 +495,14 @@ rule calculate_sc_and_bsa:
         mem="1GB"
     script: "../scripts/calculate_sc_and_bsa.py"
 
+rule calculate_external_structures_sc_and_bsa:
+    input: "data/interim/external_structures_clean/{name}.pdb"
+    output: temp("data/interim/{name}_sc_and_bsa.json")
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: "../scripts/calculate_sc_and_bsa.py"
+
 rule aggregate_sc_and_bsa:
     input: create_paths("data/raw/structures_summary.csv", "data/interim/{name}_sc_and_bsa.json")
     output: "data/processed/tcr_pmhc_sc_and_bsa.csv"
@@ -423,6 +525,71 @@ rule aggregate_sc_and_bsa:
 
         df = pd.DataFrame(entries)
         df.to_csv(output[0], index=False)
+
+rule aggregate_coeliac_structure_sc_and_bsa:
+    input: ["data/interim/DQ2_5a1_572G2_DECAB_sc_and_bsa.json", "data/interim/DQ2_5w1_572G2_DECAB_sc_and_bsa.json"]
+    output: "data/processed/coeliac_structure_sc_and_bsa.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    run:
+        import json
+        import pandas as pd
+
+        entries = []
+        for path in input:
+            with open(path, 'r') as fh:
+                structural_features = json.load(fh)
+
+            name = os.path.basename(path).replace('_sc_and_bsa.json', '')
+            structural_features['name'] = name
+
+            entries.append(structural_features)
+
+        df = pd.DataFrame(entries)
+        df.to_csv(output[0], index=False)
+
+rule create_external_structures_contact_map:
+    input: "data/interim/external_structures_clean/{name}.pdb"
+    output: temp("data/interim/{name}_contacts.csv")
+    params:
+        contact_distance=5.0
+    resources:
+        runtime="10m",
+        mem="1GB"
+    shell:
+        """
+        columns="cdr_type,chain_id_tcr,chain_type_tcr,residue_seq_id_tcr,residue_insert_code_tcr,resi_tcr,residue_name_tcr,"
+        columns+="cdr_tcr,cdr_position,relative_pos_centre_tcr,chain_id_pmhc,residue_seq_id_pmhc,residue_insert_code_pmhc,"
+        columns+="resi_pmhc,residue_name_pmhc,chain_type_pmhc,peptide_position,relative_pos_centre_pmhc,mhc_type"
+
+        python -m tcr_pmhc_predicted_structures.apps.create_contact_map \
+            --log-level {config[log_level]} \
+            --cutoff-distance {params.contact_distance} \
+            -o {output} \
+            {input} || echo $columns > {output}
+        """
+
+rule aggregate_coeliac_structure_contact_maps:
+    input: ["data/interim/DQ2_5a1_572G2_DECAB_contacts.csv", "data/interim/DQ2_5w1_572G2_DECAB_contacts.csv"]
+    output: "data/processed/coeliac_structure_contacts.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    run:
+        import pandas as pd
+
+        contacts = []
+        for path in input:
+            contact = pd.read_csv(path)
+
+            name = os.path.basename(path).replace('_contacts.csv', '')
+            contact['name'] = name
+
+            contacts.append(contact)
+
+        contacts = pd.concat(contacts)
+        contacts.to_csv(output[0], index=False)
 
 rule create_distance_restraints:
     input:
