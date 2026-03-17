@@ -29,4 +29,5 @@ dependencies:
       - boltz[cuda]==2.2.1
       - git+https://github.com/chaidiscovery/chai-lab.git@a01bfde
       - python-pdb
+      - git+ssh://git@github.com/t-whalley/SCASA.git
       - git+ssh://git@github.com/benjiemc/STCRpy.git@pre-release

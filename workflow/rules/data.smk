@@ -244,6 +244,39 @@ rule aggregate_interactions:
         interactions = pd.concat(interactions)
         interactions.to_csv(output[0], index=False)
 
+rule calculate_sc_and_bsa:
+    input: "data/raw/structures/{name}.pdb"
+    output: temp("data/interim/{name}_sc_and_bsa.json")
+    params:
+        seed=123
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: "../scripts/calculate_sc_and_bsa.py"
+
+rule aggregate_sc_and_bsa:
+    input: create_paths("data/raw/structures_summary.csv", "data/interim/{name}_sc_and_bsa.json")
+    output: "data/processed/tcr_pmhc_sc_and_bsa.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    run:
+        import json
+        import pandas as pd
+
+        entries = []
+        for path in input:
+            with open(path, 'r') as fh:
+                structural_features = json.load(fh)
+
+            name = os.path.basename(path).replace('_sc_and_bsa.json', '')
+            structural_features['name'] = name
+
+            entries.append(structural_features)
+
+        df = pd.DataFrame(entries)
+        df.to_csv(output[0], index=False)
+
 rule create_distance_restraints:
     input:
         "data/raw/structures_summary.csv",

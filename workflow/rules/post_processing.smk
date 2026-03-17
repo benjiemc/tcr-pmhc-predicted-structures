@@ -131,6 +131,24 @@ rule aggregate_predicted_interactions:
         mem="1GB"
     script: "../scripts/aggregate_post_processing.py"
 
+rule calculate_predicted_sc_and_bsa:
+    input: "data/processed/structures_{model}_{msa_method}_{data_source}{ablations}/{name}_{seed}_{sample}.pdb"
+    output: temp("data/interim/{model}_{msa_method}_{data_source}{ablations}_{name}_{seed}_{sample}_sc_and_bsa.json")
+    params:
+        seed=123
+    resources:
+        runtime="10m",
+        mem="2GB"
+    script: "../scripts/calculate_sc_and_bsa.py"
+
+rule aggregate_predicted_sc_and_bsa:
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_sample_{wildcards.sample_size}{wildcards.unbalance}.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_sc_and_bsa.json", config['seed'])
+    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_sc_and_bsa_{sample_size}{unbalance}.csv"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    script: "../scripts/aggregate_post_processing.py"
+
 rule calculate_dockq_score:
     input:
         prediction="data/interim/structures_{model}_{msa_method}_{data_source}{ablations}/{name}_seed-{seed}_sample-{sample}_model.cif",
