@@ -25,7 +25,11 @@ Mamba and Snakemake are used to setup and manage the dependencies and workflows 
 snakemake environment --cores 1
 ```
 
-To create the mamba environment (will be located at ./.venv).
+To create the mamba environment (will be located at ./.venv). Activate it by running:
+
+```
+mamba activate ./.venv/
+```
 
 ### Installing for Development
 
