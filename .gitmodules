@@ -4,9 +4,6 @@
 [submodule "third_party/alphafold3"]
 	path = third_party/alphafold3
 	url = git@github.com:google-deepmind/alphafold3.git
-[submodule "third_party/anarci"]
-	path = third_party/anarci
-	url = git@github.com:benjiemc/anarci-tcr-pmhc.git
 [submodule "third_party/IPSAE"]
 	path = third_party/IPSAE
 	url = git@github.com:DunbrackLab/IPSAE.git
