@@ -1,12 +1,12 @@
-[submodule "third_party/tcrmodel2"]
-	path = third_party/tcrmodel2
-	url = git@github.com:benjiemc/tcrmodel2.git
-[submodule "third_party/alphafold3"]
-	path = third_party/alphafold3
-	url = git@github.com:google-deepmind/alphafold3.git
-[submodule "third_party/IPSAE"]
-	path = third_party/IPSAE
-	url = git@github.com:DunbrackLab/IPSAE.git
 [submodule "report"]
 	path = report
 	url = git@github.com:benjiemc/tcr-pmhc-predicted-structures-report.git
+[submodule "third_party/alphafold3"]
+	path = third_party/alphafold3
+	url = git@github.com:google-deepmind/alphafold3.git
+[submodule "third_party/tcrmodel2"]
+	path = third_party/tcrmodel2
+	url = git@github.com:benjiemc/tcrmodel2.git
+[submodule "third_party/IPSAE"]
+	path = third_party/IPSAE
+	url = git@github.com:DunbrackLab/IPSAE.git
