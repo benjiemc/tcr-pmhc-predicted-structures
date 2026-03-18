@@ -190,7 +190,7 @@ rule aggregate_predicted_sc_and_bsa:
     script: "../scripts/aggregate_post_processing.py"
 
 rule aggregate_dash_bmlf_predicted_sc_and_bsa:
-    input: lambda wildcards: get_dash_names("data/interim/sequences_dash.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_sc_and_bsa.json", 'GLCTLVAML', config['seed'])
+    input: lambda wildcards: get_dash_names("data/interim/sequences_dash_with_negatives.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_sc_and_bsa.json", 'GLCTLVAML', config['seed'])
     output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_sc_and_bsa_dash_bmlf.csv"
     resources:
         runtime="10m",
