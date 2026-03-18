@@ -1,0 +1,39 @@
+name: Deploy documentation
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install miniconda
+        uses: conda-incubator/setup-miniconda@v3
+        with:
+          auto-activate: true
+          activate-environment: ""
+      - name: Setup environment
+        run: |
+          conda install -c conda-forge -c nodefaults mamba -y
+          pip install snakemake
+          export ALPHAFOLD3_WEIGHTS_DIR=''
+          export ALPHAFOLD_DATA_DIR=''
+          export COLABFOLD_DATA_DIR=''
+          export TCRMODEL2_ALPHAFOLD_DATA_DIR=''
+          snakemake environment --cores 1
+      - name: Install Pandoc
+        uses: pandoc/actions/setup@v1
+        with:
+          version: 2.19
+      - name: Build documentation
+        run: snakemake docs --cores 1
+      - name: Publish documentation
+        uses: peaceiris/actions-gh-pages@v3
+        if: github.ref == 'refs/heads/main'
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: docs/public
