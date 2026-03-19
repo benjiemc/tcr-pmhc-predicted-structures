@@ -558,7 +558,7 @@ rule create_external_structures_contact_map:
         contact_distance=5.0
     resources:
         runtime="10m",
-        mem="1GB"
+        mem="5GB"
     shell:
         """
         columns="cdr_type,chain_id_tcr,chain_type_tcr,residue_seq_id_tcr,residue_insert_code_tcr,resi_tcr,residue_name_tcr,"
