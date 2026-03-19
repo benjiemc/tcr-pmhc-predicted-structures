@@ -498,6 +498,8 @@ rule calculate_sc_and_bsa:
 rule calculate_external_structures_sc_and_bsa:
     input: "data/interim/external_structures_clean/{name}.pdb"
     output: temp("data/interim/{name}_sc_and_bsa.json")
+    params:
+        seed=123
     resources:
         runtime="5m",
         mem="1GB"
