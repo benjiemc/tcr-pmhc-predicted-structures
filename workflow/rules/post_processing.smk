@@ -106,7 +106,7 @@ rule aggregate_dash_bmlf_predicted_structural_features:
 
 rule aggregate_coeliac_predicted_structural_features:
     input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_coeliac_with_negatives.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_structural_summary.json", config['seed'], column_name='id')
-    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_structural_features_sequences_coeliac.csv"
+    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_structural_features_coeliac.csv"
     resources:
         runtime="10m",
         mem="1GB"
@@ -114,7 +114,7 @@ rule aggregate_coeliac_predicted_structural_features:
 
 rule aggregate_coeliac_mutations_predicted_structural_features:
     input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_coeliac_mutations.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.ablations}_{{name}}_{{seed}}_{{sample}}_structural_summary.json", config['seed'], column_name='id')
-    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_structural_features_sequences_coeliac_mutations.csv"
+    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{ablations}_structural_features_coeliac_mutations.csv"
     resources:
         runtime="10m",
         mem="1GB"
