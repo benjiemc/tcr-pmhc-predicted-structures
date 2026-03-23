@@ -113,177 +113,7 @@ rule create_af3_msa_inputs_from_af_training_structures:
         mem="10MB"
     script: "../scripts/create_af3_msa_inputs_from_structures.py"
 
-def get_dash_sequence_ids(path: str, sequence_key_path: str, template: str) -> list[str]:
-    if not os.path.exists(sequence_key_path):
-        print(sequence_key_path, 'does not exist!')
-        return []
-
-    with open(sequence_key_path, 'r') as fh:
-        sequence_key = dict(line.strip().split() for line in fh if line)
-
-    if not os.path.exists(path):
-        print(path, 'does not exist!')
-        return []
-
-    with open(path, 'r') as fh:
-        reader = csv.DictReader(fh)
-
-        ids = {
-            sequence_id
-            for entry in reader
-            for sequence_name in ('tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2')
-            if (sequence := entry[sequence_name])
-            and (sequence_id := hashlib.sha256(sequence.encode()).hexdigest()[:8]) not in sequence_key
-        }
-
-    return expand(template, name=ids)
-
-rule create_af3_msa_inputs_from_dash_dataset:
-    input:
-        sequences="data/interim/sequences_dash_with_negatives.csv",
-        sequence_key="data/interim/sequence_key.txt"
-    output: get_dash_sequence_ids("data/interim/sequences_dash_with_negatives.csv", "data/interim/sequence_key.txt", "data/interim/msa-inputs_af3/{name}.json")
-    resources:
-        runtime="10m",
-        mem="500MB"
-    run:
-        output_dir = os.path.dirname(output[0])
-        if not os.path.exists(output_dir):
-            os.mkdir(output_dir)
-
-        with open(input.sequence_key, 'r') as fh:
-            sequence_key = dict(line.strip().split() for line in fh if line)
-
-        past_ids = set()
-        with open(input.sequences, 'r') as fh:
-            reader = csv.DictReader(fh)
-            for entry in reader:
-                for sequence_name in (
-                    'tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2'
-                ):
-                    if sequence_name not in entry:
-                        continue
-
-                    sequence = entry[sequence_name]
-                    if not sequence:
-                        continue
-
-                    sequence_id = hashlib.sha256(sequence.encode()).hexdigest()[:8]
-                    if sequence_id in sequence_key or sequence_id in past_ids:
-                        continue
-
-                    with open(os.path.join(output_dir, sequence_id + '.json'), 'w') as output_fh:
-                        json.dump(
-                            {
-                                'name': sequence_id,
-                                'modelSeeds': [1],
-                                'sequences': [
-                                    {'protein': {'id': 'A', 'sequence': sequence}},
-                                ],
-                                'dialect': 'alphafold3',
-                                'version': 1,
-                            },
-                            output_fh,
-                        )
-
-                    past_ids.add(sequence_id)
-
-def get_mutated_dash_sequence_ids(
-    path: str, sequence_key_path: str, dash_sequences_path: str, template: str
-) -> list[str]:
-    past_ids = set()
-    if not os.path.exists(sequence_key_path):
-        print(sequence_key_path, 'does not exist!')
-        return []
-
-    with open(sequence_key_path, 'r') as fh:
-        past_ids = past_ids | {line.strip().split()[0] for line in fh if line}
-
-    if not os.path.exists(dash_sequences_path):
-        print(dash_sequences_path, 'does not exist!')
-        return []
-
-    with open(dash_sequences_path, 'r') as fh:
-        for entry in csv.DictReader(fh):
-            for chain_name in 'tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2':
-                if chain_name in entry:
-                    past_ids.add(hashlib.sha256(entry[chain_name].encode()).hexdigest()[:8])
-
-    if not os.path.exists(path):
-        print(path, 'does not exist!')
-        return []
-
-    with open(path, 'r') as fh:
-        reader = csv.DictReader(fh)
-
-        ids = {
-            sequence_id
-            for entry in reader
-            for sequence_name in ('tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2')
-            if (sequence := entry[sequence_name])
-            and (sequence_id := hashlib.sha256(sequence.encode()).hexdigest()[:8]) not in past_ids
-        }
-
-    return expand(template, name=ids)
-
-rule create_af3_msa_inputs_from_mutated_dash_dataset:
-    input:
-        sequences="data/interim/sequences_dash_BMLF_mutated.csv",
-        sequence_key="data/interim/sequence_key.txt",
-        dash_sequences="data/interim/sequences_dash_with_negatives.csv"
-    output: get_mutated_dash_sequence_ids("data/interim/sequences_dash_BMLF_mutated.csv", "data/interim/sequence_key.txt", "data/interim/sequences_dash_with_negatives.csv", "data/interim/msa-inputs_af3/{name}.json")
-    resources:
-        runtime="10m",
-        mem="500MB"
-    run:
-        output_dir = os.path.dirname(output[0])
-        if not os.path.exists(output_dir):
-            os.mkdir(output_dir)
-
-        past_ids = set()
-        with open(input.sequence_key, 'r') as fh:
-            past_ids = past_ids | {line.strip().split()[0] for line in fh if line}
-
-        with open(input.dash_sequences, 'r') as fh:
-            for entry in csv.DictReader(fh):
-                for chain_name in 'tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2':
-                    if chain_name in entry:
-                        past_ids.add(hashlib.sha256(entry[chain_name].encode()).hexdigest()[:8])
-
-        with open(input.sequences, 'r') as fh:
-            reader = csv.DictReader(fh)
-            for entry in reader:
-                for sequence_name in (
-                    'tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2'
-                ):
-                    if sequence_name not in entry:
-                        continue
-
-                    sequence = entry[sequence_name]
-                    if not sequence:
-                        continue
-
-                    sequence_id = hashlib.sha256(sequence.encode()).hexdigest()[:8]
-                    if sequence_id in past_ids:
-                        continue
-
-                    with open(os.path.join(output_dir, sequence_id + '.json'), 'w') as output_fh:
-                        json.dump(
-                            {
-                                'name': sequence_id,
-                                'modelSeeds': [1],
-                                'sequences': [
-                                    {'protein': {'id': 'A', 'sequence': sequence}},
-                                ],
-                                'dialect': 'alphafold3',
-                                'version': 1,
-                            },
-                            output_fh,
-                        )
-
-                    past_ids.add(sequence_id)
-
-def get_coeliac_sequence_ids(path: str, sequence_key_path: str, higher_priority_datasets: list[str], template: str) -> list[str]:
+def get_secondary_sequence_ids(path: str, sequence_key_path: str, higher_priority_datasets: list[str], template: str) -> list[str]:
     past_ids = set()
     if not os.path.exists(sequence_key_path):
         print(sequence_key_path, 'does not exist!')
@@ -320,120 +150,48 @@ def get_coeliac_sequence_ids(path: str, sequence_key_path: str, higher_priority_
 
     return expand(template, name=ids)
 
+rule create_af3_msa_inputs_from_dash_dataset:
+    input:
+        sequences="data/interim/sequences_dash_with_negatives.csv",
+        sequence_key="data/interim/sequence_key.txt"
+    output: get_secondary_sequence_ids("data/interim/sequences_dash_with_negatives.csv", "data/interim/sequence_key.txt", [], "data/interim/msa-inputs_af3/{name}.json")
+    resources:
+        runtime="10m",
+        mem="500MB"
+    script: "../scripts/create_secondary_msa_inputs.py"
+
+rule create_af3_msa_inputs_from_mutated_dash_dataset:
+    input:
+        sequences="data/interim/sequences_dash_BMLF_mutated.csv",
+        sequence_key="data/interim/sequence_key.txt",
+        higher_priority_datasets=["data/interim/sequences_dash_with_negatives.csv"]
+    output: get_secondary_sequence_ids("data/interim/sequences_dash_BMLF_mutated.csv", "data/interim/sequence_key.txt", ["data/interim/sequences_dash_with_negatives.csv"], "data/interim/msa-inputs_af3/{name}.json")
+    resources:
+        runtime="10m",
+        mem="500MB"
+    script: "../scripts/create_secondary_msa_inputs.py"
+
 rule create_af3_msa_inputs_from_coeliac_dataset:
     input:
         sequences="data/interim/sequences_coeliac_with_negatives.csv",
         sequence_key="data/interim/sequence_key.txt",
-        dash_sequences="data/interim/sequences_dash_with_negatives.csv"
-    output: get_coeliac_sequence_ids("data/interim/sequences_coeliac_with_negatives.csv", "data/interim/sequence_key.txt", ["data/interim/sequences_dash_with_negatives.csv"], "data/interim/msa-inputs_af3/{name}.json")
+        higher_priority_datasets=["data/interim/sequences_dash_with_negatives.csv"]
+    output: get_secondary_sequence_ids("data/interim/sequences_coeliac_with_negatives.csv", "data/interim/sequence_key.txt", ["data/interim/sequences_dash_with_negatives.csv"], "data/interim/msa-inputs_af3/{name}.json")
     resources:
         runtime="10m",
         mem="500MB"
-    run:
-        output_dir = os.path.dirname(output[0])
-        if not os.path.exists(output_dir):
-            os.mkdir(output_dir)
-
-        past_ids = set()
-        with open(input.sequence_key, 'r') as fh:
-            past_ids = past_ids | {line.strip().split()[0] for line in fh if line}
-
-        with open(input.dash_sequences, 'r') as fh:
-            for entry in csv.DictReader(fh):
-                for chain_name in 'tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2':
-                    if chain_name in entry:
-                        past_ids.add(hashlib.sha256(entry[chain_name].encode()).hexdigest()[:8])
-
-        with open(input.sequences, 'r') as fh:
-            reader = csv.DictReader(fh)
-            for entry in reader:
-                for sequence_name in (
-                    'tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2'
-                ):
-                    if sequence_name not in entry:
-                        continue
-
-                    sequence = entry[sequence_name]
-                    if not sequence:
-                        continue
-
-                    sequence_id = hashlib.sha256(sequence.encode()).hexdigest()[:8]
-                    if sequence_id in past_ids:
-                        continue
-
-                    with open(os.path.join(output_dir, sequence_id + '.json'), 'w') as output_fh:
-                        json.dump(
-                            {
-                                'name': sequence_id,
-                                'modelSeeds': [1],
-                                'sequences': [
-                                    {'protein': {'id': 'A', 'sequence': sequence}},
-                                ],
-                                'dialect': 'alphafold3',
-                                'version': 1,
-                            },
-                            output_fh,
-                        )
-
-                    past_ids.add(sequence_id)
+    script: "../script/create_secondary_msa_inputs.py"
 
 rule create_af3_msa_inputs_from_coeliac_mutations_dataset:
     input:
         sequences="data/interim/sequences_coeliac_mutations.csv",
         sequence_key="data/interim/sequence_key.txt",
         higher_priority_datasets=["data/interim/sequences_dash_with_negatives.csv", "data/interim/sequences_coeliac_with_negatives.csv"]
-    output: get_coeliac_sequence_ids("data/interim/sequences_coeliac_mutations.csv", "data/interim/sequence_key.txt", ["data/interim/sequences_dash_with_negatives.csv", "data/interim/sequences_coeliac_with_negatives.csv"], "data/interim/msa-inputs_af3/{name}.json")
+    output: get_secondary_sequence_ids("data/interim/sequences_coeliac_mutations.csv", "data/interim/sequence_key.txt", ["data/interim/sequences_dash_with_negatives.csv", "data/interim/sequences_coeliac_with_negatives.csv"], "data/interim/msa-inputs_af3/{name}.json")
     resources:
         runtime="10m",
         mem="500MB"
-    run:
-        output_dir = os.path.dirname(output[0])
-        if not os.path.exists(output_dir):
-            os.mkdir(output_dir)
-
-        past_ids = set()
-        with open(input.sequence_key, 'r') as fh:
-            past_ids = past_ids | {line.strip().split()[0] for line in fh if line}
-
-        for dataset_path in input.higher_priority_datasets:
-            with open(dataset_path, 'r') as fh:
-                for entry in csv.DictReader(fh):
-                    for chain_name in 'tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2':
-                        if chain_name in entry:
-                            past_ids.add(hashlib.sha256(entry[chain_name].encode()).hexdigest()[:8])
-
-        with open(input.sequences, 'r') as fh:
-            reader = csv.DictReader(fh)
-            for entry in reader:
-                for sequence_name in (
-                    'tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2'
-                ):
-                    if sequence_name not in entry:
-                        continue
-
-                    sequence = entry[sequence_name]
-                    if not sequence:
-                        continue
-
-                    sequence_id = hashlib.sha256(sequence.encode()).hexdigest()[:8]
-                    if sequence_id in past_ids:
-                        continue
-
-                    with open(os.path.join(output_dir, sequence_id + '.json'), 'w') as output_fh:
-                        json.dump(
-                            {
-                                'name': sequence_id,
-                                'modelSeeds': [1],
-                                'sequences': [
-                                    {'protein': {'id': 'A', 'sequence': sequence}},
-                                ],
-                                'dialect': 'alphafold3',
-                                'version': 1,
-                            },
-                            output_fh,
-                        )
-
-                    past_ids.add(sequence_id)
+    script: "../script/create_secondary_msa_inputs.py"
 
 rule run_create_af3_msas_and_find_templates:
     input: "data/interim/msa-inputs_af3/{name}.json"
