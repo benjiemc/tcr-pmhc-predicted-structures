@@ -71,7 +71,7 @@ def number_sequences(sequence_info: dict[str, str]) -> dict[str, list[tuple[tupl
         }
 
     else:
-        numbered_sequences = {name: number(sequence_info[name]) for name in CHAI_CHAIN_ORDER if name not in {'peptide'}}
+        numbered_sequences = {name: number(sequence_info[name]) for name in CHAI_CHAIN_ORDER if name != 'peptide'}
 
     numbered_sequences = {
         name: [
@@ -166,7 +166,7 @@ def create_restraints(sequence_info: dict, restraints: pd.DataFrame) -> pd.DataF
         )
 
         imgt_seq_id = int(imgt_seq_id)
-        imgt_insert_code = imgt_insert_code if imgt_insert_code else ' '
+        imgt_insert_code = imgt_insert_code or ' '
 
         if sequence_info['mhc_type'] == 'MH1' and helix == 'beta':
             chain_name = 'mhc_chain_1'

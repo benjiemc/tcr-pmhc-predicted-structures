@@ -22,7 +22,7 @@ def collect_summary_scores(summary_confidences: dict) -> dict:
     chain_map = {
         chain_id: chain_name
         for chain_name, chain_id in zip(
-            CHAIN_ORDER, sorted(summary_confidences['chains_ptm'].keys(), key=lambda key: int(key)), strict=False
+            CHAIN_ORDER, sorted(summary_confidences['chains_ptm'].keys(), key=int), strict=False
         )
     }
 

@@ -42,7 +42,7 @@ uniprot_entry_name_regex = re.compile(
     r'(?:tr|sp)\|(?:[A-Z0-9]{6,10})(?:_\d+)?\|(?:[A-Z0-9]{1,10}_)(?P<species>[A-Z0-9]{1,5})'
 )
 msa_paired_df['pairing_key'] = msa_paired_df['comment'].map(
-    lambda comment: ('' if (match := re.match(uniprot_entry_name_regex, comment)) is None else match.group('species'))
+    lambda comment: '' if (match := re.match(uniprot_entry_name_regex, comment)) is None else match.group('species')
 )
 
 msa_df = pd.concat([msa_paired_df, msa_unpaired_df[msa_unpaired_df['source_database'] != 'query']])
