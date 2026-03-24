@@ -31,6 +31,16 @@ To create the mamba environment (will be located at ./.venv). Activate it by run
 mamba activate ./.venv/
 ```
 
+### Creating AlphaFold containers
+
+Two containers need to be created and placed in a "containers" directory (`mkdir containers`) at the project root to run the AlphaFold predictions in the workflow. These include:
+
+* AlphaFold2 container: navigate from the project root into the TCRmodel2 directory (`cd third_party/tcrmodel2`) and build the container using `apptainer build alphafold2.sif singularity/tcrmodel2_singularity_cuda12-2.def`
+
+* AlphaFold3 container: navigate into the AlphaFold 3 directory (`cd third_party/AlphaFold3`) and follow the [instructions here](https://github.com/google-deepmind/alphafold3/blob/main/docs/installation.md#running-using-singularity-instead-of-docker).
+
+Once built, these containers need to be moved into the "containers" directory (`mv alphafold<#>.sif ../../containers`).
+
 ### Installing for Development
 
 To install the required dependencies for development, run the above and additionally run the command:
