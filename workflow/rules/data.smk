@@ -592,16 +592,3 @@ rule aggregate_coeliac_structure_contact_maps:
 
         contacts = pd.concat(contacts)
         contacts.to_csv(output[0], index=False)
-
-rule create_distance_restraints:
-    input:
-        "data/raw/structures_summary.csv",
-        "data/raw/structures"
-    output: "data/processed/tcr_pmhc_distance_restaints.csv"
-    resources:
-        runtime="15m",
-        mem="2GB"
-    shell:
-        """
-        jupyter nbconvert --to notebook --execute --inplace notebooks/measure_constraint_distances.ipynb
-        """
