@@ -270,7 +270,7 @@ rule run_benchmark_structure_prediction_methods:
         "data/external/stcrdab/db_summary.dat",
         "data/interim/sequences_sample_1500.csv",
         "data/processed/confidence_scores_af3_af3_tcrmodel2_1500.csv",
-        "data/processed/confidence_scores_boltz_af3_tcrmodel2_1500.csv",
+        "data/interim/confidence_scores_boltz_af3_tcrmodel2_1500.csv",
         "data/interim/confidence_scores_chai_af3_tcrmodel2_1500.csv",
         "data/interim/confidence_scores_af3_af3_tcrmodel2_benchmark.csv",
         "data/interim/confidence_scores_boltz_af3_tcrmodel2_benchmark.csv",
