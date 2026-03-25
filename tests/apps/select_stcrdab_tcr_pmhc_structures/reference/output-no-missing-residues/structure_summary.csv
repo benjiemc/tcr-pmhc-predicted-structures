@@ -1,0 +1,3 @@
+path,pdb,Achain,Bchain,antigen_chain,mhc_chain1,mhc_chain2,mhc_type,cdr1_alpha,cdr2_alpha,cdr3_alpha,cdr1_beta,cdr2_beta,cdr3_beta,v_alpha,v_beta,peptide,mhc1,mhc2,species
+7q9b_DECAB.pdb,7q9b,D,E,C,A,B,MH1,DRGSQS,IYSNGD,AVQKLV,MNHEY,SVGAGI,ASSYSFTEATYEQY,TRAV12,TRBV6,EAAGIGILTV,,,
+7q9b_IJHFG.pdb,7q9b,I,J,H,F,G,MH1,DRGSQS,IYSNGD,AVQKLV,MNHEY,SVGAGI,ASSYSFTEATYEQY,TRAV12,TRBV6,EAAGIGILTV,,,

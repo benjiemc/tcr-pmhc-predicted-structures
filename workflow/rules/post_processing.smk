@@ -278,7 +278,7 @@ rule aggregate_coeliac_mutations_predicted_sc_and_bsa:
 rule calculate_dockq_score:
     input:
         prediction="data/interim/structures_{model}_{msa_method}_{data_source}{ablations}/{name}_seed-{seed}_sample-{sample}_model.cif",
-        structure="data/raw/structures_no_crop/{name}.pdb"
+        structure="data/interim/structures_no_crop/{name}.pdb"
     output: temp("data/interim/{model}_{msa_method}_{data_source}{ablations}_{name}_{seed}_{sample}_dockq.json")
     resources:
         runtime="10m",

@@ -29,6 +29,12 @@ The following envrionment variables need to be set during the initialisation sta
 - `COLABFOLD_DATA_DIR`: Path to the ColabFold data directory
 - `TCRMODEL2_ALPHAFOLD_DATA_DIR`: Path to the TCRModel2 data directory
 
+> ### Using MODELLER to fix missing residues and atoms
+>
+> Parts of the data pipeline for this project use [MODELLER](https://salilab.org/modeller/) to fix structures missing atoms and residues. A license is required to use MODELLER. Please [register for a license](https://salilab.org/modeller/registration.html) and then set the license key as an evironment variable using the following command: `export KEY_MODELLER='XXXXXX'`, replacing XXXXXX with your assigned license key.
+>
+> Alternatively, the use of MODELLER can be manually disabled in the workflow steps.
+
 Mamba and Snakemake are used to setup and manage the dependencies and workflows in this project. Conda must also be available for the inital setup. Run:
 
 ```

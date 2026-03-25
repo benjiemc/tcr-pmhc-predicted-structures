@@ -6,6 +6,69 @@ wildcard_constraints:
     unbalance="(_unbalanced)?",
     sample_size="\d+"
 
+rule download_stcrdab:
+    output: directory("data/raw/stcrdab")
+    resources:
+        runtime="20m",
+        mem="500MB",
+        tasks=1
+    shell: "python -m tcr_pmhc_predicted_structures.data.apps.download_stcrdab --log-level {config[log_level]} {output}"
+
+rule select_stcrdab_structures:
+    input: "data/raw/stcrdab"
+    output:
+        structures=directory("data/interim/structures"),
+        summary="data/interim/structures_summary.csv"
+    resources:
+        runtime="1h",
+        mem="500MB",
+        tasks=1
+    log: "data/logs/select_stcrdab_tcr_pmhc_structures.log"
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.data.apps.select_stcrdab_tcr_pmhc_structures \
+            --log-level {config[log_level]} \
+            --log-file {log} \
+            --tcr-types abTCR \
+            --mhc-types MH1 MH2 \
+            --antigen-types peptide \
+            --crop-structures \
+            --remove-het-atoms \
+            --remove-structures-missing-residues \
+            --fix-structures-missing-residues \
+            --structural-similarity-cutoff 2.0 \
+            --output-summary-csv {output.summary} \
+            -o {output.structures} \
+            {input}
+        """
+
+rule select_stcrdab_structures_no_crop:
+    input: "data/raw/stcrdab"
+    output:
+        structures=directory("data/interim/structures_no_crop"),
+        summary="data/interim/structures_summary_no_crop.csv"
+    resources:
+        runtime="1h",
+        mem="500MB",
+        tasks=1
+    log: "data/logs/select_stcrdab_tcr_pmhc_structures.log"
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.data.apps.select_stcrdab_tcr_pmhc_structures \
+            --log-level {config[log_level]} \
+            --log-file {log} \
+            --tcr-types abTCR \
+            --mhc-types MH1 MH2 \
+            --antigen-types peptide \
+            --remove-het-atoms \
+            --remove-structures-missing-residues \
+            --fix-structures-missing-residues \
+            --structural-similarity-cutoff 2.0 \
+            --output-summary-csv {output.summary} \
+            -o {output.structures} \
+            {input}
+        """
+
 rule create_full_length_sequences:
     input:
         sequences="data/raw/sequences_pMHC_split.csv",
@@ -115,8 +178,8 @@ rule convert_sequences_to_jsons:
 rule select_benchmark_structures:
     input:
         shi_parks_smith_benchmark="data/external/benchmark_set_from_shi_parks_smith.csv",
-        structures="data/raw/structures_no_crop",
-        structures_summary="data/raw/structures_summary_no_crop.csv",
+        structures="data/interim/structures_no_crop",
+        structures_summary="data/interim/structures_summary_no_crop.csv",
         stcrdab="data/external/stcrdab"
     output: "data/interim/benchmark_structures.csv"
     resources:
@@ -144,8 +207,8 @@ rule extract_benchmark_sequences:
 
 rule select_af_training_structures:
     input:
-        structures="data/raw/structures_no_crop",
-        structures_summary="data/raw/structures_summary_no_crop.csv",
+        structures="data/interim/structures_no_crop",
+        structures_summary="data/interim/structures_summary_no_crop.csv",
         stcrdab="data/external/stcrdab"
     output: "data/interim/af_training_structures.csv"
     params:
@@ -366,7 +429,7 @@ rule remove_hetatom_from_external_structure:
         io.save(output[0])
 
 rule summarise_structural_features:
-    input: "data/raw/structures/{name}.pdb"
+    input: "data/interim/structures/{name}.pdb"
     output: temp("data/interim/{name}_structural_summary.json")
     resources:
         runtime="5m",
@@ -382,7 +445,7 @@ rule summarise_external_structures_structural_features:
     script: "../scripts/summarise_structural_features.py"
 
 rule aggregate_structural_features:
-    input: create_paths("data/raw/structures_summary.csv", "data/interim/{name}_structural_summary.json")
+    input: create_paths("data/interim/structures_summary.csv", "data/interim/{name}_structural_summary.json")
     output: "data/processed/tcr_pmhc_structural_features.csv"
     resources:
         runtime="5m",
@@ -428,7 +491,7 @@ rule aggregate_coeliac_structure_structural_features:
         df.to_csv(output[0], index=False)
 
 rule profile_interactions:
-    input: "data/raw/structures/{name}.pdb"
+    input: "data/interim/structures/{name}.pdb"
     output: temp("data/interim/{name}_interactions.csv")
     resources:
         runtime="5m",
@@ -444,7 +507,7 @@ rule profile_external_structures_interactions:
     script: "../scripts/profile_interactions.py"
 
 rule aggregate_interactions:
-    input: create_paths("data/raw/structures_summary.csv", "data/interim/{name}_interactions.csv")
+    input: create_paths("data/interim/structures_summary.csv", "data/interim/{name}_interactions.csv")
     output: "data/processed/tcr_pmhc_interactions.csv"
     resources:
         runtime="5m",
@@ -486,7 +549,7 @@ rule aggregate_coeliac_structure_interactions:
         interactions.to_csv(output[0], index=False)
 
 rule calculate_sc_and_bsa:
-    input: "data/raw/structures/{name}.pdb"
+    input: "data/interim/structures/{name}.pdb"
     output: temp("data/interim/{name}_sc_and_bsa.json")
     params:
         seed=123
@@ -506,7 +569,7 @@ rule calculate_external_structures_sc_and_bsa:
     script: "../scripts/calculate_sc_and_bsa.py"
 
 rule aggregate_sc_and_bsa:
-    input: create_paths("data/raw/structures_summary.csv", "data/interim/{name}_sc_and_bsa.json")
+    input: create_paths("data/interim/structures_summary.csv", "data/interim/{name}_sc_and_bsa.json")
     output: "data/processed/tcr_pmhc_sc_and_bsa.csv"
     resources:
         runtime="5m",

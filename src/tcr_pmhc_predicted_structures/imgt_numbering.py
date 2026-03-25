@@ -3,6 +3,8 @@
 import logging
 
 from Bio.Align import PairwiseAligner
+from Bio.PDB import Chain
+from Bio.SeqUtils import IUPACData
 
 logger = logging.getLogger(__name__)
 
@@ -179,3 +181,61 @@ def number(sequence: str) -> AnarciNumbering:
         return [((seq_id, ' '), olc) for seq_id, olc in enumerate(sequence, 1)]
 
     return _align_numbering(sequence, numbering)
+
+
+def renumber_chain(chain: Chain.Chain) -> tuple[Chain.Chain, str]:
+    """Renumber a chain following IMGT conventions.
+
+    Args:
+        chain: input chain
+
+    Returns:
+        tuple with the new chain with imgt numbering and the type of chain identified by anarci
+
+    Raises:
+        ValueError: if chain cannot be identified by ANARCI
+
+    """
+    residues = list(chain.get_residues())
+
+    sequence = ''.join(
+        [
+            IUPACData.protein_letters_3to1[res.get_resname().title()]
+            for res in residues
+            if res.id[0] == ' ' and res.get_resname().title() in IUPACData.protein_letters_3to1
+        ]
+    )
+
+    numbering, chain_type = anarci.number(sequence)
+
+    if not numbering:
+        msg = f'Chain ID {chain.id} not identified by ANARCI'
+        raise ValueError(msg)
+
+    if len(numbering) == 2:  # noqa: PLR2004
+        numbering = numbering[0]
+        chain_type = chain_type[0]
+
+        logger.warning(
+            ('Multiple possible chain annotations found for chain id %s. Defaulting to first: %sCHAIN'),
+            chain.id,
+            chain_type,
+        )
+
+    numbering = [(seq_id, insert_code) for (seq_id, insert_code), res_name in numbering if res_name != '-']
+
+    num_residues_not_numbered = len(residues) - len(numbering)
+
+    next_seq_id = numbering[-1][0] + 1
+
+    for _ in range(num_residues_not_numbered):
+        numbering.append((next_seq_id, ' '))
+        next_seq_id += 1
+
+    output_chain = Chain.Chain(chain.id)
+    for (seq_id, insert_code), res in zip(numbering, residues, strict=False):
+        new_res = res.copy()
+        new_res.id = (new_res.id[0], seq_id, insert_code)
+        output_chain.add(new_res)
+
+    return output_chain, chain_type

@@ -1,6 +1,7 @@
 name: tcr-pmhc-predicted-structures
 channels:
   - bioconda
+  - salilab
   - conda-forge
   - nodefaults
 dependencies:
@@ -13,6 +14,7 @@ dependencies:
   - mafft
   - matplotlib
   - mmseqs2
+  - modeller
   - numpy
   - pandas
   - pingouin
