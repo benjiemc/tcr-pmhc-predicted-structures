@@ -1,0 +1,11 @@
+CDR3.alpha.aa,CDR3.beta.aa,Species,Category,Pathology,Pathology.Mesh.ID,Additional.study.details,Antigen.identification.method,Single.cell,NGS,Antigen.protein,Protein.ID,Epitope.peptide,Epitope.ID,MHC,Tissue,T.Cell.Type,T.cell.characteristics,CDR3.alpha.nt,TRAV,TRAJ,TRBV,TRBD,TRBJ,Reconstructed.J.annotation,CDR3.beta.nt,Mouse.strain,PubMed.ID,Remarks
+,CASRPGQVWQPQHF,Human,Pathogens,M.Tuberculosis,D009169,Bulk,2.2,No,Yes,,,,,,PBMC,CD4,,,,,TRBV6-5,,,,,,32341563,
+CALVNPPGGYSTLTF,CSVAGQGTYGYTF,Human,Pathogens,M.Tuberculosis,D009169,,2.2,Yes,Yes,,,,,,PBMC,CD4,,,TRAV6,TRAJ11,TRBV29-1,,TRBJ1-2,,,,32341563,
+,CASSARDRGFTEAFF,Human,Pathogens,M.Tuberculosis,D009169,Bulk,2.2,No,Yes,,,,,,PBMC,CD4,,,,,TRBV7-9,,,,,,32341563,
+,CASSLWVENYGYTF,Human,Pathogens,Cytomegalovirus (CMV),D003586,,1.0,Yes,Yes,pp65,P06725,NLVPMVATV,44920,HLA-A2,PBMC,CD8,,,,,TRBV12-5,,TRBJ1-5,No,,,28423320,
+,CASS*EAPSQ*LWL,,,ARDS,D012128,Acute Respiratory Distress Syndrome,,No,Yes,,,,,,Lung edema fluid,CD8,,,,,,,,,,,37238695,TRBJ not suplied
+CATSGTYKYIF,CATSRAGAYEQYF,Human,Pathogens,Yellow fever virus,D015005,,1.0,Yes,Yes,YFV-17D,P03314,LLWNGPMAV,121572,HLA-A*02:01:03:04,,CD8,,,TRAV12-2,TRAJ40,TRBV15,TRBD1,TRBJ2-7,No,,,28103239,
+CAVNYNVLYF,CASGTGENSDYTF,Mouse,Pathogens,Influenza,D009980,,1.0,Yes,Yes,PB1,P03431,LSLRNPILV,39494,H-2Db,Bronchoalveolar,CD8,,,TRAV9N-3:01,TRAJ2-01,TRBV1-01,,TRBJ1-2:01,No,,C57/BL6,28636592,
+CASSDSRGTEAFF,CASSDSRGTEAFF,Human,Pathogens,Yellow fever virus,D015005,,1.0,Yes,Yes,YFV-17D,P03314,LLWNGPMAV,121572,HLA-A*02:01,,CD8,,,TRAV14/DV4,TRAJ42,TRBV9,TRBD1,TRBJ1-1,No,,,28103239,
+CALSSYGSSGNKLIF,CTCSAGTGGYNYAEQFF,Mouse,Pathogens,mCMV,D018146,,1.0,Yes,Yes,M38,A8E1G4,SSPPMFRV,61280.0,H-2Kb,Spleen,CD8,,,TRAV6N-6:01,TRAJ3-01,TRBV1-01,,TRBJ2-1:01,No,,C57/BL6,28636592,
+CAASGAGGYKVVF,CASSTGTGGYNYAEQFF,Mouse,Pathogens,mCMV,D018146,,1.0,Yes,Yes,M38,A8E1G4,SSPPMFRV,61280,H-2Kb,Spleen,CD8,,,TRAV14N-2:01,TRAJ1-01,TRBV4-01,,TRBJ2-1:01,No,,C57/BL6,28636592,

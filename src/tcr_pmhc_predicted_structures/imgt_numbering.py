@@ -172,11 +172,27 @@ def _align_numbering(sequence: str, numbering: AnarciNumbering) -> AnarciNumberi
     return full_numbering
 
 
-def number(sequence: str) -> AnarciNumbering:
-    """Numbers sequence with IMGT convention using ANARCI."""
+def number(sequence: str, *, allow_sequential_numbering: bool = True) -> AnarciNumbering:
+    """Numbers sequence with IMGT convention using ANARCI.
+
+    Args:
+        sequence: amino acid sequence to number
+        allow_sequential_numbering: if anarci cannot number the sequence, number it sequentially (Default: True)
+
+    Returns:
+        annotated sequence with the IMGT numbering for a given sequence
+
+    Raises:
+        ValueError: if anarci cannot number the sequence and sequential numbering is not allowed
+
+    """
     numbering = _get_numberings(sequence)
 
     if not numbering:
+        if not allow_sequential_numbering:
+            msg = f"Sequence '{sequence}' cannot be numbered by anarci and sequential numbering is not allowed."
+            raise ValueError(msg)
+
         logger.warning('Sequence not identified by ANARCI: %s. Numbering sequence sequentially', {sequence})
         return [((seq_id, ' '), olc) for seq_id, olc in enumerate(sequence, 1)]
 

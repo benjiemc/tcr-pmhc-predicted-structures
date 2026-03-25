@@ -68,3 +68,42 @@ pip install -e '.[develop]'
 This will install the required development dependencies. To verfiy the installation, run:
 
 snakemake test --cores 1
+
+## Database Notes
+
+Several sequence databases were manually downloaded to make up the datasets for this project:
+
+1. IEDB
+    * URL: https://www.iedb.org/
+    * Date: 2025/01/14
+    * Selection Criteria:
+      * Assay: T cell, MHC Ligand, Outcome - Positive
+      * Epitope: Any
+      * MHC Restriction: Any
+      * Host: Any
+      * Disease: Any
+      * Reference: Any
+    * Export T Cell Receptors with Epitopes (single headers as csv)
+    * Result: 224498 sequences downloaded
+
+2. ITRAP
+    * URL: https://doi.org/10.11583/DTU.22645342.v1
+    * Date: 2025/01/14
+    * Complete download of TCR (highest quality) dataset (2833 sequences)
+
+3. McPas-TCR
+    * URL: https://friedmanlab.weizmann.ac.il/McPAS-TCR/
+    * Date: 2025/01/10
+    * Download complete database (40779 sequences)
+
+4. VDJdb
+    * URL: https://vdjdb.cdr3.net/
+    * Date: 2025/01/10
+    * Selection Criteria:
+      * CDR3 - Species: Human, Monkey, Mouse
+      * CDR3 - Gene (chain): TRA, TRB
+      * MHC - Class: MHCI, MHCII
+      * Meta - Assay Type: Multimer sorting, Culture-based, Other
+      * Meta - Sequencing: Sanger, High-throughput, Single-cell
+      * Meta - Spurious CDR3: Include non-canonical, Include unmapped V/J
+    * Result: All sequences downloaded (120849 of 120849)

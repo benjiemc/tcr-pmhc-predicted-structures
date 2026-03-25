@@ -69,9 +69,68 @@ rule select_stcrdab_structures_no_crop:
             {input}
         """
 
+rule collate_sequence_data:
+    input:
+        iedb="data/raw/iedb.csv",
+        vdjdb="data/raw/vdjdb.tsv",
+        mcpas_tcr="data/raw/McPAS-TCR.csv",
+        itrap="data/raw/itrap.csv",
+        mhc_sequences=expand("data/external/hla_sequences/{mhc}.json", mhc=[
+            'h2_d',
+            'h2_k',
+            'h2_l',
+            'hla_a',
+            'hla_b',
+            'hla_c',
+            'hla_e',
+            'hla_f',
+            'hla_g',
+        ]),
+    output: "data/interim/sequences.csv"
+    log: "data/logs/collate_sequence_data.log"
+    resources:
+        runtime="20m",
+        mem="500MB",
+        tasks=1
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.apps.collate_sequence_data \
+            --log-level {config[log_level]} \
+            --log-file {log} \
+            --mhc-sequences {input.mhc_sequences} \
+            --iedb-path {input.iedb} \
+            --vdjdb-path {input.vdjdb} \
+            --itrap-path {input.itrap} \
+            --mcpas-tcr-path {input.mcpas_tcr} \
+            -o {output}
+        """
+
+rule create_data_splits:
+    input: "data/interim/sequences.csv"
+    output: "data/interim/sequences_{split_type}_split.csv"
+    resources:
+        runtime="20m",
+        mem="2GB",
+        tasks=1
+    params:
+        negative_proportion=5,
+        number_of_folds=5,
+        seed=123
+    shell:
+        """
+        python -m tcr_pmhc_predicted_structures.apps.create_data_splits \
+            --log-level {config[log_level]} \
+            --seed {params.seed} \
+            --negative-proportion {params.negative_proportion} \
+            --split-type {wildcards.split_type} \
+            --num-folds {params.number_of_folds} \
+            -o {output} \
+            {input}
+        """
+
 rule create_full_length_sequences:
     input:
-        sequences="data/raw/sequences_pMHC_split.csv",
+        sequences="data/interim/sequences_pMHC_split.csv",
         mhc_sequences=expand("data/external/hla_sequences/{mhc}.json", mhc=[
                 'h2_d',
                 'h2_k',
@@ -100,7 +159,7 @@ rule create_full_length_sequences:
 
 rule get_bad_sequence_ids:
     input:
-        raw_sequences="data/raw/sequences_pMHC_split.csv",
+        raw_sequences="data/interim/sequences_pMHC_split.csv",
         full_sequences="data/interim/sequences_full.csv"
     output: "data/interim/bad_sequences.txt"
     resources:
@@ -115,7 +174,7 @@ rule get_bad_sequence_ids:
 
 rule sample_sequences:
     input:
-        sequences="data/raw/sequences_pMHC_split.csv",
+        sequences="data/interim/sequences_pMHC_split.csv",
         bad_sequences="data/interim/bad_sequences.txt"
     output: "data/interim/sequences_sample_{sample_size}{unbalance}.csv"
     params:
@@ -161,7 +220,7 @@ def _get_complex_names(path: str, bad_sequences_path: str, template: str) -> lis
 
 rule convert_sequences_to_jsons:
     input: "data/interim/sequences_full.csv"
-    output: _get_complex_names("data/raw/sequences_pMHC_split.csv", "data/interim/bad_sequences.txt", "data/interim/sequences/{name}.json")
+    output: _get_complex_names("data/interim/sequences_pMHC_split.csv", "data/interim/bad_sequences.txt", "data/interim/sequences/{name}.json")
     resources:
         runtime="10m",
         mem="1GB"
@@ -228,7 +287,7 @@ rule extract_af_training_sequences:
 
 rule combine_af_training_sequences_with_sample:
     input:
-        raw_sequences="data/raw/sequences_pMHC_split.csv",
+        raw_sequences="data/interim/sequences_pMHC_split.csv",
         sequences_sample="data/interim/sequences_sample_{sample_size}.csv",
         af_training_sequences="data/interim/af_training_structures.csv"
     output: "data/interim/sequences_sample_{sample_size}_af_training.csv"
@@ -267,7 +326,7 @@ rule create_sequences_from_dash_data:
 rule add_negatives_to_dash_sequences:
     input:
         dash_sequences="data/interim/sequences_dash.csv",
-        sequences="data/raw/sequences_pMHC_split.csv",
+        sequences="data/interim/sequences_pMHC_split.csv",
         sequences_full="data/interim/sequences_full.csv"
     output: "data/interim/sequences_dash_with_negatives.csv"
     params:

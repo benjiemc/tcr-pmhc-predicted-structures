@@ -3,7 +3,7 @@ from unittest import TestCase
 import numpy as np
 import pandas as pd
 
-from tcr_pmhc_predicted_structures.utils import find_common_groups
+from tcr_pmhc_predicted_structures.utils import assign_mhc_class, find_common_groups, get_cdr_sequences
 
 
 class TestFindCommonGroups(TestCase):
@@ -54,3 +54,50 @@ class TestFindCommonGroups(TestCase):
 
         groups = find_common_groups(data, ['col_a', 'col_b', 'col_c', 'col_d'])
         np.testing.assert_array_equal(groups, np.array([1, 1, 1, 2, 2, 2, 2, 2, 2, 2]))
+
+
+class TestAssignMHCClass(TestCase):
+    def test_class_i_human(self):
+        self.assertEqual(assign_mhc_class('HLA-A*02:01'), 'MH1')
+
+    def test_class_ii_human(self):
+        self.assertEqual(assign_mhc_class('HLA-DQ*02:01'), 'MH2')
+
+    def test_class_i_mouse(self):
+        self.assertEqual(assign_mhc_class('H2-D'), 'MH1')
+
+    def test_class_ii_mouse(self):
+        self.assertEqual(assign_mhc_class('H2-IA'), 'MH2')
+
+
+class TestGetCDRSequences(TestCase):
+    def test_alpha_chain(self):
+        cdr1_alpha, cdr2_alpha, cdr3_alpha = get_cdr_sequences(
+            'MDAGVIQSPRHEVTEMGQEVTLRCKPISGHNSLFWYRQTMMRGLELLIYFNNNVPIDDSGMPEDRFSAKMPNASFSTLKIQPSEPRDSAVYFCASTWGRASTDTQY'
+            'FGPGTRLTVLEDLKNVFPPEVAVFEPSEAEISHTQKATLVCLATGFYPDHVELSWWVNGKEVHSGVCTDPQPLKEQPALNDSRYALSSRLRVSATFWQNPRNHFRC'
+            'QVQFYGLSENDEWTQDRAKPVTQIVSAEAWGRAD',
+        )
+
+        self.assertEqual(cdr1_alpha, 'SGHNS')
+        self.assertEqual(cdr2_alpha, 'FNNNVP')
+        self.assertEqual(cdr3_alpha, 'ASTWGRASTDTQY')
+
+    def test_beta_chain(self):
+        cdr1_beta, cdr2_beta, cdr3_beta = get_cdr_sequences(
+            'MAQTVTQSQPEMSVQEAETVTLSCTYDTSESDYYLFWYKQPPSRQMILVIRQEAYKQQNATENRFSVNFQKAAKSFSLKISDSQLGDAAMYFCASSGNTPLVFGKG'
+            'TRLSVIPNIQNPDPAVYQLRDSKSSDKSVCLFTDFDSQTNVSQSKDSDVYITDKCVLDMRSMDFKSNSAVAWSNKSDFACANAFNNSIIPEDTFFPSPESS'
+        )
+
+        self.assertEqual(cdr1_beta, 'TSESDYY')
+        self.assertEqual(cdr2_beta, 'QEAYKQQN')
+        self.assertEqual(cdr3_beta, 'ASSGNTPLV')
+
+    def test_invalid(self):
+        cdr1, cdr2, cdr3 = get_cdr_sequences(
+            'CLFTDFDSQTNVSQSKDSDVNSIIPEDTRLSVIPNSMDFKSNSAVAWSNKSDFACANAIQNPDPAVYQLRDSKSSYITDKCVLDMRFNDKSVTFFPSPESSMAQTV'
+            'TQSQPEMLVIRQEAYKQQNATENRFSMYFCSVQEAETVTLSCTYDTSVNFQKAAKSFSLKISDSQLGDAAESDYYLFWYKQPPSRQMIASSGNTPLVFGKG'
+        )
+
+        self.assertIsNone(cdr1)
+        self.assertIsNone(cdr2)
+        self.assertIsNone(cdr3)
