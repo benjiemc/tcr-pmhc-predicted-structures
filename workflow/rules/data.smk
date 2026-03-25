@@ -673,6 +673,27 @@ rule aggregate_coeliac_structure_sc_and_bsa:
         df = pd.DataFrame(entries)
         df.to_csv(output[0], index=False)
 
+rule create_contact_map:
+    input: "data/interim/structures/{name}.pdb"
+    output: temp("data/interim/{name}_contacts.csv")
+    params:
+        contact_distance=5.0
+    resources:
+        runtime="10m",
+        mem="5GB"
+    shell:
+        """
+        columns="cdr_type,chain_id_tcr,chain_type_tcr,residue_seq_id_tcr,residue_insert_code_tcr,resi_tcr,residue_name_tcr,"
+        columns+="cdr_tcr,cdr_position,relative_pos_centre_tcr,chain_id_pmhc,residue_seq_id_pmhc,residue_insert_code_pmhc,"
+        columns+="resi_pmhc,residue_name_pmhc,chain_type_pmhc,peptide_position,relative_pos_centre_pmhc,mhc_type"
+
+        python -m tcr_pmhc_predicted_structures.apps.create_contact_map \
+            --log-level {config[log_level]} \
+            --cutoff-distance {params.contact_distance} \
+            -o {output} \
+            {input} || echo $columns > {output}
+        """
+
 rule create_external_structures_contact_map:
     input: "data/interim/external_structures_clean/{name}.pdb"
     output: temp("data/interim/{name}_contacts.csv")
@@ -693,6 +714,27 @@ rule create_external_structures_contact_map:
             -o {output} \
             {input} || echo $columns > {output}
         """
+
+rule aggregate_contacts:
+    input: create_paths("data/interim/structures_summary.csv", "data/interim/{name}_contacts.csv")
+    output: "data/processed/tcr_pmhc_contacts.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    run:
+        import pandas as pd
+
+        contacts = []
+        for path in input:
+            contact = pd.read_csv(path)
+
+            name = os.path.basename(path).replace('_contacts.csv', '')
+            contact['name'] = name
+
+            contacts.append(contact)
+
+        contacts = pd.concat(contacts)
+        contacts.to_csv(output[0], index=False)
 
 rule aggregate_coeliac_structure_contact_maps:
     input: ["data/interim/DQ2_5a1_572G2_DECAB_contacts.csv", "data/interim/DQ2_5w1_572G2_DECAB_contacts.csv"]
