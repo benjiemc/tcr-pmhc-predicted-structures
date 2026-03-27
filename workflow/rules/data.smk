@@ -453,6 +453,27 @@ rule extract_coeliac_mutations_sequences:
                         'mhc_type': entry['mhc_type']
                     }, fh)
 
+rule process_c259_tcr_data:
+    input:
+        mutational_scans="data/raw/TCR_c259_peptide_mutational_scanning.txt",
+        mhc_sequences=expand("data/external/hla_sequences/{mhc}.json", mhc=[
+            'h2_d',
+            'h2_k',
+            'h2_l',
+            'hla_a',
+            'hla_b',
+            'hla_c',
+            'hla_e',
+            'hla_f',
+            'hla_g',
+        ]),
+        tcr_1g4_structure="data/interim/structures_no_crop/2bnr_DECAB.pdb"
+    output: "data/interim/c259_mutational_scan_affinity.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: "../scripts/process_c259_mutational_scanning.py"
+
 rule remove_hetatom_from_external_structure:
     input: "data/raw/external_structures/{name}.pdb"
     output: "data/interim/external_structures_clean/{name}.pdb"
