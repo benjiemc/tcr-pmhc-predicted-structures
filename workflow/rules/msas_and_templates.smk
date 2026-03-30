@@ -180,7 +180,7 @@ rule create_af3_msa_inputs_from_coeliac_dataset:
     resources:
         runtime="10m",
         mem="500MB"
-    script: "../script/create_secondary_msa_inputs.py"
+    script: "../scripts/create_secondary_msa_inputs.py"
 
 rule create_af3_msa_inputs_from_coeliac_mutations_dataset:
     input:
@@ -191,7 +191,7 @@ rule create_af3_msa_inputs_from_coeliac_mutations_dataset:
     resources:
         runtime="10m",
         mem="500MB"
-    script: "../script/create_secondary_msa_inputs.py"
+    script: "../scripts/create_secondary_msa_inputs.py"
 
 rule run_create_af3_msas_and_find_templates:
     input: "data/interim/msa-inputs_af3/{name}.json"
