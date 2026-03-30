@@ -135,6 +135,7 @@ def main() -> None:
         sequence_ids,
         insert_codes,
         confidence,
+        binding_only=args.binding_only,
         score_type=args.score,
         mhc_type=sequences['mhc_type'],
         padding=pad_config,
