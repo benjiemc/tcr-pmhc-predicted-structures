@@ -129,7 +129,16 @@ def get_secondary_sequence_ids(path: str, sequence_key_path: str, higher_priorit
 
         with open(dataset_path, 'r') as fh:
             for entry in csv.DictReader(fh):
-                for chain_name in 'tcr_alpha_chain', 'tcr_beta_chain', 'mhc_chain_1', 'mhc_chain_2':
+                for chain_name in (
+                    'tcr_alpha_chain',
+                    'tcr_beta_chain',
+                    'mhc_chain_1',
+                    'mhc_chain_2',
+                    'Achain_sequence',
+                    'Bchain_sequence',
+                    'mhc_chain1_sequence',
+                    'mhc_chain2_sequence'
+                ):
                     if chain_name in entry:
                         past_ids.add(hashlib.sha256(entry[chain_name].encode()).hexdigest()[:8])
 
@@ -188,6 +197,17 @@ rule create_af3_msa_inputs_from_coeliac_mutations_dataset:
         sequence_key="data/interim/sequence_key.txt",
         higher_priority_datasets=["data/interim/sequences_dash_with_negatives.csv", "data/interim/sequences_coeliac_with_negatives.csv"]
     output: get_secondary_sequence_ids("data/interim/sequences_coeliac_mutations.csv", "data/interim/sequence_key.txt", ["data/interim/sequences_dash_with_negatives.csv", "data/interim/sequences_coeliac_with_negatives.csv"], "data/interim/msa-inputs_af3/{name}.json")
+    resources:
+        runtime="10m",
+        mem="500MB"
+    script: "../scripts/create_secondary_msa_inputs.py"
+
+rule create_af3_msa_inputs_from_c259_affinity_mutations_dataset:
+    input:
+        sequences="data/interim/c259_mutational_scan_affinity.csv",
+        sequence_key="data/interim/sequence_key.txt",
+        higher_priority_datasets=["data/interim/sequences_dash_with_negatives.csv", "data/interim/sequences_coeliac_with_negatives.csv", "data/interim/sequences_coeliac_mutations.csv", "data/interim/af_training_structures.csv"]
+    output: get_secondary_sequence_ids("data/interim/c259_mutational_scan_affinity.csv", "data/interim/sequence_key.txt", ["data/interim/sequences_dash_with_negatives.csv", "data/interim/sequences_coeliac_with_negatives.csv", "data/interim/sequences_coeliac_mutations.csv", "data/interim/af_training_structures.csv"], "data/interim/msa-inputs_af3/{name}.json")
     resources:
         runtime="10m",
         mem="500MB"
@@ -475,7 +495,7 @@ rule create_tcrmodel2_msas_and_find_templates_mutated_dash_bmlf:
         paired_msas=_get_msas_for_dash("data/interim/sequences_dash_BMLF_mutated.csv", "data/interim/msas_af3_tcrmodel2/{name}_paired.a3m", "GLCTLVAML"),
         templates=_get_msas_for_dash("data/interim/sequences_dash_BMLF_mutated.csv", "data/interim/templates_af3_tcrmodel2/{name}", "GLCTLVAML")
 
-def _get_msas_for_coeliac(path: str, template: str) -> list[str]:
+def _get_msas_for_secondary(path: str, template: str) -> list[str]:
     if not os.path.exists(path):
         print(path, 'does not exist!')
         return []
@@ -493,15 +513,21 @@ def _get_msas_for_coeliac(path: str, template: str) -> list[str]:
 
 rule create_tcrmodel2_msas_and_find_templates_coeliac:
     input:
-        unpaired_msas=_get_msas_for_coeliac("data/interim/sequences_coeliac_with_negatives.csv", "data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m"),
-        paired_msas=_get_msas_for_coeliac("data/interim/sequences_coeliac_with_negatives.csv", "data/interim/msas_af3_tcrmodel2/{name}_paired.a3m"),
-        templates=_get_msas_for_coeliac("data/interim/sequences_coeliac_with_negatives.csv", "data/interim/templates_af3_tcrmodel2/{name}")
+        unpaired_msas=_get_msas_for_secondary("data/interim/sequences_coeliac_with_negatives.csv", "data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m"),
+        paired_msas=_get_msas_for_secondary("data/interim/sequences_coeliac_with_negatives.csv", "data/interim/msas_af3_tcrmodel2/{name}_paired.a3m"),
+        templates=_get_msas_for_secondary("data/interim/sequences_coeliac_with_negatives.csv", "data/interim/templates_af3_tcrmodel2/{name}")
 
 rule create_tcrmodel2_msas_and_find_templates_coeliac_mutations:
     input:
-        unpaired_msas=_get_msas_for_coeliac("data/interim/sequences_coeliac_mutations.csv", "data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m"),
-        paired_msas=_get_msas_for_coeliac("data/interim/sequences_coeliac_mutations.csv", "data/interim/msas_af3_tcrmodel2/{name}_paired.a3m"),
-        templates=_get_msas_for_coeliac("data/interim/sequences_coeliac_mutations.csv", "data/interim/templates_af3_tcrmodel2/{name}")
+        unpaired_msas=_get_msas_for_secondary("data/interim/sequences_coeliac_mutations.csv", "data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m"),
+        paired_msas=_get_msas_for_secondary("data/interim/sequences_coeliac_mutations.csv", "data/interim/msas_af3_tcrmodel2/{name}_paired.a3m"),
+        templates=_get_msas_for_secondary("data/interim/sequences_coeliac_mutations.csv", "data/interim/templates_af3_tcrmodel2/{name}")
+
+rule create_tcrmodel2_msas_and_find_templates_c259_affinity_mutations:
+    input:
+        unpaired_msas=_get_msas_for_secondary("data/interim/c259_mutational_scan_affinity.csv", "data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m"),
+        paired_msas=_get_msas_for_secondary("data/interim/c259_mutational_scan_affinity.csv", "data/interim/msas_af3_tcrmodel2/{name}_paired.a3m"),
+        templates=_get_msas_for_secondary("data/interim/c259_mutational_scan_affinity.csv", "data/interim/templates_af3_tcrmodel2/{name}")
 
 rule combine_msas_to_parquet:
     input:
