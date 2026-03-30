@@ -474,6 +474,24 @@ rule process_c259_tcr_data:
         mem="1GB"
     script: "../scripts/process_c259_mutational_scanning.py"
 
+rule extract_c259_sequences:
+    input: "data/interim/c259_mutational_scan_affinity.csv"
+    output: get_sequence_names("data/interim/c259_mutational_scan_affinity.csv", "data/interim/sequences/{name}.json")
+    run:
+        output_dir = os.path.dirname(output[0])
+        with open(input[0], 'r') as fh:
+            for entry in csv.DictReader(fh):
+                with open(os.path.join(output_dir, f"{entry['id']}.json"), 'w') as fh:
+                    json.dump({
+                        'id': entry['id'],
+                        'tcr_alpha_chain': entry['tcr_alpha_chain'],
+                        'tcr_beta_chain': entry['tcr_beta_chain'],
+                        'peptide': entry['peptide'],
+                        'mhc_chain_1': entry['mhc_chain_1'],
+                        'mhc_chain_2': entry['mhc_chain_2'],
+                        'mhc_type': entry['mhc_type']
+                    }, fh)
+
 rule remove_hetatom_from_external_structure:
     input: "data/raw/external_structures/{name}.pdb"
     output: "data/interim/external_structures_clean/{name}.pdb"
