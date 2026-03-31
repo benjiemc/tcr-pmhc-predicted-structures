@@ -421,7 +421,7 @@ rule create_af3_structures_with_tcrmodel2_data_coeliac_mutations:
     input: get_predicted_structure_names("data/interim/sequences_coeliac_mutations.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
 
 rule create_af3_structures_with_tcrmodel2_data_c259_affinity_mutations:
-    input: get_predicted_structure_names("data/interim/c259_mutational_scan_affinity.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
+    input: get_predicted_structure_names("data/interim/sequences_c259_mutational_scan_affinity.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif", config['seed'], column_name='id')
 
 rule compute_ipsae_on_af3_structure:
     input:

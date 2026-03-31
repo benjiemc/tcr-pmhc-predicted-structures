@@ -468,15 +468,15 @@ rule process_c259_tcr_data:
             'hla_g',
         ]),
         tcr_1g4_structure="data/interim/structures_no_crop/2bnr_DECAB.pdb"
-    output: "data/interim/c259_mutational_scan_affinity.csv"
+    output: "data/interim/sequences_c259_mutational_scan_affinity.csv"
     resources:
         runtime="5m",
         mem="1GB"
     script: "../scripts/process_c259_mutational_scanning.py"
 
 rule extract_c259_sequences:
-    input: "data/interim/c259_mutational_scan_affinity.csv"
-    output: get_sequence_names("data/interim/c259_mutational_scan_affinity.csv", "data/interim/sequences/{name}.json")
+    input: "data/interim/sequences_c259_mutational_scan_affinity.csv"
+    output: get_sequence_names("data/interim/sequences_c259_mutational_scan_affinity.csv", "data/interim/sequences/{name}.json")
     run:
         output_dir = os.path.dirname(output[0])
         with open(input[0], 'r') as fh:
