@@ -12,7 +12,10 @@ from tcr_pmhc_predicted_structures.imgt_numbering import (
     IMGT_CDR1,
     IMGT_CDR2,
     IMGT_CDR3,
+    IMGT_MH1_ABD,
+    IMGT_MH2_ABD,
     IMGT_MHC_TCR_CONTACT_POSITIONS,
+    IMGT_VARIABLE_DOMAIN,
     MHC_I_IMGT_BETA_HELIX_START,
     number,
 )
@@ -136,13 +139,19 @@ def _create_masks(
     insert_codes: np.ndarray,
     *,
     mhc_type: str,
-    binding_only: bool = True,
+    portion: bool = True,
 ) -> tuple[np.ndarray, np.ndarray, np.ndarray]:
     tcr_mask = np.isin(chain_ids, np.array(['D', 'E']))
     peptide_mask = chain_ids == 'C'
     mhc_1_mask = chain_ids == 'A'
 
-    if binding_only:
+    if portion == 'cropped':
+        tcr_mask = tcr_mask & np.isin(sequence_ids, np.array(sorted(IMGT_VARIABLE_DOMAIN)))
+        mhc_1_mask = mhc_1_mask & np.isin(
+            sequence_ids, np.array(sorted(IMGT_MH1_ABD if mhc_type == 'MH1' else IMGT_MH2_ABD))
+        )
+
+    elif portion == 'binding':
         tcr_mask = tcr_mask & np.isin(sequence_ids, np.array(sorted(IMGT_CDR)))
         ((mhc_alpha_seq_ids, mhc_alpha_insert_codes), (mhc_beta_seq_ids, mhc_beta_insert_codes)) = (
             _get_mhc_tcr_contact_positions(mhc_type)
@@ -163,7 +172,10 @@ def _create_masks(
     if mhc_type == 'MH2':
         mhc_2_mask = chain_ids == 'B'
 
-        if binding_only:
+        if portion == 'cropped':
+            mhc_2_mask = mhc_2_mask & np.isin(sequence_ids, np.array(sorted(IMGT_MH2_ABD)))
+
+        elif portion == 'binding':
             mhc_beta = np.array(
                 [
                     f'{seq_id}{insert_code}'
@@ -278,7 +290,7 @@ def extract_confidence_score(
     *,
     score_type: str,
     mhc_type: str,
-    binding_only: bool = True,
+    portion: str = 'binding',
     avg_atoms_for_residue: bool = False,
     padding: None | dict = None,
 ) -> np.ndarray:
@@ -303,7 +315,7 @@ def extract_confidence_score(
         sequence_ids_processed,
         insert_codes_processed,
         mhc_type=mhc_type,
-        binding_only=binding_only,
+        portion=portion,
     )
     pmhc_mask = peptide_mask | mhc_mask
 
@@ -329,7 +341,7 @@ def extract_confidence_score(
                     sequence_ids,
                     insert_codes,
                     mhc_type=mhc_type,
-                    binding_only=binding_only,
+                    portion=portion,
                 )
                 pmhc_mask = peptide_mask | mhc_mask
 
@@ -357,7 +369,7 @@ def compute_alpha_bridge_scores(
     *,
     mhc_type: str,
     atom_level_plddt: bool = True,
-    binding_only: bool = True,
+    portion: str = 'all',
 ) -> np.ndarray:
     """Compute AlphaBridge score.
 
@@ -379,8 +391,7 @@ def compute_alpha_bridge_scores(
         mhc_type: either 'MH1' for class I TCR:pMHC complexes or 'MH2' for class II TCR:pMHC complexes
         atom_level_plddt: flag to say if the resolution of the plddt array is at atom level (True) or residue level
             (False)
-        binding_only: Whether to only to consider the binding interface of the TCR:pMHC complex in the score or not. The
-            binding interface is formed of the CDR loops, peptide, and MHC-TCR contact positions.
+        portion: either 'all', 'cropped', or 'binding' to consider different portions of the structure
 
     Returns:
         a 2D array of shape num_selected_residues x num_selected_residues with the AlphaBridge score computed for each
@@ -388,7 +399,7 @@ def compute_alpha_bridge_scores(
 
     """
     tcr_mask, peptide_mask, mhc_mask = _create_masks(
-        chain_ids, sequence_ids, insert_codes, mhc_type=mhc_type, binding_only=binding_only
+        chain_ids, sequence_ids, insert_codes, mhc_type=mhc_type, porition=portion
     )
     pmhc_mask = peptide_mask | mhc_mask
 

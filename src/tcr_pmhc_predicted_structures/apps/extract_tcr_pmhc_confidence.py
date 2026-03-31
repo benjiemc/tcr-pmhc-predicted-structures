@@ -33,11 +33,13 @@ parser.add_argument(
     help='aggregate atom level confidence by averaging per residue',
 )
 parser.add_argument(
-    '--binding-only',
-    action='store_true',
+    '--portion',
+    choices=['all', 'cropped', 'binding'],
+    default='all',
     help=(
-        'extract the confidence scores just isolated to the binding interface (CDRs, peptide, and MHC-TCR contact '
-        'positions) rather than the full TCR and MHC chains'
+        "Extract the confidence scores for a portion of the complex. 'cropped' refers to the TCR-variable domain, "
+        "peptide, and antigen binding domain. 'binding' is isolated to the binding interface (CDRs, peptide, and "
+        "MHC-TCR contact positions) rather than the full TCR and MHC chains. (Default: 'all')"
     ),
 )
 
@@ -135,7 +137,7 @@ def main() -> None:
         sequence_ids,
         insert_codes,
         confidence,
-        binding_only=args.binding_only,
+        portion=args.portion,
         score_type=args.score,
         mhc_type=sequences['mhc_type'],
         padding=pad_config,

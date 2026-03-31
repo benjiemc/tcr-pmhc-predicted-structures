@@ -9,11 +9,23 @@ Test extract TCR:pMHC PAE.
 
   $ diff tcr_pmhc_pae.txt $TESTDIR/reference/tcr_pmhc_pae.txt
 
-Test extract TCR:pMHC PAE binding-only.
+Test extract TCR:pMHC PAE portion cropped.
+  $ python -m tcr_pmhc_predicted_structures.apps.extract_tcr_pmhc_confidence \
+  > -o tcr_pmhc_cropped_pae.txt \
+  > --score pae \
+  > --portion cropped \
+  > $TESTDIR/data/pae.txt \
+  > $TESTDIR/data/sequences.json
+  *: UserWarning: Region 1 of the B2M molecule was not identified by ANARCI and is therefore being numbered sequentially. See https://github.com/npqst/anarci-mhc/issues/6 for more information. (glob)
+    warnings.warn(warning_message)
+
+  $ diff tcr_pmhc_pae.txt $TESTDIR/reference/tcr_pmhc_pae.txt
+
+Test extract TCR:pMHC PAE portion binding.
   $ python -m tcr_pmhc_predicted_structures.apps.extract_tcr_pmhc_confidence \
   > -o cdr_pmhc_pae.txt \
   > --score pae \
-  > --binding-only \
+  > --portion binding \
   > $TESTDIR/data/pae.txt \
   > $TESTDIR/data/sequences.json
   *: UserWarning: Region 1 of the B2M molecule was not identified by ANARCI and is therefore being numbered sequentially. See https://github.com/npqst/anarci-mhc/issues/6 for more information. (glob)
@@ -32,11 +44,11 @@ Test extract TCR:pMHC atom plddt.
 
   $ diff tcr_pmhc_plddt.txt $TESTDIR/reference/tcr_pmhc_plddt.txt
 
-Test extract TCR:pMHC atom plddt binding-only.
+Test extract TCR:pMHC atom plddt portion binding.
   $ python -m tcr_pmhc_predicted_structures.apps.extract_tcr_pmhc_confidence \
   > -o cdr_pmhc_plddt.txt \
   > --score atom_plddt \
-  > --binding-only \
+  > --portion binding \
   > $TESTDIR/data/atom_plddt.txt \
   > $TESTDIR/data/sequences.json
   *: UserWarning: Region 1 of the B2M molecule was not identified by ANARCI and is therefore being numbered sequentially. See https://github.com/npqst/anarci-mhc/issues/6 for more information. (glob)
@@ -49,7 +61,7 @@ Test padding for PAE.
   > -o pad_cdr_pmhc_pae.txt \
   > --score pae \
   > --pad \
-  > --binding-only \
+  > --portion binding \
   > $TESTDIR/data/pae.txt \
   > $TESTDIR/data/sequences.json
   *: UserWarning: Region 1 of the B2M molecule was not identified by ANARCI and is therefore being numbered sequentially. See https://github.com/npqst/anarci-mhc/issues/6 for more information. (glob)
@@ -63,7 +75,7 @@ Test padding for atom pLDDT.
   > --score atom_plddt \
   > --pad \
   > --aggregate-atom-level-confidence \
-  > --binding-only \
+  > --portion binding \
   > $TESTDIR/data/atom_plddt.txt \
   > $TESTDIR/data/sequences.json
   *: UserWarning: Region 1 of the B2M molecule was not identified by ANARCI and is therefore being numbered sequentially. See https://github.com/npqst/anarci-mhc/issues/6 for more information. (glob)
