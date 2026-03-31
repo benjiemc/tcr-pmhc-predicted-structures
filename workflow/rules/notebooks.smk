@@ -82,6 +82,25 @@ rule run_coeliac_mutagenesis_analysis:
         touch {output}
         """
 
+rule run_c259_mutational_scanning:
+    input:
+        "data/interim/sequences_c259_mutational_scan_affinity.csv",
+        "data/processed/af3_af3_tcrmodel2_c259_mutational_scan_affinity_pae_aggregator_predictions.csv"
+    output:
+        "data/flags/c259_mutational_scanning_done.flag"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    shell:
+        """
+        jupyter nbconvert \
+            --to notebook \
+            --execute \
+            --inplace \
+            notebooks/c259_mutational_scanning.ipynb
+        touch {output}
+        """
+
 rule run_compare_structural_features_to_confidence:
     input:
         "data/interim/sequences_sample_1500.csv",
