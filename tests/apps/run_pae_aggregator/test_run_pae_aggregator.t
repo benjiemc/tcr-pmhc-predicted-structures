@@ -2,7 +2,6 @@ Test untrained.
   $ python -m tcr_pmhc_predicted_structures.apps.run_pae_aggregator \
   > --mode untrained \
   > --paes $TESTDIR/data/paes.h5 \
-  > --pcas $TESTDIR/data/pcas.csv \
   > --model $TESTDIR/data/model \
   > -o untrained.csv
 
@@ -18,7 +17,6 @@ Test evaluation.
   $ python -m tcr_pmhc_predicted_structures.apps.run_pae_aggregator \
   > --mode evaluation \
   > --paes $TESTDIR/data/paes.h5 \
-  > --pcas $TESTDIR/data/pcas.csv \
   > --model $TESTDIR/data/model \
   > -o evaluation.csv
 
@@ -34,7 +32,6 @@ Test run.
   $ python -m tcr_pmhc_predicted_structures.apps.run_pae_aggregator \
   > --mode run \
   > --paes $TESTDIR/data/paes.h5 \
-  > --pcas $TESTDIR/data/pcas.csv \
   > --model $TESTDIR/data/model \
   > -o run.csv
 

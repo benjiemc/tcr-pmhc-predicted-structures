@@ -101,9 +101,7 @@ rule create_pae_dataset:
         """
 
 rule train_pae_aggregator:
-    input:
-        paes="data/processed/{model}_{msa_method}_{data_source}_pae.h5",
-        pcas="data/interim/{model}_{msa_method}_{data_source}_full_pae_pca.csv"
+    input: "data/processed/{model}_{msa_method}_{data_source}_pae.h5"
     output: directory("models/PAEAggregator_{model}_{msa_method}_{data_source}")
     log: "data/logs/train_PAEAggregator_{model}_{msa_method}_{data_source}.log"
     resources:
@@ -127,15 +125,13 @@ rule train_pae_aggregator:
             --learning-rate {params.learning_rate} \
             --eval-batch-size {params.eval_batch_size} \
             --eval-interval {params.eval_interval} \
-            --scaling-data {input.pcas} \
             -o {output} \
-            {input.paes}
+            {input}
         """
 
 rule run_pae_aggregator_untrained:
     input:
         paes="data/processed/{model}_{msa_method}_{data_source}_pae{dataset_name}.h5",
-        pcas="data/interim/{model}_{msa_method}_{data_source}_full_pae_pca{dataset_name}.csv",
         model="models/PAEAggregator_{model}_{msa_method}_{data_source}"
     output: "data/processed/{model}_{msa_method}_{data_source}{dataset_name}_pae_aggregator_predictions_untrained.csv"
     resources:
@@ -147,7 +143,6 @@ rule run_pae_aggregator_untrained:
             --log-level {config[log_level]} \
             --mode untrained \
             --paes {input.paes} \
-            --pcas {input.pcas} \
             --model {input.model} \
             -o {output}
         """
@@ -155,7 +150,6 @@ rule run_pae_aggregator_untrained:
 rule run_pae_aggregator_evaluation:
     input:
         paes="data/processed/{model}_{msa_method}_{data_source}_pae.h5",
-        pcas="data/interim/{model}_{msa_method}_{data_source}_full_pae_pca.csv",
         model="models/PAEAggregator_{model}_{msa_method}_{data_source}"
     output: "data/processed/{model}_{msa_method}_{data_source}_pae_aggregator_predictions_trained.csv"
     resources:
@@ -167,7 +161,6 @@ rule run_pae_aggregator_evaluation:
             --log-level {config[log_level]} \
             --mode evaluation \
             --paes {input.paes} \
-            --pcas {input.pcas} \
             --model {input.model} \
             -o {output}
         """
@@ -175,7 +168,6 @@ rule run_pae_aggregator_evaluation:
 rule run_pae_aggregator:
     input:
         paes="data/processed/{model}_{msa_method}_{data_source}_pae{dataset_name}.h5",
-        pcas="data/interim/{model}_{msa_method}_{data_source}_full_pae_pca{dataset_name}.csv",
         model="models/PAEAggregator_{model}_{msa_method}_{data_source}"
     output: "data/processed/{model}_{msa_method}_{data_source}{dataset_name}_pae_aggregator_predictions.csv"
     resources:
@@ -187,7 +179,6 @@ rule run_pae_aggregator:
             --log-level {config[log_level]} \
             --mode run \
             --paes {input.paes} \
-            --pcas {input.pcas} \
             --model {input.model} \
             -o {output}
         """

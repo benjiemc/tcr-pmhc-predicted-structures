@@ -27,7 +27,6 @@ parser.add_argument(
 
 inputs = parser.add_argument_group('Inputs')
 inputs.add_argument('--paes', required=True, help='path to pae dataset')
-inputs.add_argument('--pcas', required=True, help='path to pca dataset')
 inputs.add_argument('--model', help='path to model')
 
 outputs = parser.add_argument_group('Outputs')
@@ -54,26 +53,13 @@ def main():
     model_size = paes.shape[1]
     logger.debug('Model size is %d', model_size)
 
-    logger.info('Loading scaling data from %s', args.pcas)
-    scaling_data_df = pd.read_csv(args.pcas)
-
-    scaling_data_df['name'] = scaling_data_df['name'].astype(str)
-    scaling_data_df = scaling_data_df.set_index(['name', 'seed', 'sample'])
-
-    scaling_data = np.stack(
-        [
-            scaling_data_df.loc[name, seed, sample].to_numpy()
-            for name, seed, sample in zip(names, seeds, samples, strict=True)
-        ]
-    )
-
     logger.info('Making predictions')
     match args.mode:
         case 'untrained':
             model = PAEAggregator(model_size)
             model.eval()
 
-            predictions = model(torch.Tensor(paes), torch.Tensor(scaling_data)).cpu().detach().numpy()
+            predictions = model(torch.Tensor(paes)).cpu().detach().numpy()
 
             predictions_df = pd.DataFrame(
                 {
@@ -96,9 +82,7 @@ def main():
 
                 fold_mask = folds == fold
 
-                predictions = (
-                    model(torch.Tensor(paes[fold_mask]), torch.Tensor(scaling_data[fold_mask])).cpu().detach().numpy()
-                )
+                predictions = model(torch.Tensor(paes[fold_mask])).cpu().detach().numpy()
 
                 predictions_df = pd.concat(
                     [
@@ -125,7 +109,7 @@ def main():
                 model.load_state_dict(torch.load(model_path, weights_only=True, map_location=torch.device('cpu')))
                 model.eval()
 
-                predictions = model(torch.Tensor(paes), torch.Tensor(scaling_data)).cpu().detach().numpy()
+                predictions = model(torch.Tensor(paes)).cpu().detach().numpy()
                 predictions_df[f'prediction_{model_name}'] = predictions
 
     logger.info('Outputting predictions to %s', args.output)

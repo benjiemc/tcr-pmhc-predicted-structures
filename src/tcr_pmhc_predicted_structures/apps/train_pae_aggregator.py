@@ -7,7 +7,6 @@ import sys
 
 import h5py
 import numpy as np
-import pandas as pd
 import torch
 from sklearn.metrics import roc_auc_score
 from torch import nn, optim
@@ -27,7 +26,6 @@ parser.add_argument('training_data', help='path to the training data (HDF5 file)
 parser.add_argument('-o', '--output', required=True, help='path to output models to')
 parser.add_argument('--seed', default=None, type=int, help='seed for random processes (Default: None)')
 parser.add_argument('--label-name', default='label', help="name to use access label in dataset (Default: 'label')")
-parser.add_argument('--scaling-data', required=True, help='path to scaling data')
 parser.add_argument('--num-epochs', type=int, default=5, help='number of epochs (Default: 5)')
 parser.add_argument('--batch-size', type=int, default=32, help='training batch size (Default: 32)')
 parser.add_argument('--learning-rate', type=float, default=1e-3, help='optimizer learning rate (Default: 1e-3)')
@@ -44,7 +42,6 @@ add_logging_arguments(parser)
 def evaluate_model(
     model: nn.Module,
     paes: np.ndarray,
-    scaling_data: np.ndarray,
     labels: np.ndarray,
     device: torch.device,
     batch_size: int = 1000,
@@ -67,10 +64,9 @@ def evaluate_model(
             if i < num_eval_batches - 1
             else indices[batch_idx_start:]
         )
-        pae_batch = torch.tensor(paes[batch_indices], dtype=torch.float32, device=device)
-        scaling_data_batch = torch.tensor(scaling_data[batch_indices], dtype=torch.float32, device=device)
+        batch = torch.tensor(paes[batch_indices], dtype=torch.float32, device=device)
 
-        prediction = model(pae_batch, scaling_data_batch)
+        prediction = model(batch)
         predictions.append(prediction.detach().cpu().numpy())
 
     predictions = np.concatenate(predictions)
@@ -95,29 +91,11 @@ def main() -> None:
 
     logger.info('Loading training data from %s', args.training_data)
     with h5py.File(args.training_data) as fh:
-        names = np.array([name.decode() for name in fh['id'][:]])
-        seeds = fh['seed'][:]
-        samples = fh['sample'][:]
-
         paes = fh['pae'][:]
         labels = fh[args.label_name][:]
         folds = fh['fold'][:]
 
     indices = np.arange(len(labels))
-
-    logger.info('Loading scaling data from %s', args.scaling_data)
-    scaling_data_df = pd.read_csv(args.scaling_data)
-
-    scaling_data_df['name'] = scaling_data_df['name'].astype(str)
-    scaling_data_df = scaling_data_df.set_index(['name', 'seed', 'sample'])
-
-    logger.debug('Re-ordering scaling data')
-    scaling_data = np.stack(
-        [
-            scaling_data_df.loc[name, seed, sample].to_numpy()
-            for name, seed, sample in zip(names, seeds, samples, strict=True)
-        ]
-    )
 
     if not os.path.exists(args.output):
         logger.info('Creating output directory: %s', args.output)
@@ -129,15 +107,14 @@ def main() -> None:
         training_indices = indices[folds != fold_idx]
         validation_indices = indices[folds == fold_idx]
 
-        validation_pae_data = paes[validation_indices]
-        validation_scaling_data = scaling_data[validation_indices]
+        validation_data = paes[validation_indices]
         validation_labels = labels[validation_indices]
 
         logger.debug('Number of training data points: %d', len(training_indices))
         logger.debug('Number of validation data points: %d', len(validation_indices))
 
         logger.info('Initialising model')
-        model = PAEAggregator(paes.shape[-1], scaling_data.shape[-1])
+        model = PAEAggregator(paes.shape[-1])
         model.train()
 
         device = torch.device('cuda:0' if torch.cuda.is_available() else 'cpu')
@@ -161,11 +138,10 @@ def main() -> None:
                 logger.debug('Training batch %d of %d', i + 1, batches_per_epoch)
                 batch_indices = epoch_indices[i * args.batch_size : i * args.batch_size + args.batch_size]
 
-                pae_batch = torch.tensor(paes[batch_indices], dtype=torch.float32, device=device)
-                scaling_data_batch = torch.tensor(scaling_data[batch_indices], dtype=torch.float32, device=device)
+                batch = torch.tensor(paes[batch_indices], dtype=torch.float32, device=device)
                 batch_label = torch.tensor(labels[batch_indices], dtype=torch.float32, device=device)
 
-                prediction = model(pae_batch, scaling_data_batch)
+                prediction = model(batch)
 
                 loss = loss_fn(prediction, batch_label)
                 loss.backward()
@@ -181,12 +157,7 @@ def main() -> None:
                     )
 
                     validation_roc_auc = evaluate_model(
-                        model,
-                        validation_pae_data,
-                        validation_scaling_data,
-                        validation_labels,
-                        device,
-                        batch_size=args.eval_batch_size,
+                        model, validation_data, validation_labels, device, batch_size=args.eval_batch_size
                     )
 
                     logger.info('Loss: %f', loss.item())
