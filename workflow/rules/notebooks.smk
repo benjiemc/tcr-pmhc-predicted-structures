@@ -250,7 +250,7 @@ rule run_exploring_specificity_prediction_normalisation:
 rule run_evaluating_out_of_distribution_detector:
     input:
         "data/interim/sequences_sample_1500_af_training.csv",
-        "data/interim/af3_af3_tcrmodel2_full_pae_pca.csv"
+        "data/interim/af3_af3_tcrmodel2_cropped_pae_pca_training.csv"
     output: "data/flags/evaluating_out_of_distribution_detector_done.flag"
     resources:
         runtime="15m",
