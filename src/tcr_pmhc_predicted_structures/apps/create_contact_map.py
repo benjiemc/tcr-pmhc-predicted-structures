@@ -37,7 +37,7 @@ parser.add_argument(
     '--even-offset-side',
     choices=['left', 'right'],
     default='left',
-    help="fffset side when relative_pos_centre is selected (Default: 'left')",
+    help="offset side when relative_pos_centre is selected (Default: 'left')",
 )
 
 add_logging_arguments(parser)
