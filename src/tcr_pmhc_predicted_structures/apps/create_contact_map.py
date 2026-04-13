@@ -195,6 +195,7 @@ def main():
 
     logger.info('Loading structure from %s', args.structure)
     tcr = stcrpy.load_TCR(args.structure, include_symmetry_mates=False)
+    tcr.standardise_chain_names()
 
     tcr_df = stcrpy_to_pandas(tcr)
     mhc_df = stcrpy_to_pandas(tcr.get_MHC()[0])
