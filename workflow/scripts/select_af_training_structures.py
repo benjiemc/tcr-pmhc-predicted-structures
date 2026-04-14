@@ -39,7 +39,7 @@ processed_structures = pd.read_csv(snakemake.input.structures_summary)
 logger.info('Loading STCRDab summary from %s', snakemake.input.stcrdab)
 stcrdab_summary = pd.read_csv(os.path.join(snakemake.input.stcrdab, 'db_summary.dat'), delimiter='\t')
 
-# Known bug in STCRDab where entries that do get a date get assigned '01/08/09' (1909-01-08) as a date
+# Known bug in STCRDab where entries that don't get a date get assigned '01/08/09' (1909-01-08) as a date
 stcrdab_summary = stcrdab_summary[stcrdab_summary['date'] != '01/08/09'].copy()
 stcrdab_summary['date'] = pd.to_datetime(stcrdab_summary['date'], format=r'%m/%d/%y')
 
