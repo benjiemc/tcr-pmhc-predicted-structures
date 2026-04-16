@@ -60,7 +60,7 @@ data_formated = data_formated.rename({'n': 'num_samples', 'sequence': 'peptide'}
 data_formated['num_samples'] = data_formated['num_samples'].fillna(0).astype(int)
 
 original = pd.Series(
-    ['original_9V', 'SLLMWITQV', 1.240, 0.129, 3],
+    ['original_9V', 'SLLMWITQV', 0.701, 1.966, 3],
     index=['id', 'peptide', 'geometric_mean', 'geometric_sd', 'num_samples'],
 )
 
