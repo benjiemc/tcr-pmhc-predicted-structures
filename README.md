@@ -47,6 +47,10 @@ To create the mamba environment (will be located at ./.venv). Activate it by run
 mamba activate ./.venv/
 ```
 
+> ### Using NetMHCpan
+> A small part of the analysis uses NetMHCpan version 4.2 to screen out non-presentable peptides.
+> In order to run this analysis, NetMHCpan 4.2 needs to be downloaded and installed in the environment following the instructions [here](https://services.healthtech.dtu.dk/services/NetMHCpan-4.2/).
+
 ### Creating AlphaFold containers
 
 Two containers need to be created and placed in a "containers" directory (`mkdir containers`) at the project root to run the AlphaFold predictions in the workflow. These include:
