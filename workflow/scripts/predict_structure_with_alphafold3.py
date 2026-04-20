@@ -57,6 +57,7 @@ with tempfile.TemporaryDirectory() as tmp_dir:
             'third_party/alphafold3/run_alphafold.py',
             '--norun_data_pipeline',
             '--jax_compilation_cache_dir=/root/jax_cache',
+            f'--num_recycles={snakemake.params.num_recycles}',
             f'--json_path=/root/input/{input_file_name}',
             '--model_dir=/root/models',
             '--output_dir=/root/output',
