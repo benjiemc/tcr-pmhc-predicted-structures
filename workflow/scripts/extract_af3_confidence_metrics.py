@@ -112,7 +112,7 @@ scores['tcr_pmhc_pae_score'] = np.mean(
         pae,
         mhc_type=sequences['mhc_type'],
         score_type='pae',
-        binding_only=False,
+        portion='all',
     )
 )
 
@@ -126,7 +126,7 @@ scores['cdr_pmhc_pae_score'] = np.mean(
         pae,
         mhc_type=sequences['mhc_type'],
         score_type='pae',
-        binding_only=True,
+        portion='binding',
     )
 )
 
@@ -141,7 +141,7 @@ scores['tcr_pmhc_plddt_score'] = np.mean(
         atom_plddt,
         mhc_type=sequences['mhc_type'],
         score_type='atom_plddt',
-        binding_only=False,
+        portion='all',
     )
 )
 
@@ -155,7 +155,7 @@ scores['cdr_pmhc_plddt_score'] = np.mean(
         atom_plddt,
         mhc_type=sequences['mhc_type'],
         score_type='atom_plddt',
-        binding_only=True,
+        portion='binding',
     )
 )
 
@@ -169,7 +169,7 @@ scores['tcr_pmhc_alphabridge_score'] = np.mean(
         atom_plddt,
         pae,
         mhc_type=sequences['mhc_type'],
-        binding_only=False,
+        portion='all',
     )
 )
 logger.info('Computring CDR-pMHC AlphaBridge score')
@@ -182,7 +182,7 @@ scores['cdr_pmhc_alphabridge_score'] = np.mean(
         atom_plddt,
         pae,
         mhc_type=sequences['mhc_type'],
-        binding_only=True,
+        portion='binding',
     )
 )
 

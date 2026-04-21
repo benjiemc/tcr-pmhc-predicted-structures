@@ -77,7 +77,7 @@ scores['tcr_pmhc_pae_score'] = np.mean(
         pae,
         mhc_type=sequences['mhc_type'],
         score_type='pae',
-        binding_only=False,
+        portion='all',
     )
 )
 scores['cdr_pmhc_pae_score'] = np.mean(
@@ -89,7 +89,7 @@ scores['cdr_pmhc_pae_score'] = np.mean(
         pae,
         mhc_type=sequences['mhc_type'],
         score_type='pae',
-        binding_only=True,
+        portion='binding',
     )
 )
 
@@ -103,7 +103,7 @@ scores['tcr_pmhc_pde_score'] = np.mean(
         pde,
         mhc_type=sequences['mhc_type'],
         score_type='pde',
-        binding_only=False,
+        portion='all',
     )
 )
 scores['cdr_pmhc_pde_score'] = np.mean(
@@ -115,7 +115,7 @@ scores['cdr_pmhc_pde_score'] = np.mean(
         pde,
         mhc_type=sequences['mhc_type'],
         score_type='pde',
-        binding_only=True,
+        portion='binding',
     )
 )
 
@@ -129,7 +129,7 @@ scores['tcr_pmhc_plddt_score'] = np.mean(
         plddt,
         mhc_type=sequences['mhc_type'],
         score_type='plddt',
-        binding_only=False,
+        portion='all',
     )
 )
 scores['cdr_pmhc_plddt_score'] = np.mean(
@@ -141,7 +141,7 @@ scores['cdr_pmhc_plddt_score'] = np.mean(
         plddt,
         mhc_type=sequences['mhc_type'],
         score_type='plddt',
-        binding_only=True,
+        portion='binding',
     )
 )
 
@@ -155,7 +155,7 @@ scores['tcr_pmhc_alphabridge_score'] = np.mean(
         pae,
         mhc_type=sequences['mhc_type'],
         atom_level_plddt=False,
-        binding_only=False,
+        portion='all',
     )
 )
 scores['cdr_pmhc_alphabridge_score'] = np.mean(
@@ -168,7 +168,7 @@ scores['cdr_pmhc_alphabridge_score'] = np.mean(
         pae,
         mhc_type=sequences['mhc_type'],
         atom_level_plddt=False,
-        binding_only=True,
+        portion='binding',
     )
 )
 

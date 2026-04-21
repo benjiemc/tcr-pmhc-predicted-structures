@@ -399,7 +399,7 @@ def compute_alpha_bridge_scores(
 
     """
     tcr_mask, peptide_mask, mhc_mask = _create_masks(
-        chain_ids, sequence_ids, insert_codes, mhc_type=mhc_type, porition=portion
+        chain_ids, sequence_ids, insert_codes, mhc_type=mhc_type, portion=portion
     )
     pmhc_mask = peptide_mask | mhc_mask
 
