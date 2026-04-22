@@ -1,6 +1,29 @@
 # TCR:pMHC Predicted Structures
 
-This project creates synthetic TCR:pMHC structures from sequence data using state of the art deep learning models.
+This repository contains the code, scripts, and analysis to accompany the work "Characterising AlphaFold 3's ability to predict T cell antigen specificity". The analysis investigates of state-of-the-art deep learning models for structure prediction can be used to predict T cell antigen specificity.
+
+## Overview
+
+The results of the analysis are presented in the following notebooks:
+
+| Notebook Name | Description | Associated Figures in Manuscript |
+| ------------- | ----------- | -------------------------------- |
+| [ablations_of_alphafold3.ipynb](notebooks/ablations_of_alphafold3.ipynb) | Ablation study of the effect of unpaired MSAs, paired MSAs, and templates on AlphaFold 3's performance | Figure 2 |
+| [benchmark_alphafold3_against_sequence_models.ipynb](notebooks/benchmark_alphafold3_against_sequence_models.ipynb) | Comparison of AlphaFold 3's ability to predict T cell antigen specificity to NetTCR and TCRStructMap |  |
+| [benchmark_structure_prediction_methods.ipynb](notebooks/benchmark_structure_prediction_methods.ipynb) | Benchmark of AlphaFold 2, AlphaFold 3, Chai-1, and Boltz-2 at predicting T cell antigen specificity and TCR:pMHC complex structures | Figure 3 |
+| [c259_mutational_scanning.ipynb](notebooks/c259_mutational_scanning.ipynb) | Correlation anaylsis between the AlphaFold 3-derived binding scores and the affinity data of the c259 TCR binding to a peptide mutational scanning library | Figure S4 |
+| [coeliac_antigen_specificity_with_alphafold3.ipynb](notebooks/coeliac_antigen_specificity_with_alphafold3.ipynb) | Assessing the ability of AlphaFold 3 to predict the specificity of coeliac TCRs binding to gluten peptides | |
+| [coeliac_mutagenesis_analysis.ipynb](notebooks/coeliac_mutagenesis_analysis.ipynb) | Analysis of the effects of mutations to the 572G TCR binding score compared to affinity data | Figure 7 |
+| [compare_msa_generation.ipynb](notebooks/compare_msa_generation.ipynb) | Comparison of the different MSA strategies run time, ability to predict T cell antigen specificity, and ability to predict TCR:pMHC complex structures | Figure 1 |
+| [compare_structural_features_to_confidence.ipynb](notebook/compare_structural_features_to_confidence.ipynb) | Correlation analysis of the AlphaFold 3 confidence scores to structural features of TCR:pMHC complexes | Figure 4 and S1, Table 1|
+| [dash_mutagenesis_analysis.ipynb](notebooks/dash_mutagenesis_analysis.ipynb) | Analysis of the effect of mutations on AlphaFold confidence scores for TCRs reported in Dash et al. binding the BMLF epitope | |
+| [evaluating_antigen_specificity_model.ipynb](notebooks/evaluating_antigen_specificity_model.ipynb) | Analysing the performace of PAE Aggregator Scores at predicting T cell antigen specificity | Figures S2 |
+| [exploring_coeliac_tcrs.ipynb](notebooks/exploring_coeliac_tcrs.ipynb) | Data exploration and clustering of TCRs reacting to coeliac antigens | |
+| [exploring_dash_dataset.ipynb](notebooks/exploring_dash_dataset.ipynb) | Data exploration and clustering of TCRs reacting to antigens reported by Dash et al. | Figure 6 and S3 |
+| [exploring_specificity_prediction_normalisation.ipynb](notebooks/exploring_specificity_prediction_normalisation.ipynb) | Looking at the impact of the PAE Aggregator Scores on normalising TCR:pMHC specificity predictions | Figure 5 |
+| [investigate_specificity_information_in_af3_scores.ipynb](notebooks/investigate_specificity_information_in_af3_scores.ipynb) | Comparison of different strategies to predict T cell antigen specificity using AlphaFold 3 confidence scores | |
+
+To run the analysis, follow the instructions below and use the [Snakemake workflow](workflow/Snakefile).
 
 ## Downloading required data
 
