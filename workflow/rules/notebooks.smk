@@ -268,16 +268,16 @@ rule run_exploring_specificity_prediction_normalisation:
 
 rule run_benchmark_structure_prediction_methods:
     input:
-        "data/external/stcrdab/db_summary.dat",
+        "data/raw/stcrdab/db_summary.dat",
         "data/interim/sequences_sample_1500.csv",
-        "data/processed/confidence_scores_af3_af3_tcrmodel2_1500.csv",
+        "data/interim/confidence_scores_af3_af3_tcrmodel2_3_recycles_1500.csv",
         "data/interim/confidence_scores_boltz_af3_tcrmodel2_1500.csv",
         "data/interim/confidence_scores_chai_af3_tcrmodel2_1500.csv",
         "data/interim/confidence_scores_af3_af3_tcrmodel2_benchmark.csv",
         "data/interim/confidence_scores_boltz_af3_tcrmodel2_benchmark.csv",
         "data/interim/confidence_scores_chai_af3_tcrmodel2_benchmark.csv",
         "data/interim/confidence_scores_af2_af3_tcrmodel2_benchmark.csv",
-        "data/processed/predicted_af3_af3_tcrmodel2_dockq_benchmark.csv",
+        "data/processed/predicted_af3_af3_tcrmodel2_3_recycles_dockq_benchmark.csv",
         "data/processed/predicted_boltz_af3_tcrmodel2_dockq_benchmark.csv",
         "data/processed/predicted_chai_af3_tcrmodel2_dockq_benchmark.csv",
         "data/processed/predicted_af2_af3_tcrmodel2_dockq_benchmark.csv"
