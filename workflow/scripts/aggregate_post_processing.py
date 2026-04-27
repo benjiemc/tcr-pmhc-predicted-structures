@@ -24,7 +24,7 @@ for path in snakemake.input:
             raise ValueError(msg)
 
     info = re.search(
-        r'^[A-Za-z0-9]+_[A-Za-z0-9]+_[A-Za-z0-9]+(?:_no_unpaired_msas|_no_paired_msas|_no_templates)*_'
+        r'^[A-Za-z0-9]+_[A-Za-z0-9]+_[A-Za-z0-9]+(?:_no_unpaired_msas|_no_paired_msas|_no_templates|_\d+_recycles)*_'
         r'(?P<name>[A-Za-z0-9_]+)_(?P<seed>\d+)_(?P<sample>\d+)',
         basename,
     ).groupdict()
