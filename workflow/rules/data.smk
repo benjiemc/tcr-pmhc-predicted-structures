@@ -453,6 +453,34 @@ rule extract_coeliac_mutations_sequences:
                         'mhc_type': entry['mhc_type']
                     }, fh)
 
+rule create_peptide_mutations_for_coeliac_data:
+    input:
+        coeliac_sequences="data/interim/sequences_coeliac.csv",
+        structures_summary="data/raw/external_structures_summary.csv"
+    output: "data/interim/sequences_coeliac_peptide_mutants.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: "../scripts/create_coeliac_cross_reactive_mutants.py"
+
+rule extract_coeliac_peptide_mutations_sequences:
+    input: "data/interim/sequences_coeliac_peptide_mutants.csv"
+    output: get_sequence_names("data/interim/sequences_coeliac_peptide_mutants.csv", "data/interim/sequences/{name}.json")
+    run:
+        output_dir = os.path.dirname(output[0])
+        with open(input[0], 'r') as fh:
+            for entry in csv.DictReader(fh):
+                with open(os.path.join(output_dir, f"{entry['id']}.json"), 'w') as fh:
+                    json.dump({
+                        'id': entry['id'],
+                        'tcr_alpha_chain': entry['tcr_alpha_chain'],
+                        'tcr_beta_chain': entry['tcr_beta_chain'],
+                        'peptide': entry['peptide'],
+                        'mhc_chain_1': entry['mhc_chain_1'],
+                        'mhc_chain_2': entry['mhc_chain_2'],
+                        'mhc_type': entry['mhc_type']
+                    }, fh)
+
 rule process_c259_tcr_data:
     input:
         mutational_scans="data/raw/TCR_c259_peptide_mutational_scanning.txt",
