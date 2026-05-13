@@ -82,6 +82,27 @@ rule run_coeliac_mutagenesis_analysis:
         touch {output}
         """
 
+rule run_coeliac_peptide_mutations:
+    input:
+        "data/interim/sequences_coeliac_mutations.csv",
+        "data/interim/sequences_coeliac_peptide_mutants.csv",
+        "data/processed/af3_af3_tcrmodel2_coeliac_mutations_pae_aggregator_predictions.csv",
+        "data/processed/af3_af3_tcrmodel2_coeliac_peptide_mutants_pae_aggregator_predictions.csv"
+    output:
+        "data/flags/coeliac_peptide_mutations_done.flag"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    shell:
+        """
+        jupyter nbconvert \
+            --to notebook \
+            --execute \
+            --inplace \
+            notebooks/coeliac_peptide_mutations.ipynb
+        touch {output}
+        """
+
 rule run_c259_mutational_scanning:
     input:
         "data/interim/sequences_c259_mutational_scan_affinity.csv",
