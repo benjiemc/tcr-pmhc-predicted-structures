@@ -1,0 +1,54 @@
+2025-01-22 10:42:01,188 - WARNING: Failed to standardize "H2-Dk" for species musmusculus: unrecognized gene name. (best attempted fix: "H2-DK").
+2025-01-22 10:42:01,188 - WARNING: Failed to standardize "H2-Dp" for species musmusculus: unrecognized gene name. (best attempted fix: "H2-DP").
+2025-01-22 10:42:01,188 - WARNING: Failed to standardize "H2-Kb" for species musmusculus: unrecognized gene name. (best attempted fix: "H2-KB").
+2025-01-22 10:42:01,189 - WARNING: Failed to standardize "H2-Kd" for species musmusculus: unrecognized gene name. (best attempted fix: "H2-KD").
+2025-01-22 10:42:01,189 - WARNING: Failed to standardize "H2-Kk" for species musmusculus: unrecognized gene name. (best attempted fix: "H2-KK").
+2025-01-22 10:42:01,189 - WARNING: Failed to standardize "H2-Kw28" for species musmusculus: unrecognized gene name. (best attempted fix: "H2-KW28").
+2025-01-22 10:42:01,189 - WARNING: Failed to standardize "H2-Kwm7" for species musmusculus: unrecognized gene name. (best attempted fix: "H2-KWM7").
+2025-01-22 10:42:01,189 - WARNING: Failed to standardize "H2-Ld" for species musmusculus: unrecognized gene name. (best attempted fix: "H2-LD").
+2025-01-22 10:42:01,190 - INFO: Processing IEDB data
+2025-01-22 10:42:04,380 - INFO: Number of sequences in IEDB: 223701
+2025-01-22 10:42:04,380 - INFO: Selecting sequences with complete gene and CDR information
+2025-01-22 10:42:04,522 - INFO: Number of complete sequences: 1268
+2025-01-22 10:42:04,522 - INFO: Selecting only peptide antigens
+2025-01-22 10:42:04,546 - INFO: Number of sequences with peptide antigens: 950
+2025-01-22 10:42:04,546 - INFO: Expanding MHC alleles
+2025-01-22 10:42:04,558 - INFO: Number of sequences after expanding MHC alleles: 1013
+2025-01-22 10:42:04,559 - INFO: Splitting MH1 and MH2 gene names
+2025-01-22 10:42:04,656 - INFO: Number of sequences after splitting MH1 and MH2 gene names: 935
+2025-01-22 10:42:04,656 - INFO: Assigning species based on MHC gene name
+2025-01-22 10:42:04,657 - INFO: Standardising column names
+2025-01-22 10:42:04,661 - INFO: Number of IEDB sequences: 935
+2025-01-22 10:42:04,661 - INFO: Processing VDJdb data
+2025-01-22 10:42:05,906 - INFO: Number of sequences in VDJdb: 120849
+2025-01-22 10:42:05,906 - INFO: Merging paired alpha and beta TCR sequences
+2025-01-22 10:42:06,065 - INFO: Number of paired alpha-beta TCR sequences: 39623
+2025-01-22 10:42:06,065 - INFO: Removing 10x study
+2025-01-22 10:42:06,073 - INFO: Number of sequences after removing 10x study: 19265
+2025-01-22 10:42:06,073 - INFO: Standardising column names
+2025-01-22 10:42:06,080 - INFO: Number of VDJdb sequences: 19265
+2025-01-22 10:42:06,084 - INFO: Processing ITRAP data
+2025-01-22 10:42:06,131 - INFO: Number of sequences in ITRAP dataset: 2833
+2025-01-22 10:42:06,131 - INFO: Standardising column names
+2025-01-22 10:42:06,625 - INFO: Number of ITRAP sequences: 2833
+2025-01-22 10:42:06,625 - INFO: Processing McPAS-TCR data
+2025-01-22 10:42:06,830 - INFO: Number of sequences in McPAS-TCR dataset: 40731
+2025-01-22 10:42:06,831 - INFO: Selecting sequences with complete gene and CDR information
+2025-01-22 10:42:06,844 - INFO: Number of sequences with complete gene and CDR information: 3117
+2025-01-22 10:42:06,844 - INFO: Standardising MHC gene names
+2025-01-22 10:42:06,847 - INFO: Assigning MHC type based on MHC allele codes
+2025-01-22 10:42:06,850 - INFO: Standardising column names
+2025-01-22 10:42:06,852 - INFO: Number of McPAS-TCR Sequences: 3117
+2025-01-22 10:42:06,852 - INFO: Collating datasets
+2025-01-22 10:42:06,856 - INFO: Number of collated sequences: 26150
+2025-01-22 10:42:06,856 - INFO: Standardising gene names
+2025-01-22 10:42:08,076 - INFO: Number of sequences after standardising gene names (removing invalid names): 23135
+2025-01-22 10:42:08,076 - INFO: Creating full length sequences from genes and junctions
+2025-01-22 10:43:24,813 - INFO: Number of sequences after creating full length sequences: 19978
+2025-01-22 10:43:24,813 - INFO: IMGT numbering TCR sequences and extracting CDR regions
+2025-01-22 10:49:48,504 - INFO: Number of sequences after extracting CDR regions: 19760
+2025-01-22 10:49:48,504 - INFO: IMGT numbering MHC sequencs and extracting pseudo sequence representations
+2025-01-22 10:52:02,115 - INFO: Number of sequences after extracting MHC pseudo sequences: 19760
+2025-01-22 10:52:02,115 - INFO: Collapsing redundant sequences
+2025-01-22 10:52:03,391 - INFO: Number of non-redundant sequences: 13962
+2025-01-22 10:52:03,391 - INFO: Outputting data to data/interim/sequences.csv

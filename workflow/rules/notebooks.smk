@@ -297,3 +297,60 @@ rule run_benchmark_structure_prediction_methods:
             notebooks/benchmark_structure_prediction_methods.ipynb
         touch {output}
         """
+
+rule run_visualise_sequence_data:
+    input:
+        "data/interim/sequences.csv",
+        "data/logs/collate_sequence_data.log"
+    output:
+        "report/figures/sequences_source.svg",
+        "report/figures/sequences_species.svg",
+        "report/figures/sequences_cdr_lengths.svg",
+        "report/figures/sequences_tcr_alpha_genes.svg",
+        "report/figures/sequences_tcr_beta_genes.svg",
+        "report/figures/sequences_tcr_v_genes.svg",
+        "report/figures/sequences_peptide_lengths.svg",
+        "report/figures/sequences_peptide_clustering.svg",
+        "report/figures/sequences_mhc_class.svg",
+        "report/figures/sequences_mhc_alleles.svg",
+        "report/figures/sequences_mhc_pseudo.svg",
+        "report/figures/sequences_mhc_pseudo_allele_norm.svg",
+        "report/figures/sequences_tcr_pmhcs.svg",
+        "data/flags/visualise_sequence_data_done.flag"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    shell:
+        """
+        jupyter nbconvert \
+            --to notebook \
+            --execute \
+            --inplace \
+            notebooks/visualise_sequence_data.ipynb
+        touch {output}
+        """
+
+rule run_visualise_structure_data:
+    input:
+        "data/interim/structures_summary.csv",
+        "data/logs/select_stcrdab_tcr_pmhc_structures.log"
+    output:
+        "report/figures/structures_species.svg",
+        "report/figures/structures_tcr_gene_usage.svg",
+        "report/figures/structures_peptide_clustering.svg",
+        "report/figures/structures_mhc_class.svg",
+        "report/figures/structures_mhc_alleles.svg",
+        "report/figures/structures_mhc_pseudo.svg",
+        "data/flags/visualise_structure_data_done.flag"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    shell:
+        """
+        jupyter nbconvert \
+            --to notebook \
+            --execute \
+            --inplace \
+            notebooks/visualise_structure_data.ipynb
+        touch {output}
+        """

@@ -1,0 +1,15 @@
+2025-03-06 19:09:04,237 - INFO: Loading STCRDab summary
+2025-03-06 19:09:04,320 - INFO: Number of structures: 958
+2025-03-06 19:09:04,335 - INFO: Selecting structures (TCRs: abTCR, MHCs: MH1, MH2, antigens: peptide)
+2025-03-06 19:09:04,357 - INFO: Number of structures: 429
+2025-03-06 19:09:04,357 - INFO: Screening structures above 3.50 Å resolution
+2025-03-06 19:09:04,371 - INFO: Number of structures: 419
+2025-03-06 19:09:04,371 - INFO: Removing structures missing residues
+2025-03-06 19:17:49,233 - WARNING: Chain ID not found in raw structure of 3tf7 and chains c-C-B-A. Structure will be removed.
+2025-03-06 19:24:31,458 - WARNING: Chain ID not found in raw structure of 3tf7 and chains g-G-F-E. Structure will be removed.
+2025-03-06 19:31:56,646 - INFO: Number of structures: 356
+2025-03-06 19:31:56,710 - INFO: Getting sequence information...
+2025-03-06 19:33:44,915 - INFO: Getting available MHC information
+2025-03-06 19:34:14,764 - INFO: Removing structures within 2.00 Å RMSD
+2025-03-06 19:39:32,373 - INFO: Number of structures: 251
+2025-03-06 19:39:32,383 - INFO: Outputing structures...
