@@ -3,10 +3,12 @@ include: "utils.smk"
 rule run_exploring_dash_dataset:
     input:
         "data/external/dash_human.csv",
+        "data/interim/sequences_dash_with_negatives.csv",
         "data/interim/confidence_scores_af3_af3_tcrmodel2_dash_bmlf.csv",
         "data/processed/predicted_af3_af3_tcrmodel2_structural_features_dash_bmlf.csv",
         "data/processed/predicted_af3_af3_tcrmodel2_contact_maps_dash_bmlf.csv",
-        "data/processed/predicted_af3_af3_tcrmodel2_interactions_dash_bmlf.csv"
+        "data/processed/predicted_af3_af3_tcrmodel2_interactions_dash_bmlf.csv",
+        "data/processed/predicted_af3_af3_tcrmodel2_sc_and_bsa_dash_bmlf.csv"
     output:
         "data/flags/exploring_dash_dataset_done.flag"
     resources:
