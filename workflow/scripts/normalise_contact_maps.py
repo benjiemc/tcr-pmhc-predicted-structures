@@ -2,7 +2,6 @@
 """Aggregate and normalise contact maps from PDB structures."""
 
 import logging
-import os
 
 import pandas as pd
 from snakemake.script import snakemake
@@ -12,18 +11,8 @@ from tcr_pmhc_predicted_structures.apps._log import setup_logger
 logger = logging.getLogger()
 setup_logger(logger, level=snakemake.config['log_level'])
 
-logger.info('Aggregating contacts')
-contacts = []
-for path in snakemake.input:
-    logger.debug('Loading contacts from %s', path)
-    contact = pd.read_csv(path, dtype={'resi_pmhc': str})
-
-    name = os.path.basename(path).replace('_contacts.csv', '')
-    contact['name'] = name
-
-    contacts.append(contact)
-
-contacts = pd.concat(contacts)
+logger.info('Loading contacts from %s', snakemake.input[0])
+contacts = pd.read_csv(snakemake.input[0])
 
 logger.info('Normalising contacts')
 contacts = contacts.drop_duplicates(
