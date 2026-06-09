@@ -96,7 +96,9 @@ pip install -e '.[develop]'
 
 This will install the required development dependencies. To verfiy the installation, run:
 
+```
 snakemake test --cores 1
+```
 
 ## Database Notes
 
