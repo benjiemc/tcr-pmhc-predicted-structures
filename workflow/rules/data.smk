@@ -492,6 +492,26 @@ rule extract_c259_sequences:
                         'mhc_type': entry['mhc_type']
                     }, fh)
 
+rule process_tcrvdb:
+    input:
+        tcrvdb="data/external/tcrvdb.csv",
+        mhc_sequences=expand("data/external/hla_sequences/{mhc}.json", mhc=[
+            'h2_d',
+            'h2_k',
+            'h2_l',
+            'hla_a',
+            'hla_b',
+            'hla_c',
+            'hla_e',
+            'hla_f',
+            'hla_g',
+        ])
+    output: "data/interim/tcrvdb.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: "../scripts/process_tcrvdb.py"
+
 rule remove_hetatom_from_external_structure:
     input: "data/raw/external_structures/{name}.pdb"
     output: "data/interim/external_structures_clean/{name}.pdb"

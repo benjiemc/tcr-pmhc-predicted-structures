@@ -138,3 +138,8 @@ Several sequence databases were manually downloaded to make up the datasets for 
       * Meta - Sequencing: Sanger, High-throughput, Single-cell
       * Meta - Spurious CDR3: Include non-canonical, Include unmapped V/J
     * Result: All sequences downloaded (120849 of 120849)
+
+5. TCRvdb:
+    * URL: https://github.com/schumacherlab/TCRvdb
+    * Date: 2025/05/01
+    * Functional annotations for TCRs for binding YLQ and GLC epitopes
