@@ -88,6 +88,14 @@ rule aggregate_c259_affinity_mutations_confidence_scores:
         mem="1GB"
     script: "../scripts/aggregate_post_processing.py"
 
+rule aggregate_nf9_mutations_confidence_scores:
+    input: lambda wildcards: get_predicted_structure_names("data/interim/sequences_nf9_mutants.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.modifications}_{{name}}_{{seed}}_{{sample}}_confidence_scores.csv", config['seed'], column_name='id')
+    output: "data/interim/confidence_scores_{model}_{msa_method}_{data_source}{modifications}_nf9_mutants.csv"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    script: "../scripts/aggregate_post_processing.py"
+
 rule summarise_predicted_structural_features:
     input: "data/interim/structures_{model}_{msa_method}_{data_source}{modifications}/{name}_seed-{seed}_sample-{sample}_model.cif"
     output: temp("data/interim/{model}_{msa_method}_{data_source}{modifications}_{name}_{seed}_{sample}_structural_summary.json")
@@ -131,6 +139,14 @@ rule aggregate_coeliac_mutations_predicted_structural_features:
 rule aggregate_c259_affinity_mutations_predicted_structural_features:
     input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_c259_mutational_scan_affinity.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.modifications}_{{name}}_{{seed}}_{{sample}}_structural_summary.json", config['seed'], column_name='id')
     output: "data/processed/predicted_{model}_{msa_method}_{data_source}{modifications}_structural_features_c259_mutational_scan_affinity.csv"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    script: "../scripts/aggregate_post_processing.py"
+
+rule aggregate_nf9_mutations_predicted_structural_features:
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_nf9_mutants.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.modifications}_{{name}}_{{seed}}_{{sample}}_structural_summary.json", config['seed'], column_name='id')
+    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{modifications}_structural_features_nf9_mutants.csv"
     resources:
         runtime="10m",
         mem="1GB"
@@ -221,6 +237,14 @@ rule aggregate_c259_affinity_mutations_predicted_contact_maps:
         mem="1GB"
     script: "../scripts/aggregate_post_processing.py"
 
+rule aggregate_nf9_mutations_predicted_contact_maps:
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_nf9_mutants.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.modifications}_{{name}}_{{seed}}_{{sample}}_contacts.csv", config['seed'], column_name='id')
+    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{modifications}_contact_maps_nf9_mutants.csv"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    script: "../scripts/aggregate_post_processing.py"
+
 rule profile_predicted_interactions:
     input: "data/processed/structures_{model}_{msa_method}_{data_source}{modifications}/{name}_{seed}_{sample}.pdb"
     output: temp("data/interim/{model}_{msa_method}_{data_source}{modifications}_{name}_{seed}_{sample}_interactions.csv")
@@ -269,6 +293,14 @@ rule aggregate_c259_affinity_mutations_predicted_interactions:
         mem="1GB"
     script: "../scripts/aggregate_post_processing.py"
 
+rule aggregate_nf9_mutants_predicted_interactions:
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_nf9_mutants.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.modifications}_{{name}}_{{seed}}_{{sample}}_interactions.csv", config['seed'], column_name='id')
+    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{modifications}_interactions_nf9_mutants.csv"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    script: "../scripts/aggregate_post_processing.py"
+
 rule calculate_predicted_sc_and_bsa:
     input: "data/processed/structures_{model}_{msa_method}_{data_source}{modifications}/{name}_{seed}_{sample}.pdb"
     output: temp("data/interim/{model}_{msa_method}_{data_source}{modifications}_{name}_{seed}_{sample}_sc_and_bsa.json")
@@ -310,6 +342,14 @@ rule aggregate_coeliac_mutations_predicted_sc_and_bsa:
 rule aggregate_c259_affinity_mutations_predicted_sc_and_bsa:
     input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_c259_mutational_scan_affinity.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.modifications}_{{name}}_{{seed}}_{{sample}}_sc_and_bsa.json", config['seed'], column_name='id')
     output: "data/processed/predicted_{model}_{msa_method}_{data_source}{modifications}_sc_and_bsa_c259_mutational_scan_affinity.csv"
+    resources:
+        runtime="10m",
+        mem="1GB"
+    script: "../scripts/aggregate_post_processing.py"
+
+rule aggregate_nf9_mutants_predicted_sc_and_bsa:
+    input: lambda wildcards: get_predicted_structure_names(f"data/interim/sequences_nf9_mutants.csv", f"data/interim/{wildcards.model}_{wildcards.msa_method}_{wildcards.data_source}{wildcards.modifications}_{{name}}_{{seed}}_{{sample}}_sc_and_bsa.json", config['seed'], column_name='id')
+    output: "data/processed/predicted_{model}_{msa_method}_{data_source}{modifications}_sc_and_bsa_nf9_mutants.csv"
     resources:
         runtime="10m",
         mem="1GB"

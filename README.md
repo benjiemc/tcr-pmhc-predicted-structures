@@ -22,6 +22,7 @@ The results of the analysis are presented in the following notebooks:
 | [exploring_dash_dataset.ipynb](notebooks/exploring_dash_dataset.ipynb) | Data exploration and clustering of TCRs reacting to antigens reported by Dash et al. | Figure 6, S7, and S8 |
 | [exploring_specificity_prediction_normalisation.ipynb](notebooks/exploring_specificity_prediction_normalisation.ipynb) | Looking at the impact of the PAE Aggregator Scores on normalising TCR:pMHC specificity predictions | Figure 5 |
 | [investigate_specificity_information_in_af3_scores.ipynb](notebooks/investigate_specificity_information_in_af3_scores.ipynb) | Comparison of different strategies to predict T cell antigen specificity using AlphaFold 3 confidence scores | |
+| [nf9_mutational_scanning.ipynb](notebooks/nf9_mutational_scanning.ipynb) | Analysis of AlphaFold's ability to predict the changes in specificity for a panel of TCRs binding a panel of NF9 peptides with P5 mutations. | |
 | [visualise_sequence_data.ipynb](notebooks/visualise_sequence_data.ipynb) | Visualisations of the sequence data used in this project. | |
 | [visualise_structure_data.ipynb](notebooks/visualise_structure_data.ipynb) | Visualisations of the structure data used in this project. | |
 

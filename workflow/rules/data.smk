@@ -492,6 +492,43 @@ rule extract_c259_sequences:
                         'mhc_type': entry['mhc_type']
                     }, fh)
 
+rule process_nf9_tcr_data:
+    input:
+        mhc_sequences=expand("data/external/hla_sequences/{mhc}.json", mhc=[
+            'h2_d',
+            'h2_k',
+            'h2_l',
+            'hla_a',
+            'hla_b',
+            'hla_c',
+            'hla_e',
+            'hla_f',
+            'hla_g',
+        ])
+    output: "data/interim/sequences_nf9_mutants.csv"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    script: "../scripts/process_nf9_sequences.py"
+
+rule extract_nf9_sequences:
+    input: "data/interim/sequences_nf9_mutants.csv"
+    output: get_sequence_names("data/interim/sequences_nf9_mutants.csv", "data/interim/sequences/{name}.json")
+    run:
+        output_dir = os.path.dirname(output[0])
+        with open(input[0], 'r') as fh:
+            for entry in csv.DictReader(fh):
+                with open(os.path.join(output_dir, f"{entry['id']}.json"), 'w') as fh:
+                    json.dump({
+                        'id': entry['id'],
+                        'tcr_alpha_chain': entry['tcr_alpha_chain'],
+                        'tcr_beta_chain': entry['tcr_beta_chain'],
+                        'peptide': entry['peptide'],
+                        'mhc_chain_1': entry['mhc_chain_1'],
+                        'mhc_chain_2': entry['mhc_chain_2'],
+                        'mhc_type': entry['mhc_type']
+                    }, fh)
+
 rule process_tcrvdb:
     input:
         tcrvdb="data/external/tcrvdb.csv",

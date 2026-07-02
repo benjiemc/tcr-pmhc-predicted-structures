@@ -285,6 +285,25 @@ rule run_benchmark_structure_prediction_methods:
         touch {output}
         """
 
+rule run_nf9_mutational_scanning:
+    input:
+        "data/interim/sequences_nf9_mutants.csv",
+        "data/processed/af3_af3_tcrmodel2_nf9_mutants_pae_aggregator_predictions.csv"
+    output:
+        "data/flags/nf9_mutational_scanning_done.flag"
+    resources:
+        runtime="5m",
+        mem="1GB"
+    shell:
+        """
+        jupyter nbconvert \
+            --to notebook \
+            --execute \
+            --inplace \
+            notebooks/nf9_mutational_scanning.ipynb
+        touch {output}
+        """
+
 rule run_visualise_sequence_data:
     input:
         "data/interim/sequences.csv",

@@ -213,6 +213,17 @@ rule create_af3_msa_inputs_from_c259_affinity_mutations_dataset:
         mem="500MB"
     script: "../scripts/create_secondary_msa_inputs.py"
 
+rule create_af3_msa_inputs_from_nf9_mutations_dataset:
+    input:
+        sequences="data/interim/sequences_nf9_mutants.csv",
+        sequence_key="data/interim/sequence_key.txt",
+        higher_priority_datasets=["data/interim/sequences_dash_with_negatives.csv", "data/interim/sequences_coeliac_with_negatives.csv", "data/interim/sequences_coeliac_mutations.csv", "data/interim/af_training_structures.csv", "data/interim/sequences_c259_mutational_scan_affinity.csv"]
+    output: get_secondary_sequence_ids("data/interim/sequences_nf9_mutants.csv", "data/interim/sequence_key.txt", ["data/interim/sequences_dash_with_negatives.csv", "data/interim/sequences_coeliac_with_negatives.csv", "data/interim/sequences_coeliac_mutations.csv", "data/interim/af_training_structures.csv", "data/interim/sequences_c259_mutational_scan_affinity.csv"], "data/interim/msa-inputs_af3/{name}.json")
+    resources:
+        runtime="10m",
+        mem="500MB"
+    script: "../scripts/create_secondary_msa_inputs.py"
+
 rule run_create_af3_msas_and_find_templates:
     input: "data/interim/msa-inputs_af3/{name}.json"
     output:
@@ -528,6 +539,12 @@ rule create_tcrmodel2_msas_and_find_templates_c259_affinity_mutations:
         unpaired_msas=_get_msas_for_secondary("data/interim/sequences_c259_mutational_scan_affinity.csv", "data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m"),
         paired_msas=_get_msas_for_secondary("data/interim/sequences_c259_mutational_scan_affinity.csv", "data/interim/msas_af3_tcrmodel2/{name}_paired.a3m"),
         templates=_get_msas_for_secondary("data/interim/sequences_c259_mutational_scan_affinity.csv", "data/interim/templates_af3_tcrmodel2/{name}")
+
+rule create_tcrmodel2_msas_and_find_templates_nf9_dataset:
+    input:
+        unpaired_msas=_get_msas_for_secondary("data/interim/sequences_nf9_mutants.csv", "data/interim/msas_af3_tcrmodel2/{name}_unpaired.a3m"),
+        paired_msas=_get_msas_for_secondary("data/interim/sequences_nf9_mutants.csv", "data/interim/msas_af3_tcrmodel2/{name}_paired.a3m"),
+        templates=_get_msas_for_secondary("data/interim/sequences_nf9_mutants.csv", "data/interim/templates_af3_tcrmodel2/{name}")
 
 rule combine_msas_to_parquet:
     input:
