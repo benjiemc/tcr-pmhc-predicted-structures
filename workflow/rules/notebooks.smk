@@ -119,20 +119,6 @@ rule run_compare_structural_features_to_confidence:
         "data/processed/tcr_pmhc_interactions.csv",
         "data/processed/tcr_pmhc_contacts.csv"
     output:
-        "report/figures/scanning_angle.svg",
-        "report/figures/pitch_angle.svg",
-        "report/figures/tilt_angle.svg",
-        "report/figures/roll_angle.svg",
-        "report/figures/x_distance.svg",
-        "report/figures/y_distance.svg",
-        "report/figures/z_distance.svg",
-        "report/figures/interaction_numbers.svg",
-        "report/figures/interaction_types.svg",
-        "report/figures/structrual_feature_intra_correlations.svg",
-        "report/figures/ranked_confidence_metric_correlations.svg",
-        "report/figures/structural_feature_inter_correlations.svg",
-        "report/figures/structural_feature_inter_correlations_no_outliers.svg",
-        "report/figures/structural_feature_inter_correlations_no_outliers_bootstrap.svg",
         "data/flags/compare_structural_features_to_confidence_done.flag"
     resources:
         runtime="10m",
@@ -211,10 +197,6 @@ rule run_compare_msa_generation:
         get_predicted_structure_names(f"data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3_af3/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", config['seed'], column_name='id'),
         get_predicted_structure_names(f"data/interim/benchmark_structures.csv", "data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_summary_confidences.json", config['seed'], column_name='id')
     output:
-        "report/figures/msa_strategy_generation_time.svg",
-        "report/figures/msa_strategy_specificity.svg",
-        "report/figures/msa_strategy_dockq_boxplot.svg",
-        "report/figures/msa_strategy_dockq_capri.svg",
         "data/flags/compare_msa_generation_done.flag"
     resources:
         runtime="5m",
@@ -289,8 +271,6 @@ rule run_benchmark_structure_prediction_methods:
         "data/processed/predicted_chai_af3_tcrmodel2_dockq_benchmark.csv",
         "data/processed/predicted_af2_af3_tcrmodel2_dockq_benchmark.csv"
     output:
-        "report/figures/method_benchmark_dockq_boxplot.svg",
-        "report/figures/method_benchmark_dockq_capri.svg",
         "data/flags/benchmark_structure_prediction_methods_done.flag"
     resources:
         runtime="5m",
@@ -310,19 +290,6 @@ rule run_visualise_sequence_data:
         "data/interim/sequences.csv",
         "data/logs/collate_sequence_data.log"
     output:
-        "report/figures/sequences_source.svg",
-        "report/figures/sequences_species.svg",
-        "report/figures/sequences_cdr_lengths.svg",
-        "report/figures/sequences_tcr_alpha_genes.svg",
-        "report/figures/sequences_tcr_beta_genes.svg",
-        "report/figures/sequences_tcr_v_genes.svg",
-        "report/figures/sequences_peptide_lengths.svg",
-        "report/figures/sequences_peptide_clustering.svg",
-        "report/figures/sequences_mhc_class.svg",
-        "report/figures/sequences_mhc_alleles.svg",
-        "report/figures/sequences_mhc_pseudo.svg",
-        "report/figures/sequences_mhc_pseudo_allele_norm.svg",
-        "report/figures/sequences_tcr_pmhcs.svg",
         "data/flags/visualise_sequence_data_done.flag"
     resources:
         runtime="5m",
@@ -342,12 +309,6 @@ rule run_visualise_structure_data:
         "data/interim/structures_summary.csv",
         "data/logs/select_stcrdab_tcr_pmhc_structures.log"
     output:
-        "report/figures/structures_species.svg",
-        "report/figures/structures_tcr_gene_usage.svg",
-        "report/figures/structures_peptide_clustering.svg",
-        "report/figures/structures_mhc_class.svg",
-        "report/figures/structures_mhc_alleles.svg",
-        "report/figures/structures_mhc_pseudo.svg",
         "data/flags/visualise_structure_data_done.flag"
     resources:
         runtime="5m",

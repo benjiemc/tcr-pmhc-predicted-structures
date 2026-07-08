@@ -1,6 +1,3 @@
-[submodule "report"]
-	path = report
-	url = git@github.com:benjiemc/tcr-pmhc-predicted-structures-report.git
 [submodule "third_party/alphafold3"]
 	path = third_party/alphafold3
 	url = git@github.com:google-deepmind/alphafold3.git
