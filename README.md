@@ -1,6 +1,6 @@
 # TCR:pMHC Predicted Structures
 
-This repository contains the code, scripts, and analysis to accompany the work "Characterising AlphaFold 3's ability to predict T cell antigen specificity". The analysis investigates of state-of-the-art deep learning models for structure prediction can be used to predict T cell antigen specificity.
+This repository contains the code, scripts, and analysis to accompany the work "[Characterising AlphaFold 3's ability to predict T cell antigen specificity](https://www.biorxiv.org/content/10.64898/2026.07.08.737208v2)". The analysis investigates whether state-of-the-art deep learning models for structure prediction can be used to predict T cell antigen specificity.
 
 ## Overview
 
@@ -143,3 +143,17 @@ Several sequence databases were manually downloaded to make up the datasets for 
     * URL: https://github.com/schumacherlab/TCRvdb
     * Date: 2025/05/01
     * Functional annotations for TCRs for binding YLQ and GLC epitopes
+
+## Citing this Work
+The results of this analysis are described in the article [here](https://www.biorxiv.org/content/10.64898/2026.07.08.737208v2). If you use the code, please cite:
+
+```
+@article{mcmasterCharacterisingAlphaFold3s2026,
+  title = {Characterising {{AlphaFold}} 3s Ability to Predict {{T}} Cellantigen Specificity},
+  author = {McMaster, Benjamin and Elmoselhy, Ali and Ilievski, Ilija and Thorpe, Christopher J. and Gruta, Nicole L. La and Rossjohn, Jamie and Deane, Charlotte and Koohy, Hashem},
+  journal = {bioRxiv},
+  doi = {10.64898/2026.07.08.737208},
+  url = {https://www.biorxiv.org/content/10.64898/2026.07.08.737208v2},
+  year = {2026},
+}
+```
