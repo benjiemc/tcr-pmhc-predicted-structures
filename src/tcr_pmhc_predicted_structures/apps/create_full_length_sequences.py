@@ -71,7 +71,7 @@ def create_full_length_sequences(sequences: list[dict], mhc_sequences: pd.DataFr
                 sequence['v_alpha'],
                 sequence['cdr3_alpha'],
                 sequence['j_alpha'],
-                sequence['tcr_species'],
+                sequence['species'],
             )
             continue
 
@@ -92,7 +92,7 @@ def create_full_length_sequences(sequences: list[dict], mhc_sequences: pd.DataFr
                 sequence['v_beta'],
                 sequence['cdr3_beta'],
                 sequence['j_beta'],
-                sequence['tcr_species'],
+                sequence['species'],
             )
             continue
 
