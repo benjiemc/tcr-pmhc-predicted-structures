@@ -124,7 +124,7 @@ def stitch_sequence(v_gene: str, j_gene: str, cdr3: str, species: str) -> str | 
     gene_types = list(fxn.regions.values())
 
     start = 'C' if not cdr3.startswith('C') else ''
-    end = 'F' if not cdr3.startswith('C') else ''
+    end = 'F' if not cdr3.endswith(('F', 'W')) else ''
 
     cdr3 = start + cdr3 + end
 
