@@ -55,6 +55,7 @@ rule create_data_archive:
         sequences="data/interim/sequences_pMHC_split.csv",
         sequences_sample_50="data/interim/sequences_sample_50.csv",
         sequences_sample_1500="data/interim/sequences_sample_1500.csv",
+        sequences_coeliac_mutations="data/interim/sequences_coeliac_mutations.csv",
         structures_summary="data/interim/structures_summary.csv",
         structures="data/interim/structures",
         structures_af3_af3_af3_50=get_predicted_structure_names('data/interim/sequences_sample_50.csv', 'data/interim/structures_af3_af3_af3/{name}_seed-{seed}_sample-{sample}_model.cif', config['seed']),
@@ -141,6 +142,9 @@ rule create_data_archive:
         structures_af2_af3_tcrmodel2_benchmark=get_predicted_structure_names('data/interim/benchmark_structures.csv', 'data/interim/structures_af2_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_relaxed.pdb', config['seed'], column_name='id'),
         summary_confidences_af2_af3_tcrmodel2_benchmark=get_predicted_structure_names('data/interim/benchmark_structures.csv', 'data/interim/structures_af2_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_summary_confidences.json', config['seed'], column_name='id'),
         confidences_af2_af3_tcrmodel2_benchmark=get_predicted_structure_names('data/interim/benchmark_structures.csv', 'data/interim/structures_af2_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_confidences.json', config['seed'], column_name='id'),
+        structures_af3_af3_tcrmodel2_coeliac_mutations=get_predicted_structure_names('data/interim/sequences_coeliac_mutations.csv', 'data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_model.cif', config['seed'], column_name='id'),
+        summary_confidences_af3_af3_tcrmodel2_coeliac_mutations=get_predicted_structure_names('data/interim/sequences_coeliac_mutations.csv', 'data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_summary_confidences.json', config['seed'], column_name='id'),
+        confidences_af3_af3_tcrmodel2_coeliac_mutations=get_predicted_structure_names('data/interim/sequences_coeliac_mutations.csv', 'data/interim/structures_af3_af3_tcrmodel2/{name}_seed-{seed}_sample-{sample}_confidences.json', config['seed'], column_name='id'),
         PAEAggregator=expand("models/PAEAggregator_af3_af3_tcrmodel2/model_{number}.pt", number=(1, 2, 3, 4, 5))
     output: "data/processed/tcr-pmhc-predicted-structures.tar.gz"
     resources:
