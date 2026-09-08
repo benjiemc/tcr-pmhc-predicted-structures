@@ -37,6 +37,7 @@ with tarfile.open(snakemake.output[0], 'w:gz') as tar:
     tar.add(snakemake.input.sequences, arcname='sequences.csv')
     tar.add(snakemake.input.sequences_sample_50, arcname='sequences_sample_50.csv')
     tar.add(snakemake.input.sequences_sample_1500, arcname='sequences_sample_1500.csv')
+    tar.add(snakemake.input.sequences_coeliac_mutations, arcname='sequences_coeliac_mutations.csv')
 
     logger.info('Adding structures')
     tar.add(snakemake.input.structures_summary, arcname='structures/summary.csv')
@@ -75,6 +76,10 @@ with tarfile.open(snakemake.output[0], 'w:gz') as tar:
         add_confidences(tar, path.name.replace('_model.cif', ''), path.parent, structures_name)
 
     for path in (Path(p) for p in snakemake.input.structures_af3_af3_tcrmodel2_1500):
+        tar.add(str(path), arcname=f'predicted_structures/{structures_name}/{path.name}')
+        add_confidences(tar, path.name.replace('_model.cif', ''), path.parent, structures_name)
+
+    for path in (Path(p) for p in snakemake.input.structures_af3_af3_tcrmodel2_coeliac_mutations):
         tar.add(str(path), arcname=f'predicted_structures/{structures_name}/{path.name}')
         add_confidences(tar, path.name.replace('_model.cif', ''), path.parent, structures_name)
 
