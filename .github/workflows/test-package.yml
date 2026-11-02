@@ -35,6 +35,7 @@ jobs:
           export ALPHAFOLD_DATA_DIR=''
           export COLABFOLD_DATA_DIR=''
           export TCRMODEL2_ALPHAFOLD_DATA_DIR=''
+          export KEY_MODELLER=${{ secrets.MODELLER_KEY }}
           snakemake environment --cores 1
           mamba run -p ./.venv pip install '.[develop]'
       - name: Lint package
