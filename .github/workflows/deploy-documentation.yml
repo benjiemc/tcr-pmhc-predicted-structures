@@ -37,6 +37,7 @@ jobs:
           export COLABFOLD_DATA_DIR=''
           export TCRMODEL2_ALPHAFOLD_DATA_DIR=''
           snakemake environment --cores 1
+          mamba run -p ./.venv pip install '.[develop]'
       - name: Install Pandoc
         uses: pandoc/actions/setup@v1
         with:
