@@ -175,12 +175,14 @@ with tempfile.TemporaryDirectory() as tmp_dir:
                 '--models_to_relax=none',
                 '--use_gpu_relax',
                 '--use_custom_MSA_database=only',
-                '--MSA_database='  # Needed not to throw an error
-                '/data/databases/uniref90.tcrmhc.fasta,'
-                '/data/databases/uniref90.tcrmhc.fasta,'
-                '/data/databases/uniref90.tcrmhc.fasta,'
-                '/data/databases/uniref90.tcrmhc.fasta,'
-                '/data/databases/uniref90.tcrmhc.fasta',
+                (
+                    '--MSA_database='  # Needed not to throw an error
+                    '/data/databases/uniref90.tcrmhc.fasta,'
+                    '/data/databases/uniref90.tcrmhc.fasta,'
+                    '/data/databases/uniref90.tcrmhc.fasta,'
+                    '/data/databases/uniref90.tcrmhc.fasta,'
+                    '/data/databases/uniref90.tcrmhc.fasta'
+                ),
                 '--db_preset=reduced_dbs',  # Needed not to throw an error
                 '--uniref90_database_path=/data/databases/uniref90.tcrmhc.fasta',  # Needed not to throw an error
                 '--uniprot_database_path=/data/databases/uniprot.tcrmhc.fasta',  # Needed not to throw an error

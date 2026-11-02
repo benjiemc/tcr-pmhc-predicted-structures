@@ -292,7 +292,7 @@ def extract_confidence_score(
     mhc_type: str,
     portion: str = 'binding',
     avg_atoms_for_residue: bool = False,
-    padding: None | dict = None,
+    padding: dict | None = None,
 ) -> np.ndarray:
     """Extract TCR:pMHC specific confidence score from given confidence."""
     if score_type.startswith('atom'):
