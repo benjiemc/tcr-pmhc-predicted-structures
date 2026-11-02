@@ -43,7 +43,9 @@ jobs:
         with:
           version: 2.19
       - name: Build documentation
-        run: mamba run -p ./.venv snakemake docs --cores 1
+        run: |
+          mamba activate ./.venv
+          snakemake docs --cores 1
       - name: Publish documentation
         uses: peaceiris/actions-gh-pages@v3
         if: github.ref == 'refs/heads/main'
