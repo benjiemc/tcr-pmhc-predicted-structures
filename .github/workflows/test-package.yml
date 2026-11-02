@@ -37,8 +37,10 @@ jobs:
       - name: Lint package
         run: |
           mamba activate ./.venv
+          export PATH="$GITHUB_WORKSPACE/.venv/bin:$PATH"
           snakemake lint  --cores 1
       - name: Test package
         run: |
           mamba activate ./.venv
+          export PATH="$GITHUB_WORKSPACE/.venv/bin:$PATH"
           snakemake test --cores 1

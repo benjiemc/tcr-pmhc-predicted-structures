@@ -45,6 +45,7 @@ jobs:
       - name: Build documentation
         run: |
           mamba activate ./.venv
+          export PATH="$GITHUB_WORKSPACE/.venv/bin:$PATH"
           snakemake docs --cores 1
       - name: Publish documentation
         uses: peaceiris/actions-gh-pages@v3
