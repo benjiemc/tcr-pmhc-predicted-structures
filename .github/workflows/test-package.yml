@@ -21,8 +21,11 @@ jobs:
           ssh-add ~/.ssh/anarci_mhc
           ssh-add -L
           cat > "$HOME/conda_init.sh" <<'EOF'
+          _original_path="$PATH"
           eval "$(conda shell.bash hook)"
           eval "$(mamba shell hook --shell bash)"
+          export PATH="$_original_path"
+          unset _original_path
           EOF
           echo "BASH_ENV=$HOME/conda_init.sh" >> "$GITHUB_ENV"
           export BASH_ENV="$HOME/conda_init.sh"
