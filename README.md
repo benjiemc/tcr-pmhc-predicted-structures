@@ -2,6 +2,13 @@
 
 This repository contains the code, scripts, and analysis to accompany the work "[Characterising AlphaFold 3's ability to predict T cell antigen specificity](https://www.biorxiv.org/content/10.64898/2026.07.08.737208v3)". The analysis investigates whether state-of-the-art deep learning models for structure prediction can be used to predict T cell antigen specificity.
 
+## Key Links
+
+* Source code: [https://github.com/benjiemc/tcr-pmhc-predicted-structures](https://github.com/benjiemc/tcr-pmhc-predicted-structures)
+* Documentation: [https://benjiemc.github.io/tcr-pmhc-predicted-structures/](https://benjiemc.github.io/tcr-pmhc-predicted-structures/)
+* Data: [https://doi.org/10.5281/zenodo.21242411](https://doi.org/10.5281/zenodo.21242411)
+* DOI: [https://doi.org/10.64898/2026.07.08.737208](https://doi.org/10.64898/2026.07.08.737208)
+
 ## Overview
 
 The results of the analysis are presented in the following notebooks:
