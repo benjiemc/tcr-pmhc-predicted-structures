@@ -1,0 +1,36 @@
+tcr_pmhc_predicted_structures.apps.create_pae_dataset
+=====================================================
+.. code-block:: text
+
+   usage: python -m tcr_pmhc_predicted_structures.apps.create_pae_dataset
+          [-h] [--format {txt,json}] [--include-training-metadata] --sequences
+          SEQUENCES --confidences CONFIDENCES [CONFIDENCES ...] --output OUTPUT
+          [--log-level {debug,info,warning,error}] [--log-file LOG_FILE]
+   
+   Create an h5 dataset from PAE matrices.
+   
+   options:
+     -h, --help            show this help message and exit
+     --format {txt,json}   format the PAE confidence scores are stored in, either
+                           'txt' or 'json' (Default: 'txt')
+     --include-training-metadata
+                           include label, fold, and source in final dataset
+   
+   Inputs:
+     --sequences SEQUENCES
+                           path to csv containing the sequences to make into a
+                           PAE dataset
+     --confidences CONFIDENCES [CONFIDENCES ...]
+                           path to the PAE files formated as txt files
+   
+   Outputs:
+     --output OUTPUT, -o OUTPUT
+                           path to output h5 dataset
+   
+   Logging:
+     Options for logging
+   
+     --log-level {debug,info,warning,error}
+                           Level to log messages at (Default: 'warning')
+     --log-file LOG_FILE   File to output logs (default is to write to stderr)
+   

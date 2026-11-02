@@ -1,0 +1,1216 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Dash et al mutagenesis analysis &mdash; tcr_pmhc_predicted_structures  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Evaluating antigen specificity model" href="evaluating_antigen_specificity_model.html" />
+    <link rel="prev" title="Comparing structural features to confidence scores" href="compare_structural_features_to_confidence.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tcr_pmhc_predicted_structures
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Analysis Results</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="notebooks.html">Analysis Notebooks</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ablations_of_alphafold3.html">Ablations of AlphaFold3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmark_alphafold3_against_sequence_models.html">Benchmark AlphaFold3 against sequence models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmark_structure_prediction_methods.html">Benchmark Structure Prediction Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="c259_mutational_scanning.html">Correlation between affinity and binding scores for c259 TCR binding peptide mutants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coeliac_antigen_specificity_with_alphafold3.html">Coeliac antigen specificity with AlphaFold3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coeliac_mutagenesis_analysis.html">Coeliac mutagenesis analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compare_structural_features_to_confidence.html">Comparing structural features to confidence scores</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Dash et al mutagenesis analysis</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Defining-cluster-motifs">Defining cluster motifs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Assinging-mutated-sequence-to-motifs">Assinging mutated sequence to motifs</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Analysing-effect-on-confidences-scores">Analysing effect on confidences scores</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#Blocking-by-cluster-group">Blocking by cluster group</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Normalising-values-within-groups">Normalising values within groups</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="evaluating_antigen_specificity_model.html">Evaluating antigen specificity model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exploring_coeliac_tcrs.html">Exploring Coeliac TCRs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exploring_dash_dataset.html">Exploring the Dash <em>et al</em> dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="investigate_specificity_information_in_af3_scores.html">Investigating specificity information in AF3 Scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualise_sequence_data.html">Sequence Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualise_structure_data.html">Data Summary</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Command Line Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="apps.html">Command Line Applications</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">tcr_pmhc_predicted_structures</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tcr_pmhc_predicted_structures</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="notebooks.html">Analysis Notebooks</a></li>
+      <li class="breadcrumb-item active">Dash et al mutagenesis analysis</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/dash_mutagenesis_analysis.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Dash-et-al-mutagenesis-analysis">
+<h1>Dash et al mutagenesis analysis<a class="headerlink" href="#Dash-et-al-mutagenesis-analysis" title="Link to this heading"></a></h1>
+<p>In this notebook, we analyse whether the AlphaFold confidence scores are sensitive enough to detect disruptions to the binding motif of TCRs.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">anarci</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pingouin</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pg</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tidytcells</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">tcr_pmhc_predicted_structures.imgt_numbering</span><span class="w"> </span><span class="kn">import</span> <span class="n">IMGT_CDR3</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">get_cdr3</span><span class="p">(</span><span class="n">sequence</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Get CDR3 from TCR chain sequence."""</span>
+    <span class="n">numbering</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">anarci</span><span class="o">.</span><span class="n">number</span><span class="p">(</span><span class="n">sequence</span><span class="p">)</span>
+    <span class="n">cdr3</span> <span class="o">=</span> <span class="s1">''</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">amino_acid</span> <span class="k">for</span> <span class="p">(</span><span class="n">seq_id</span><span class="p">,</span> <span class="n">_</span><span class="p">),</span> <span class="n">amino_acid</span> <span class="ow">in</span> <span class="n">numbering</span> <span class="k">if</span> <span class="n">amino_acid</span> <span class="o">!=</span> <span class="s1">'-'</span> <span class="ow">and</span> <span class="n">seq_id</span> <span class="ow">in</span> <span class="n">IMGT_CDR3</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">tidytcells</span><span class="o">.</span><span class="n">junction</span><span class="o">.</span><span class="n">standardise</span><span class="p">(</span><span class="n">cdr3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<section id="Defining-cluster-motifs">
+<h2>Defining cluster motifs<a class="headerlink" href="#Defining-cluster-motifs" title="Link to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dash_sequences</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'../data/interim/sequences_dash.csv'</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">'id'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dash_sequences_bmlf</span> <span class="o">=</span> <span class="n">dash_sequences</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">"peptide == 'GLCTLVAML'"</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'../data/interim/dash_BMLF_sequence_clusters.txt'</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+    <span class="n">clusters</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span><span class="o">.</span><span class="n">split</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">fh</span> <span class="k">if</span> <span class="n">line</span><span class="p">)</span>
+
+<span class="n">dash_sequences_bmlf</span><span class="p">[</span><span class="s1">'cluster'</span><span class="p">]</span> <span class="o">=</span> <span class="n">dash_sequences_bmlf</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dash_sequences_bmlf_clustered</span> <span class="o">=</span> <span class="n">dash_sequences_bmlf</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">"cluster != 'None'"</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">dash_sequences_bmlf_clustered</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="s1">'cluster'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+cluster
+1    22
+0     7
+3     6
+Name: count, dtype: int64
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">dash_sequences_bmlf_clustered</span><span class="p">[</span><span class="s1">'cdr3_alpha'</span><span class="p">]</span> <span class="o">=</span> <span class="n">dash_sequences_bmlf_clustered</span><span class="p">[</span><span class="s1">'tcr_alpha_chain'</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">get_cdr3</span><span class="p">)</span>
+<span class="n">dash_sequences_bmlf_clustered</span><span class="p">[</span><span class="s1">'cdr3_beta'</span><span class="p">]</span> <span class="o">=</span> <span class="n">dash_sequences_bmlf_clustered</span><span class="p">[</span><span class="s1">'tcr_beta_chain'</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">get_cdr3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">align_sequences</span><span class="p">(</span><span class="n">sequences</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">child</span> <span class="o">=</span> <span class="n">subprocess</span><span class="o">.</span><span class="n">Popen</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="s1">'/usr/bin/env'</span><span class="p">,</span>
+            <span class="s1">'mafft-linsi'</span><span class="p">,</span>
+            <span class="s1">'--quiet'</span><span class="p">,</span>
+            <span class="s1">'--op'</span><span class="p">,</span>
+            <span class="s1">'2'</span><span class="p">,</span>
+            <span class="s1">'--ep'</span><span class="p">,</span>
+            <span class="s1">'10'</span><span class="p">,</span>
+            <span class="s1">'--amino'</span><span class="p">,</span>
+            <span class="s1">'-'</span><span class="p">,</span>
+        <span class="p">],</span>
+        <span class="n">stdin</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+        <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">PIPE</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">child</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">write</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="sa">f</span><span class="s1">'&gt;</span><span class="si">{</span><span class="n">idx</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="s1">'</span> <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">sequence</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">sequences</span><span class="p">))</span><span class="o">.</span><span class="n">encode</span><span class="p">())</span>
+    <span class="n">child_out</span> <span class="o">=</span> <span class="n">child</span><span class="o">.</span><span class="n">communicate</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">decode</span><span class="p">(</span><span class="s1">'utf8'</span><span class="p">)</span>
+    <span class="n">aligned_sequences</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span><span class="o">.</span><span class="n">strip</span><span class="p">()</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">child_out</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span> <span class="k">if</span> <span class="n">line</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">line</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">'&gt;'</span><span class="p">)]</span>
+    <span class="n">child</span><span class="o">.</span><span class="n">stdin</span><span class="o">.</span><span class="n">close</span><span class="p">()</span>
+
+    <span class="k">return</span> <span class="n">aligned_sequences</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">create_motif_regex</span><span class="p">(</span><span class="n">group</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">num_amino_acid_cutoff</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">2</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_create_regex</span><span class="p">(</span><span class="n">amino_acids</span><span class="p">:</span> <span class="nb">set</span><span class="p">,</span> <span class="o">*</span><span class="p">,</span> <span class="n">optional</span><span class="p">:</span> <span class="nb">bool</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="k">if</span> <span class="s1">'*'</span> <span class="ow">in</span> <span class="n">amino_acids</span><span class="p">:</span>
+            <span class="n">regex</span> <span class="o">=</span> <span class="s1">'[A-Z]'</span>
+
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">amino_acids</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">regex</span> <span class="o">=</span> <span class="nb">next</span><span class="p">(</span><span class="nb">iter</span><span class="p">(</span><span class="n">amino_acids</span><span class="p">))</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">regex</span> <span class="o">=</span> <span class="s1">'['</span> <span class="o">+</span> <span class="s1">''</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="nb">sorted</span><span class="p">(</span><span class="n">amino_acids</span><span class="p">))</span> <span class="o">+</span> <span class="s1">']'</span>
+
+        <span class="k">if</span> <span class="n">optional</span><span class="p">:</span>
+            <span class="n">regex</span> <span class="o">+=</span> <span class="s1">'?'</span>
+
+        <span class="k">return</span> <span class="n">regex</span>
+
+    <span class="n">motifs</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">chain_type</span> <span class="ow">in</span> <span class="s1">'alpha'</span><span class="p">,</span> <span class="s1">'beta'</span><span class="p">:</span>
+        <span class="n">cdr3s</span> <span class="o">=</span> <span class="n">align_sequences</span><span class="p">(</span><span class="n">group</span><span class="p">[</span><span class="sa">f</span><span class="s1">'cdr3_</span><span class="si">{</span><span class="n">chain_type</span><span class="si">}</span><span class="s1">'</span><span class="p">]</span><span class="o">.</span><span class="n">tolist</span><span class="p">())</span>
+
+        <span class="n">motif</span> <span class="o">=</span> <span class="p">[</span><span class="nb">set</span><span class="p">(</span><span class="n">amino_acids</span><span class="p">)</span> <span class="k">for</span> <span class="n">amino_acids</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="o">*</span><span class="n">cdr3s</span><span class="p">,</span> <span class="n">strict</span><span class="o">=</span><span class="kc">True</span><span class="p">)]</span>
+        <span class="n">motif</span> <span class="o">=</span> <span class="p">[({</span><span class="n">aa</span> <span class="k">for</span> <span class="n">aa</span> <span class="ow">in</span> <span class="n">amino_acids</span> <span class="k">if</span> <span class="n">aa</span> <span class="o">!=</span> <span class="s1">'-'</span><span class="p">},</span> <span class="s1">'-'</span> <span class="ow">in</span> <span class="n">amino_acids</span><span class="p">)</span> <span class="k">for</span> <span class="n">amino_acids</span> <span class="ow">in</span> <span class="n">motif</span><span class="p">]</span>
+        <span class="n">motif</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="p">(</span><span class="n">residues</span> <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">residues</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">num_amino_acid_cutoff</span> <span class="k">else</span> <span class="p">{</span><span class="s1">'*'</span><span class="p">},</span> <span class="n">optional</span><span class="p">)</span> <span class="k">for</span> <span class="n">residues</span><span class="p">,</span> <span class="n">optional</span> <span class="ow">in</span> <span class="n">motif</span>
+        <span class="p">]</span>
+        <span class="n">motif</span> <span class="o">=</span> <span class="s1">''</span><span class="o">.</span><span class="n">join</span><span class="p">([</span><span class="n">_create_regex</span><span class="p">(</span><span class="n">amino_acids</span><span class="p">,</span> <span class="n">optional</span><span class="o">=</span><span class="n">optional</span><span class="p">)</span> <span class="k">for</span> <span class="n">amino_acids</span><span class="p">,</span> <span class="n">optional</span> <span class="ow">in</span> <span class="n">motif</span><span class="p">])</span>
+
+        <span class="n">motifs</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">motif</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">(</span><span class="n">motifs</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="p">[</span><span class="s1">'cdr3_alpha_motif'</span><span class="p">,</span> <span class="s1">'cdr3_beta_motif'</span><span class="p">])</span>
+
+
+<span class="n">cluster_motifs</span> <span class="o">=</span> <span class="n">dash_sequences_bmlf_clustered</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'cluster'</span><span class="p">)</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">create_motif_regex</span><span class="p">,</span> <span class="n">include_groups</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">cluster_motifs</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>cdr3_alpha_motif</th>
+      <th>cdr3_beta_motif</th>
+    </tr>
+    <tr>
+      <th>cluster</th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>CAES[A-Z]S?[GR]?GKLIF</td>
+      <td>CSVG[A-Z][A-Z]GTNEKLFF</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>C[AS][A-Z]D[A-Z]N[A-Z]RLMF</td>
+      <td>CSAR[DV][A-Z][A-Z]GNG[HY]TF</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>CA[LV]RCFGNEKLTF</td>
+      <td>CSVP[A-Z][AT]VQETQYF</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+<section id="Assinging-mutated-sequence-to-motifs">
+<h2>Assinging mutated sequence to motifs<a class="headerlink" href="#Assinging-mutated-sequence-to-motifs" title="Link to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sequences_mutated</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'../data/interim/sequences_dash_BMLF_mutated.csv'</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">'id'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sequences_mutated</span><span class="p">[</span><span class="s1">'cdr3_alpha'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sequences_mutated</span><span class="p">[</span><span class="s1">'tcr_alpha_chain'</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">get_cdr3</span><span class="p">)</span>
+<span class="n">sequences_mutated</span><span class="p">[</span><span class="s1">'cdr3_beta'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sequences_mutated</span><span class="p">[</span><span class="s1">'tcr_beta_chain'</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">get_cdr3</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sequences_mutated</span><span class="p">[</span><span class="s1">'cluster'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sequences_mutated</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="k">lambda</span> <span class="n">id_</span><span class="p">:</span> <span class="n">id_</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'_mut_'</span><span class="p">)[</span><span class="mi">0</span><span class="p">])</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">clusters</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sequences_mutated</span> <span class="o">=</span> <span class="n">sequences_mutated</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">cluster_motifs</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">'inner'</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">'cluster'</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sequences_mutated</span><span class="p">[</span><span class="s1">'fit_cdr3_alpha_motif'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sequences_mutated</span><span class="p">[[</span><span class="s1">'cdr3_alpha_motif'</span><span class="p">,</span> <span class="s1">'cdr3_alpha'</span><span class="p">]]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="o">*</span><span class="n">row</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
+<span class="n">sequences_mutated</span><span class="p">[</span><span class="s1">'fit_cdr3_beta_motif'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sequences_mutated</span><span class="p">[[</span><span class="s1">'cdr3_beta_motif'</span><span class="p">,</span> <span class="s1">'cdr3_beta'</span><span class="p">]]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">row</span><span class="p">:</span> <span class="n">re</span><span class="o">.</span><span class="n">fullmatch</span><span class="p">(</span><span class="o">*</span><span class="n">row</span><span class="p">)</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span>
+<span class="p">)</span>
+
+<span class="n">sequences_mutated</span><span class="p">[</span><span class="s1">'fit_motif'</span><span class="p">]</span> <span class="o">=</span> <span class="n">sequences_mutated</span><span class="p">[</span><span class="s1">'fit_cdr3_alpha_motif'</span><span class="p">]</span> <span class="o">&amp;</span> <span class="n">sequences_mutated</span><span class="p">[</span><span class="s1">'fit_cdr3_alpha_motif'</span><span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sequences_mutated</span><span class="o">.</span><span class="n">value_counts</span><span class="p">(</span><span class="s1">'fit_motif'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+fit_motif
+True     35
+False    21
+Name: count, dtype: int64
+</pre></div></div>
+</div>
+</section>
+<section id="Analysing-effect-on-confidences-scores">
+<h2>Analysing effect on confidences scores<a class="headerlink" href="#Analysing-effect-on-confidences-scores" title="Link to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">confidence_scores_dash</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'../data/interim/confidence_scores_af3_af3_tcrmodel2_dash_bmlf.csv'</span><span class="p">)</span>
+<span class="n">confidence_scores_dash</span> <span class="o">=</span> <span class="n">confidence_scores_dash</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+    <span class="n">dash_sequences_bmlf_clustered</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">'right'</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">'name'</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="n">confidence_scores_dash</span><span class="p">[</span><span class="s1">'type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'Wild Type'</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">confidence_scores_mutations</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'../data/interim/confidence_scores_af3_af3_tcrmodel2_mutated_dash_bmlf.csv'</span><span class="p">)</span>
+<span class="n">confidence_scores_mutations</span> <span class="o">=</span> <span class="n">confidence_scores_mutations</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+    <span class="n">sequences_mutated</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">'left'</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">'name'</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+
+<span class="n">confidence_scores_mutations</span><span class="p">[</span><span class="s1">'type'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'Mutant '</span> <span class="o">+</span> <span class="n">confidence_scores_mutations</span><span class="p">[</span><span class="s1">'fit_motif'</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span>
+    <span class="k">lambda</span> <span class="n">fit_motif</span><span class="p">:</span> <span class="s1">'(maintains motif)'</span> <span class="k">if</span> <span class="n">fit_motif</span> <span class="k">else</span> <span class="s1">'(disrupts motif)'</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">confidence_scores</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">confidence_scores_dash</span><span class="p">,</span> <span class="n">confidence_scores_mutations</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">confidence_scores</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">'cdr_pmhc_pae_score'</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">'type'</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'CDR-pMHC PAE Score'</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticks</span><span class="p">())</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=-</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">'left'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_dash_mutagenesis_analysis_22_0.png" src="../_images/source_dash_mutagenesis_analysis_22_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[20]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">displot</span><span class="p">(</span><span class="n">confidence_scores</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">'cdr_pmhc_pae_score'</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s1">'type'</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">'hist'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_dash_mutagenesis_analysis_23_0.png" src="../_images/source_dash_mutagenesis_analysis_23_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span><span class="o">.</span><span class="n">kruskal</span><span class="p">(</span><span class="n">confidence_scores</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="s1">'cdr_pmhc_pae_score'</span><span class="p">,</span> <span class="n">between</span><span class="o">=</span><span class="s1">'type'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[21]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Source</th>
+      <th>ddof1</th>
+      <th>H</th>
+      <th>p-unc</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Kruskal</th>
+      <td>type</td>
+      <td>2</td>
+      <td>17.871998</td>
+      <td>0.000132</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'Post-hoc:'</span><span class="p">)</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">name1</span><span class="p">,</span> <span class="n">group1</span><span class="p">),</span> <span class="p">(</span><span class="n">name2</span><span class="p">,</span> <span class="n">group2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">confidence_scores</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'type'</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">mwu</span><span class="p">(</span><span class="n">group1</span><span class="p">[</span><span class="s1">'cdr_pmhc_pae_score'</span><span class="p">],</span> <span class="n">group2</span><span class="p">[</span><span class="s1">'cdr_pmhc_pae_score'</span><span class="p">],</span> <span class="n">alternative</span><span class="o">=</span><span class="s1">'less'</span><span class="p">)</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">name1</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">name2</span><span class="si">}</span><span class="s1">'</span><span class="p">]</span>
+
+    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="n">results</span><span class="p">[</span><span class="s1">'significant'</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">'p-val'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mf">0.05</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
+
+<span class="n">results</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Post-hoc:
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[22]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>U-val</th>
+      <th>alternative</th>
+      <th>p-val</th>
+      <th>RBC</th>
+      <th>CLES</th>
+      <th>significant</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Wild Type - Mutant (maintains motif)</th>
+      <td>14714.0</td>
+      <td>less</td>
+      <td>0.263749</td>
+      <td>-0.039086</td>
+      <td>0.519543</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>Wild Type - Mutant (disrupts motif)</th>
+      <td>6701.0</td>
+      <td>less</td>
+      <td>0.000075</td>
+      <td>-0.270639</td>
+      <td>0.635320</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>Mutant (maintains motif) - Mutant (disrupts motif)</th>
+      <td>6712.0</td>
+      <td>less</td>
+      <td>0.000081</td>
+      <td>-0.269442</td>
+      <td>0.634721</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>We do see that the confidence scores have a difference between sequences that fit the binding motif and things that do not.</p>
+<section id="Blocking-by-cluster-group">
+<h3>Blocking by cluster group<a class="headerlink" href="#Blocking-by-cluster-group" title="Link to this heading"></a></h3>
+<p>We can see that the cluster group itself has a big effect on the effect of mutations.</p>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">confidence_scores</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)</span><span class="o">.</span><span class="n">value_counts</span><span class="p">([</span><span class="s1">'cluster'</span><span class="p">,</span> <span class="s1">'type'</span><span class="p">])</span><span class="o">.</span><span class="n">sort_index</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[23]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+cluster  type
+0        Mutant (disrupts motif)      6
+         Mutant (maintains motif)    12
+         Wild Type                    7
+1        Mutant (disrupts motif)      5
+         Mutant (maintains motif)    12
+         Wild Type                   22
+3        Mutant (disrupts motif)     10
+         Mutant (maintains motif)    11
+         Wild Type                    6
+Name: count, dtype: int64
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">confidence_scores</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">'cdr_pmhc_pae_score'</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">'cluster'</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">'type'</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'CDR-pMHC PAE Score'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Cluster'</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'Fits the cluster motif?'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_dash_mutagenesis_analysis_29_0.png" src="../_images/source_dash_mutagenesis_analysis_29_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[25]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">displot</span><span class="p">(</span><span class="n">confidence_scores</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">'cdr_pmhc_pae_score'</span><span class="p">,</span> <span class="n">row</span><span class="o">=</span><span class="s1">'cluster'</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s1">'type'</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">'hist'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_dash_mutagenesis_analysis_30_0.png" src="../_images/source_dash_mutagenesis_analysis_30_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span><span class="o">.</span><span class="n">anova</span><span class="p">(</span><span class="n">confidence_scores</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="s1">'cdr_pmhc_pae_score'</span><span class="p">,</span> <span class="n">between</span><span class="o">=</span><span class="p">[</span><span class="s1">'cluster'</span><span class="p">,</span> <span class="s1">'type'</span><span class="p">])</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[26]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Source</th>
+      <th>SS</th>
+      <th>DF</th>
+      <th>MS</th>
+      <th>F</th>
+      <th>p-unc</th>
+      <th>np2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>cluster</td>
+      <td>3307.804048</td>
+      <td>2.0</td>
+      <td>1653.902024</td>
+      <td>930.281631</td>
+      <td>7.250966e-160</td>
+      <td>0.806639</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>type</td>
+      <td>36.411514</td>
+      <td>2.0</td>
+      <td>18.205757</td>
+      <td>10.240317</td>
+      <td>4.485145e-05</td>
+      <td>0.043905</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>cluster * type</td>
+      <td>35.344849</td>
+      <td>4.0</td>
+      <td>8.836212</td>
+      <td>4.970165</td>
+      <td>6.284575e-04</td>
+      <td>0.042673</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Residual</td>
+      <td>792.921496</td>
+      <td>446.0</td>
+      <td>1.777851</td>
+      <td>NaN</td>
+      <td>NaN</td>
+      <td>NaN</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="n">cluster_name</span><span class="p">,</span> <span class="n">cluster</span> <span class="ow">in</span> <span class="n">confidence_scores</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'cluster'</span><span class="p">):</span>
+    <span class="n">types</span> <span class="o">=</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">type_</span><span class="p">,</span> <span class="n">cluster</span><span class="p">[</span><span class="n">cluster</span><span class="p">[</span><span class="s1">'type'</span><span class="p">]</span> <span class="o">==</span> <span class="n">type_</span><span class="p">])</span>
+        <span class="k">for</span> <span class="n">type_</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'Wild Type'</span><span class="p">,</span> <span class="s1">'Mutant (maintains motif)'</span><span class="p">,</span> <span class="s1">'Mutant (disrupts motif)'</span><span class="p">)</span>
+    <span class="p">]</span>
+
+    <span class="k">for</span> <span class="p">(</span><span class="n">name1</span><span class="p">,</span> <span class="n">group1</span><span class="p">),</span> <span class="p">(</span><span class="n">name2</span><span class="p">,</span> <span class="n">group2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">types</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">ttest</span><span class="p">(</span><span class="n">group1</span><span class="p">[</span><span class="s1">'cdr_pmhc_pae_score'</span><span class="p">],</span> <span class="n">group2</span><span class="p">[</span><span class="s1">'cdr_pmhc_pae_score'</span><span class="p">],</span> <span class="n">paired</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="s1">'less'</span><span class="p">)</span>
+        <span class="n">result</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">cluster_name</span><span class="si">}</span><span class="s1">: </span><span class="si">{</span><span class="n">name1</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">name2</span><span class="si">}</span><span class="s1">'</span><span class="p">]</span>
+
+        <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="n">results</span><span class="p">[</span><span class="s1">'significant'</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">'p-val'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mf">0.05</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
+
+<span class="n">results</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[27]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>T</th>
+      <th>dof</th>
+      <th>alternative</th>
+      <th>p-val</th>
+      <th>CI95%</th>
+      <th>cohen-d</th>
+      <th>BF10</th>
+      <th>power</th>
+      <th>significant</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0: Wild Type - Mutant (maintains motif)</th>
+      <td>-0.260327</td>
+      <td>57.129811</td>
+      <td>less</td>
+      <td>3.977738e-01</td>
+      <td>[-inf, 0.59]</td>
+      <td>0.059437</td>
+      <td>0.458</td>
+      <td>8.574489e-02</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>0: Wild Type - Mutant (disrupts motif)</th>
+      <td>-0.618137</td>
+      <td>61.158304</td>
+      <td>less</td>
+      <td>2.693902e-01</td>
+      <td>[-inf, 0.57]</td>
+      <td>0.153999</td>
+      <td>0.598</td>
+      <td>1.509112e-01</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>0: Mutant (maintains motif) - Mutant (disrupts motif)</th>
+      <td>-0.496444</td>
+      <td>45.774559</td>
+      <td>less</td>
+      <td>3.109783e-01</td>
+      <td>[-inf, 0.53]</td>
+      <td>0.122102</td>
+      <td>0.517</td>
+      <td>1.350165e-01</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1: Wild Type - Mutant (maintains motif)</th>
+      <td>4.752320</td>
+      <td>158.891488</td>
+      <td>less</td>
+      <td>9.999978e-01</td>
+      <td>[-inf, 0.6]</td>
+      <td>0.686249</td>
+      <td>0.0</td>
+      <td>1.777116e-09</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1: Wild Type - Mutant (disrupts motif)</th>
+      <td>2.681470</td>
+      <td>38.048391</td>
+      <td>less</td>
+      <td>9.946099e-01</td>
+      <td>[-inf, 0.65]</td>
+      <td>0.563174</td>
+      <td>0.098</td>
+      <td>1.497608e-05</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1: Mutant (maintains motif) - Mutant (disrupts motif)</th>
+      <td>-0.316088</td>
+      <td>35.767620</td>
+      <td>less</td>
+      <td>3.768865e-01</td>
+      <td>[-inf, 0.2]</td>
+      <td>0.084618</td>
+      <td>0.512</td>
+      <td>9.813044e-02</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>3: Wild Type - Mutant (maintains motif)</th>
+      <td>2.445430</td>
+      <td>31.529150</td>
+      <td>less</td>
+      <td>9.898794e-01</td>
+      <td>[-inf, 2.05]</td>
+      <td>0.720177</td>
+      <td>0.167</td>
+      <td>8.240884e-07</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>3: Wild Type - Mutant (disrupts motif)</th>
+      <td>-0.469330</td>
+      <td>31.737883</td>
+      <td>less</td>
+      <td>3.210211e-01</td>
+      <td>[-inf, 0.61]</td>
+      <td>0.135147</td>
+      <td>0.525</td>
+      <td>1.435031e-01</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>3: Mutant (maintains motif) - Mutant (disrupts motif)</th>
+      <td>-9.924354</td>
+      <td>102.196904</td>
+      <td>less</td>
+      <td>5.876984e-17</td>
+      <td>[-inf, -1.2]</td>
+      <td>1.938524</td>
+      <td>7.601e+13</td>
+      <td>1.000000e+00</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<p>We only see significance for cluster 3.</p>
+</section>
+<section id="Normalising-values-within-groups">
+<h3>Normalising values within groups<a class="headerlink" href="#Normalising-values-within-groups" title="Link to this heading"></a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[28]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">confidence_scores</span><span class="p">[</span><span class="s1">'cdr_pmhc_pae_score_cluster_norm'</span><span class="p">]</span> <span class="o">=</span> <span class="n">confidence_scores</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'cluster'</span><span class="p">)[</span>
+    <span class="s1">'cdr_pmhc_pae_score'</span>
+<span class="p">]</span><span class="o">.</span><span class="n">transform</span><span class="p">(</span><span class="k">lambda</span> <span class="n">scores</span><span class="p">:</span> <span class="p">(</span><span class="n">scores</span> <span class="o">-</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">(</span><span class="n">scores</span><span class="p">))</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">scores</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">confidence_scores</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">'cdr_pmhc_pae_score_cluster_norm'</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">'cluster'</span><span class="p">,</span> <span class="n">hue</span><span class="o">=</span><span class="s1">'type'</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'CDR-pMHC PAE Score (Normalised)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Cluster'</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">legend</span><span class="p">(</span><span class="n">title</span><span class="o">=</span><span class="s1">'Fits the cluster motif?'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_dash_mutagenesis_analysis_36_0.png" src="../_images/source_dash_mutagenesis_analysis_36_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">confidence_scores</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">'cdr_pmhc_pae_score_cluster_norm'</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">'type'</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'CDR-pMHC PAE Score (Normalised)'</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticks</span><span class="p">())</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=-</span><span class="mi">45</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">'left'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_dash_mutagenesis_analysis_37_0.png" src="../_images/source_dash_mutagenesis_analysis_37_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[31]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">displot</span><span class="p">(</span><span class="n">confidence_scores</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">'cdr_pmhc_pae_score_cluster_norm'</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s1">'type'</span><span class="p">,</span> <span class="n">kind</span><span class="o">=</span><span class="s1">'hist'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_dash_mutagenesis_analysis_38_0.png" src="../_images/source_dash_mutagenesis_analysis_38_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span><span class="o">.</span><span class="n">anova</span><span class="p">(</span><span class="n">confidence_scores</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="s1">'cdr_pmhc_pae_score_cluster_norm'</span><span class="p">,</span> <span class="n">between</span><span class="o">=</span><span class="s1">'type'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[32]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Source</th>
+      <th>ddof1</th>
+      <th>ddof2</th>
+      <th>F</th>
+      <th>p-unc</th>
+      <th>np2</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>type</td>
+      <td>2</td>
+      <td>452</td>
+      <td>13.305969</td>
+      <td>0.000002</td>
+      <td>0.055602</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="nb">print</span><span class="p">(</span><span class="s1">'Post-hoc:'</span><span class="p">)</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">for</span> <span class="p">(</span><span class="n">name1</span><span class="p">,</span> <span class="n">group1</span><span class="p">),</span> <span class="p">(</span><span class="n">name2</span><span class="p">,</span> <span class="n">group2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">confidence_scores</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'type'</span><span class="p">,</span> <span class="n">sort</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span> <span class="mi">2</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">ttest</span><span class="p">(</span>
+        <span class="n">group1</span><span class="p">[</span><span class="s1">'cdr_pmhc_pae_score_cluster_norm'</span><span class="p">],</span>
+        <span class="n">group2</span><span class="p">[</span><span class="s1">'cdr_pmhc_pae_score_cluster_norm'</span><span class="p">],</span>
+        <span class="n">paired</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+        <span class="n">alternative</span><span class="o">=</span><span class="s1">'less'</span><span class="p">,</span>
+    <span class="p">)</span>
+    <span class="n">result</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="p">[</span><span class="sa">f</span><span class="s1">'</span><span class="si">{</span><span class="n">name1</span><span class="si">}</span><span class="s1"> - </span><span class="si">{</span><span class="n">name2</span><span class="si">}</span><span class="s1">'</span><span class="p">]</span>
+
+    <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">result</span><span class="p">)</span>
+
+<span class="n">results</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">(</span><span class="n">results</span><span class="p">)</span>
+<span class="n">results</span><span class="p">[</span><span class="s1">'significant'</span><span class="p">]</span> <span class="o">=</span> <span class="n">results</span><span class="p">[</span><span class="s1">'p-val'</span><span class="p">]</span> <span class="o">&lt;</span> <span class="p">(</span><span class="mf">0.05</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">))</span>
+
+<span class="n">results</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+Post-hoc:
+</pre></div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[33]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>T</th>
+      <th>dof</th>
+      <th>alternative</th>
+      <th>p-val</th>
+      <th>CI95%</th>
+      <th>cohen-d</th>
+      <th>BF10</th>
+      <th>power</th>
+      <th>significant</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>Wild Type - Mutant (maintains motif)</th>
+      <td>4.693270</td>
+      <td>348.000000</td>
+      <td>less</td>
+      <td>0.999998</td>
+      <td>[-inf, 0.68]</td>
+      <td>0.501732</td>
+      <td>0.0</td>
+      <td>1.233429e-10</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>Wild Type - Mutant (disrupts motif)</th>
+      <td>0.412818</td>
+      <td>267.435330</td>
+      <td>less</td>
+      <td>0.659965</td>
+      <td>[-inf, 0.26]</td>
+      <td>0.047200</td>
+      <td>0.294</td>
+      <td>2.136758e-02</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>Mutant (maintains motif) - Mutant (disrupts motif)</th>
+      <td>-4.392661</td>
+      <td>190.269997</td>
+      <td>less</td>
+      <td>0.000009</td>
+      <td>[-inf, -0.28]</td>
+      <td>0.566297</td>
+      <td>2055.208</td>
+      <td>9.983132e-01</td>
+      <td>True</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="compare_structural_features_to_confidence.html" class="btn btn-neutral float-left" title="Comparing structural features to confidence scores" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="evaluating_antigen_specificity_model.html" class="btn btn-neutral float-right" title="Evaluating antigen specificity model" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Benjamin McMaster, Ali El Moselhy, Ilija Ilievski, Christopher J. Thorpe, Jamie Rossjohn, Charlotte M. Deane, and Hashem Koohy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

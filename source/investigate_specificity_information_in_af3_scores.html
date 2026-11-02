@@ -1,0 +1,968 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Investigating specificity information in AF3 Scores &mdash; tcr_pmhc_predicted_structures  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Sequence Data" href="visualise_sequence_data.html" />
+    <link rel="prev" title="Exploring the Dash et al dataset" href="exploring_dash_dataset.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tcr_pmhc_predicted_structures
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Analysis Results</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="notebooks.html">Analysis Notebooks</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ablations_of_alphafold3.html">Ablations of AlphaFold3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmark_alphafold3_against_sequence_models.html">Benchmark AlphaFold3 against sequence models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmark_structure_prediction_methods.html">Benchmark Structure Prediction Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="c259_mutational_scanning.html">Correlation between affinity and binding scores for c259 TCR binding peptide mutants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coeliac_antigen_specificity_with_alphafold3.html">Coeliac antigen specificity with AlphaFold3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coeliac_mutagenesis_analysis.html">Coeliac mutagenesis analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compare_structural_features_to_confidence.html">Comparing structural features to confidence scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dash_mutagenesis_analysis.html">Dash et al mutagenesis analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evaluating_antigen_specificity_model.html">Evaluating antigen specificity model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exploring_coeliac_tcrs.html">Exploring Coeliac TCRs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exploring_dash_dataset.html">Exploring the Dash <em>et al</em> dataset</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Investigating specificity information in AF3 Scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualise_sequence_data.html">Sequence Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualise_structure_data.html">Data Summary</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Command Line Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="apps.html">Command Line Applications</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">tcr_pmhc_predicted_structures</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tcr_pmhc_predicted_structures</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="notebooks.html">Analysis Notebooks</a></li>
+      <li class="breadcrumb-item active">Investigating specificity information in AF3 Scores</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/investigate_specificity_information_in_af3_scores.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Investigating-specificity-information-in-AF3-Scores">
+<h1>Investigating specificity information in AF3 Scores<a class="headerlink" href="#Investigating-specificity-information-in-AF3-Scores" title="Link to this heading"></a></h1>
+<p>In this notebook, we investigate the ability of alphafold3 confidence scores at discriminating between binding and non-binding TCR:pMHC complexes.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>import matplotlib.pyplot as plt
+import pandas as pd
+import seaborn as sns
+from scipy.stats import ranksums
+from sklearn.metrics import roc_auc_score
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>af3_scores = pd.read_csv('../data/processed/confidence_scores_af3_af3_tcrmodel2_1500.csv')
+af3_scores['name'] = af3_scores['name'].astype('str')
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>sequences = pd.read_csv('../data/interim/sequences_sample_1500.csv', index_col='index')
+sequences.index = sequences.index.astype('str')
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>af3_scores = af3_scores.merge(sequences, left_on='name', right_index=True, how='left')
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>af3_scores['type'] = af3_scores['label'].map(lambda label: 'binder' if label else 'decoy')
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>af3_scores['top_model'] = False
+af3_scores.loc[af3_scores.groupby('name')['ranking_score'].idxmax(), 'top_model'] = True
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>[
+    col
+    for col in af3_scores.columns
+    if 'ptm' not in col and 'pae' not in col and 'ipsae' not in col and 'plddt' not in col
+]
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+[&#39;fraction_disordered&#39;,
+ &#39;has_clash&#39;,
+ &#39;ranking_score&#39;,
+ &#39;tcr_pmhc_alphabridge_score&#39;,
+ &#39;cdr_pmhc_alphabridge_score&#39;,
+ &#39;name&#39;,
+ &#39;seed&#39;,
+ &#39;sample&#39;,
+ &#39;cdr1_alpha&#39;,
+ &#39;cdr2_alpha&#39;,
+ &#39;cdr3_alpha&#39;,
+ &#39;cdr1_beta&#39;,
+ &#39;cdr2_beta&#39;,
+ &#39;cdr3_beta&#39;,
+ &#39;peptide&#39;,
+ &#39;mhc_pseudo&#39;,
+ &#39;v_alpha&#39;,
+ &#39;j_alpha&#39;,
+ &#39;v_beta&#39;,
+ &#39;j_beta&#39;,
+ &#39;mhc1&#39;,
+ &#39;mhc2&#39;,
+ &#39;mhc_type&#39;,
+ &#39;species&#39;,
+ &#39;source&#39;,
+ &#39;label&#39;,
+ &#39;fold&#39;,
+ &#39;type&#39;,
+ &#39;top_model&#39;]
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>scores_summary = []
+
+for column_name in af3_scores.filter(regex=r'ptm').columns:
+    score_summary = {
+        'metric': column_name,
+    }
+
+    # All Models
+    roc = roc_auc_score(af3_scores['label'], af3_scores[column_name])
+    stat, p_val = ranksums(
+        af3_scores.query("type == 'binder'")[column_name],
+        af3_scores.query("type == 'decoy'")[column_name],
+        alternative='greater',
+    )
+    score_summary['roc_all_models'] = roc
+    score_summary['stat_all_models'] = stat
+    score_summary['p_val_all_models'] = p_val
+
+    # Top Model
+    roc = roc_auc_score(af3_scores.query('top_model')['label'], af3_scores.query('top_model')[column_name])
+    stat, p_val = ranksums(
+        af3_scores.query("top_model and type == 'binder'")[column_name],
+        af3_scores.query("top_model and type == 'decoy'")[column_name],
+        alternative='greater',
+    )
+    score_summary['roc_top_model'] = roc
+    score_summary['stat_top_model'] = stat
+    score_summary['p_val_top_model'] = p_val
+
+    scores_summary.append(score_summary)
+
+for column_name in af3_scores.filter(regex=r'pae').columns:
+    score_summary = {
+        'metric': column_name,
+    }
+
+    # All Models
+    roc = 1 - roc_auc_score(af3_scores['label'], af3_scores[column_name])
+    stat, p_val = ranksums(
+        af3_scores.query("type == 'binder'")[column_name],
+        af3_scores.query("type == 'decoy'")[column_name],
+        alternative='less',
+    )
+    score_summary['roc_all_models'] = roc
+    score_summary['stat_all_models'] = stat
+    score_summary['p_val_all_models'] = p_val
+
+    # Top Model
+    roc = 1 - roc_auc_score(af3_scores.query('top_model')['label'], af3_scores.query('top_model')[column_name])
+    stat, p_val = ranksums(
+        af3_scores.query("top_model and type == 'binder'")[column_name],
+        af3_scores.query("top_model and type == 'decoy'")[column_name],
+        alternative='less',
+    )
+    score_summary['roc_top_model'] = roc
+    score_summary['stat_top_model'] = stat
+    score_summary['p_val_top_model'] = p_val
+
+    scores_summary.append(score_summary)
+
+for column_name in af3_scores.filter(regex=r'plddt').columns:
+    score_summary = {
+        'metric': column_name,
+    }
+
+    # All Models
+    roc = roc_auc_score(af3_scores['label'], af3_scores[column_name])
+    stat, p_val = ranksums(
+        af3_scores.query("type == 'binder'")[column_name],
+        af3_scores.query("type == 'decoy'")[column_name],
+        alternative='greater',
+    )
+    score_summary['roc_all_models'] = roc
+    score_summary['stat_all_models'] = stat
+    score_summary['p_val_all_models'] = p_val
+
+    # Top Model
+    roc = roc_auc_score(af3_scores.query('top_model')['label'], af3_scores.query('top_model')[column_name])
+    stat, p_val = ranksums(
+        af3_scores.query("top_model and type == 'binder'")[column_name],
+        af3_scores.query("top_model and type == 'decoy'")[column_name],
+        alternative='greater',
+    )
+    score_summary['roc_top_model'] = roc
+    score_summary['stat_top_model'] = stat
+    score_summary['p_val_top_model'] = p_val
+
+    scores_summary.append(score_summary)
+
+for column_name in af3_scores.filter(regex=r'ipsae').columns:
+    score_summary = {
+        'metric': column_name,
+    }
+
+    # All Models
+    roc = roc_auc_score(af3_scores['label'], af3_scores[column_name])
+    stat, p_val = ranksums(
+        af3_scores.query("type == 'binder'")[column_name],
+        af3_scores.query("type == 'decoy'")[column_name],
+        alternative='greater',
+    )
+    score_summary['roc_all_models'] = roc
+    score_summary['stat_all_models'] = stat
+    score_summary['p_val_all_models'] = p_val
+
+    # Top Model
+    roc = roc_auc_score(af3_scores.query('top_model')['label'], af3_scores.query('top_model')[column_name])
+    stat, p_val = ranksums(
+        af3_scores.query("top_model and type == 'binder'")[column_name],
+        af3_scores.query("top_model and type == 'decoy'")[column_name],
+        alternative='greater',
+    )
+    score_summary['roc_top_model'] = roc
+    score_summary['stat_top_model'] = stat
+    score_summary['p_val_top_model'] = p_val
+
+    scores_summary.append(score_summary)
+
+scores_summary = pd.DataFrame(scores_summary)
+scores_summary = scores_summary.set_index('metric')
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>scores_summary.sort_values('roc_all_models', ascending=False)
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>roc_all_models</th>
+      <th>stat_all_models</th>
+      <th>p_val_all_models</th>
+      <th>roc_top_model</th>
+      <th>stat_top_model</th>
+      <th>p_val_top_model</th>
+    </tr>
+    <tr>
+      <th>metric</th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+      <th></th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>combined_ipsaes</th>
+      <td>0.615853</td>
+      <td>17.376842</td>
+      <td>6.178731e-68</td>
+      <td>0.616194</td>
+      <td>7.791919</td>
+      <td>3.299960e-15</td>
+    </tr>
+    <tr>
+      <th>antigen_chain_beta_chain_ipsae</th>
+      <td>0.615192</td>
+      <td>17.277579</td>
+      <td>3.470036e-67</td>
+      <td>0.616969</td>
+      <td>7.843897</td>
+      <td>2.183870e-15</td>
+    </tr>
+    <tr>
+      <th>antigen_chain_alpha_chain_ipsae</th>
+      <td>0.613941</td>
+      <td>17.090061</td>
+      <td>8.799529e-66</td>
+      <td>0.615129</td>
+      <td>7.720508</td>
+      <td>5.793368e-15</td>
+    </tr>
+    <tr>
+      <th>mhc_chain1_beta_chain_ipsae</th>
+      <td>0.612894</td>
+      <td>16.932914</td>
+      <td>1.286602e-64</td>
+      <td>0.613588</td>
+      <td>7.617146</td>
+      <td>1.296727e-14</td>
+    </tr>
+    <tr>
+      <th>beta_chain_antigen_chain_ipsae</th>
+      <td>0.612758</td>
+      <td>16.912558</td>
+      <td>1.817893e-64</td>
+      <td>0.612245</td>
+      <td>7.527137</td>
+      <td>2.593243e-14</td>
+    </tr>
+    <tr>
+      <th>...</th>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+      <td>...</td>
+    </tr>
+    <tr>
+      <th>mhc_chain_2_mhc_chain_1_pae_min</th>
+      <td>0.486298</td>
+      <td>2.055138</td>
+      <td>9.800671e-01</td>
+      <td>0.495808</td>
+      <td>0.281114</td>
+      <td>6.106886e-01</td>
+    </tr>
+    <tr>
+      <th>mhc_chain_1_mhc_chain_2_pae_min</th>
+      <td>0.482672</td>
+      <td>2.598973</td>
+      <td>9.953248e-01</td>
+      <td>0.486367</td>
+      <td>0.914217</td>
+      <td>8.196987e-01</td>
+    </tr>
+    <tr>
+      <th>tcr_beta_chain_tcr_alpha_chain_pae_min</th>
+      <td>0.481797</td>
+      <td>2.730298</td>
+      <td>9.968361e-01</td>
+      <td>0.480085</td>
+      <td>1.335471</td>
+      <td>9.091389e-01</td>
+    </tr>
+    <tr>
+      <th>mhc_chain_2_ptm</th>
+      <td>0.478106</td>
+      <td>-3.283834</td>
+      <td>9.994880e-01</td>
+      <td>0.495404</td>
+      <td>-0.308236</td>
+      <td>6.210487e-01</td>
+    </tr>
+    <tr>
+      <th>tcr_alpha_chain_tcr_beta_chain_pae_min</th>
+      <td>0.477531</td>
+      <td>3.370079</td>
+      <td>9.996243e-01</td>
+      <td>0.478838</td>
+      <td>1.419102</td>
+      <td>9.220654e-01</td>
+    </tr>
+  </tbody>
+</table>
+<p>74 rows × 6 columns</p>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-none notranslate"><div class="highlight"><pre><span></span>for column_name, row in (
+    scores_summary.sort_values('roc_all_models', ascending=False).query('p_val_all_models &lt; 0.05').iterrows()
+):
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(10, 5))
+
+    # All Models
+    sns.histplot(af3_scores, x=column_name, hue='type', stat='probability', ax=ax1)
+    ax1.set_title('All models')
+    ax1.text(
+        0.95,
+        0.95,
+        f"ROC-AUC: {row['roc_all_models']: .2f}\nP-val: {row['p_val_all_models']: .2e}",
+        transform=ax1.transAxes,
+        verticalalignment='top',
+        horizontalalignment='right',
+        bbox={'boxstyle': 'round', 'facecolor': 'white', 'alpha': 0.90},
+    )
+
+    # Top Model
+    sns.histplot(af3_scores.query('top_model'), x=column_name, hue='type', stat='probability', ax=ax2)
+    ax2.text(
+        0.95,
+        0.95,
+        f"ROC-AUC: {row['roc_top_model']: .2f}\nP-val: {row['p_val_top_model']: .2e}",
+        transform=ax2.transAxes,
+        verticalalignment='top',
+        horizontalalignment='right',
+        bbox={'boxstyle': 'round', 'facecolor': 'white', 'alpha': 0.90},
+    )
+    ax2.set_title('Top Model')
+
+    plt.show()
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_0.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_1.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_1.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_2.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_2.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_3.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_3.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_4.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_4.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_5.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_5.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_6.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_6.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_7.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_7.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_8.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_8.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_9.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_9.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_10.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_10.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_11.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_11.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_12.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_12.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_13.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_13.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_14.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_14.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_15.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_15.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_16.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_16.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_17.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_17.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_18.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_18.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_19.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_19.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_20.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_20.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_21.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_21.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_22.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_22.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_23.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_23.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_24.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_24.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_25.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_25.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_26.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_26.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_27.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_27.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_28.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_28.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_29.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_29.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_30.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_30.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_31.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_31.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_32.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_32.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_33.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_33.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_34.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_34.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_35.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_35.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_36.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_36.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_37.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_37.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_38.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_38.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_39.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_39.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_40.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_40.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_41.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_41.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_42.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_42.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_43.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_43.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_44.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_44.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_45.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_45.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_46.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_46.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_47.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_47.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_48.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_48.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_49.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_49.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_50.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_50.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_51.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_51.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_52.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_52.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_53.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_53.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_54.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_54.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_55.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_55.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_56.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_56.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_investigate_specificity_information_in_af3_scores_10_57.png" src="../_images/source_investigate_specificity_information_in_af3_scores_10_57.png" />
+</div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="exploring_dash_dataset.html" class="btn btn-neutral float-left" title="Exploring the Dash et al dataset" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="visualise_sequence_data.html" class="btn btn-neutral float-right" title="Sequence Data" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Benjamin McMaster, Ali El Moselhy, Ilija Ilievski, Christopher J. Thorpe, Jamie Rossjohn, Charlotte M. Deane, and Hashem Koohy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

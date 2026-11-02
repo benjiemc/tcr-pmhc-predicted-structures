@@ -1,0 +1,40 @@
+tcr_pmhc_predicted_structures.apps.collate_sequence_data
+========================================================
+.. code-block:: text
+
+   usage: python -m tcr_pmhc_predicted_structures.apps.collate_sequence_data
+          [-h] [--output OUTPUT] [--iedb-path IEDB_PATH]
+          [--vdjdb-path VDJDB_PATH] [--itrap-path ITRAP_PATH]
+          [--mcpas-tcr-path MCPAS_TCR_PATH] --mhc-sequences MHC_SEQUENCES
+          [MHC_SEQUENCES ...] [--log-level {debug,info,warning,error}]
+          [--log-file LOG_FILE]
+   
+   Collate TCR:pMHC sequence data from IEDB, McPAS-TCR, VDJdb, and ITRAP, removing redundant entries.
+   
+   options:
+     -h, --help            show this help message and exit
+     --output OUTPUT, -o OUTPUT
+                           path to the output csv file
+   
+   Input:
+     --iedb-path IEDB_PATH
+                           path to the IEDB data
+     --vdjdb-path VDJDB_PATH
+                           path to the VDJdb data
+     --itrap-path ITRAP_PATH
+                           path to the ITRAP data
+     --mcpas-tcr-path MCPAS_TCR_PATH
+                           path to the McPAS-TCR data
+   
+   Annotations:
+     --mhc-sequences MHC_SEQUENCES [MHC_SEQUENCES ...]
+                           paths to mhc sequence information to create pseudo
+                           sequences.
+   
+   Logging:
+     Options for logging
+   
+     --log-level {debug,info,warning,error}
+                           Level to log messages at (Default: 'warning')
+     --log-file LOG_FILE   File to output logs (default is to write to stderr)
+   

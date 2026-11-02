@@ -1,0 +1,258 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>tcr_pmhc_predicted_structures.imgt_numbering module &mdash; tcr_pmhc_predicted_structures  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="tcr_pmhc_predicted_structures.models module" href="tcr_pmhc_predicted_structures.models.html" />
+    <link rel="prev" title="tcr_pmhc_predicted_structures.confidence_scores module" href="tcr_pmhc_predicted_structures.confidence_scores.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tcr_pmhc_predicted_structures
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Analysis Results</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="notebooks.html">Analysis Notebooks</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Command Line Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="apps.html">Command Line Applications</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="modules.html">tcr_pmhc_predicted_structures</a><ul class="current">
+<li class="toctree-l2 current"><a class="reference internal" href="tcr_pmhc_predicted_structures.html">tcr_pmhc_predicted_structures package</a><ul class="current">
+<li class="toctree-l3"><a class="reference internal" href="tcr_pmhc_predicted_structures.html#subpackages">Subpackages</a></li>
+<li class="toctree-l3 current"><a class="reference internal" href="tcr_pmhc_predicted_structures.html#submodules">Submodules</a><ul class="current">
+<li class="toctree-l4"><a class="reference internal" href="tcr_pmhc_predicted_structures.aligners.html">tcr_pmhc_predicted_structures.aligners module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tcr_pmhc_predicted_structures.chemistry.html">tcr_pmhc_predicted_structures.chemistry module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tcr_pmhc_predicted_structures.clustering.html">tcr_pmhc_predicted_structures.clustering module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tcr_pmhc_predicted_structures.comparisons.html">tcr_pmhc_predicted_structures.comparisons module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tcr_pmhc_predicted_structures.confidence_scores.html">tcr_pmhc_predicted_structures.confidence_scores module</a></li>
+<li class="toctree-l4 current"><a class="current reference internal" href="#">tcr_pmhc_predicted_structures.imgt_numbering module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tcr_pmhc_predicted_structures.models.html">tcr_pmhc_predicted_structures.models module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tcr_pmhc_predicted_structures.padding.html">tcr_pmhc_predicted_structures.padding module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tcr_pmhc_predicted_structures.predictions.html">tcr_pmhc_predicted_structures.predictions module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tcr_pmhc_predicted_structures.structure.html">tcr_pmhc_predicted_structures.structure module</a></li>
+<li class="toctree-l4"><a class="reference internal" href="tcr_pmhc_predicted_structures.utils.html">tcr_pmhc_predicted_structures.utils module</a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="tcr_pmhc_predicted_structures.html#module-tcr_pmhc_predicted_structures">Module contents</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tcr_pmhc_predicted_structures</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="modules.html">tcr_pmhc_predicted_structures</a></li>
+          <li class="breadcrumb-item"><a href="tcr_pmhc_predicted_structures.html">tcr_pmhc_predicted_structures package</a></li>
+      <li class="breadcrumb-item active">tcr_pmhc_predicted_structures.imgt_numbering module</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/tcr_pmhc_predicted_structures.imgt_numbering.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="module-tcr_pmhc_predicted_structures.imgt_numbering">
+<span id="tcr-pmhc-predicted-structures-imgt-numbering-module"></span><h1>tcr_pmhc_predicted_structures.imgt_numbering module<a class="headerlink" href="#module-tcr_pmhc_predicted_structures.imgt_numbering" title="Link to this heading"></a></h1>
+<p>Constants and functions for annotating sequences using IMGT numbering.</p>
+<dl class="py exception">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.AlignmentError">
+<span class="property"><span class="k"><span class="pre">exception</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">AlignmentError</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence1</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sequence2</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">details</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.AlignmentError" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">Exception</span></code></p>
+<p>Raised when there is an error aligning two sequences.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.IMGT_CDR">
+<span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">IMGT_CDR</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{27,</span> <span class="pre">28,</span> <span class="pre">29,</span> <span class="pre">30,</span> <span class="pre">31,</span> <span class="pre">32,</span> <span class="pre">33,</span> <span class="pre">34,</span> <span class="pre">35,</span> <span class="pre">36,</span> <span class="pre">37,</span> <span class="pre">38,</span> <span class="pre">56,</span> <span class="pre">57,</span> <span class="pre">58,</span> <span class="pre">59,</span> <span class="pre">60,</span> <span class="pre">61,</span> <span class="pre">62,</span> <span class="pre">63,</span> <span class="pre">64,</span> <span class="pre">65,</span> <span class="pre">105,</span> <span class="pre">106,</span> <span class="pre">107,</span> <span class="pre">108,</span> <span class="pre">109,</span> <span class="pre">110,</span> <span class="pre">111,</span> <span class="pre">112,</span> <span class="pre">113,</span> <span class="pre">114,</span> <span class="pre">115,</span> <span class="pre">116,</span> <span class="pre">117}</span></span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.IMGT_CDR" title="Link to this definition"></a></dt>
+<dd><p>IMGT residue numbers corresponding to all CDR domains.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.IMGT_CDR1">
+<span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">IMGT_CDR1</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{27,</span> <span class="pre">28,</span> <span class="pre">29,</span> <span class="pre">30,</span> <span class="pre">31,</span> <span class="pre">32,</span> <span class="pre">33,</span> <span class="pre">34,</span> <span class="pre">35,</span> <span class="pre">36,</span> <span class="pre">37,</span> <span class="pre">38}</span></span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.IMGT_CDR1" title="Link to this definition"></a></dt>
+<dd><p>IMGT residue numbers corresponding to CDR 1 domains.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.IMGT_CDR2">
+<span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">IMGT_CDR2</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{56,</span> <span class="pre">57,</span> <span class="pre">58,</span> <span class="pre">59,</span> <span class="pre">60,</span> <span class="pre">61,</span> <span class="pre">62,</span> <span class="pre">63,</span> <span class="pre">64,</span> <span class="pre">65}</span></span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.IMGT_CDR2" title="Link to this definition"></a></dt>
+<dd><p>IMGT residue numbers corresponding to CDR 2 domains.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.IMGT_CDR3">
+<span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">IMGT_CDR3</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{105,</span> <span class="pre">106,</span> <span class="pre">107,</span> <span class="pre">108,</span> <span class="pre">109,</span> <span class="pre">110,</span> <span class="pre">111,</span> <span class="pre">112,</span> <span class="pre">113,</span> <span class="pre">114,</span> <span class="pre">115,</span> <span class="pre">116,</span> <span class="pre">117}</span></span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.IMGT_CDR3" title="Link to this definition"></a></dt>
+<dd><p>IMGT residue numbers corresponding to CDR 3 domains.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.IMGT_FRAMEWORK_REGION">
+<span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">IMGT_FRAMEWORK_REGION</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{1,</span> <span class="pre">2,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6,</span> <span class="pre">7,</span> <span class="pre">8,</span> <span class="pre">9,</span> <span class="pre">10,</span> <span class="pre">11,</span> <span class="pre">12,</span> <span class="pre">13,</span> <span class="pre">14,</span> <span class="pre">15,</span> <span class="pre">16,</span> <span class="pre">17,</span> <span class="pre">18,</span> <span class="pre">19,</span> <span class="pre">20,</span> <span class="pre">21,</span> <span class="pre">22,</span> <span class="pre">23,</span> <span class="pre">24,</span> <span class="pre">25,</span> <span class="pre">26,</span> <span class="pre">39,</span> <span class="pre">40,</span> <span class="pre">41,</span> <span class="pre">42,</span> <span class="pre">43,</span> <span class="pre">44,</span> <span class="pre">45,</span> <span class="pre">46,</span> <span class="pre">47,</span> <span class="pre">48,</span> <span class="pre">49,</span> <span class="pre">50,</span> <span class="pre">51,</span> <span class="pre">52,</span> <span class="pre">53,</span> <span class="pre">54,</span> <span class="pre">55,</span> <span class="pre">66,</span> <span class="pre">67,</span> <span class="pre">68,</span> <span class="pre">69,</span> <span class="pre">70,</span> <span class="pre">71,</span> <span class="pre">72,</span> <span class="pre">73,</span> <span class="pre">74,</span> <span class="pre">75,</span> <span class="pre">76,</span> <span class="pre">77,</span> <span class="pre">78,</span> <span class="pre">79,</span> <span class="pre">80,</span> <span class="pre">81,</span> <span class="pre">82,</span> <span class="pre">83,</span> <span class="pre">84,</span> <span class="pre">85,</span> <span class="pre">86,</span> <span class="pre">87,</span> <span class="pre">88,</span> <span class="pre">89,</span> <span class="pre">90,</span> <span class="pre">91,</span> <span class="pre">92,</span> <span class="pre">93,</span> <span class="pre">94,</span> <span class="pre">95,</span> <span class="pre">96,</span> <span class="pre">97,</span> <span class="pre">98,</span> <span class="pre">99,</span> <span class="pre">100,</span> <span class="pre">101,</span> <span class="pre">102,</span> <span class="pre">103,</span> <span class="pre">104,</span> <span class="pre">118,</span> <span class="pre">119,</span> <span class="pre">120,</span> <span class="pre">121,</span> <span class="pre">122,</span> <span class="pre">123,</span> <span class="pre">124,</span> <span class="pre">125,</span> <span class="pre">126,</span> <span class="pre">127,</span> <span class="pre">128}</span></span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.IMGT_FRAMEWORK_REGION" title="Link to this definition"></a></dt>
+<dd><p>Framework (Fw) region range for IMGT numbered TCR structures.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.IMGT_MH1_ABD">
+<span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">IMGT_MH1_ABD</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{1,</span> <span class="pre">2,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6,</span> <span class="pre">7,</span> <span class="pre">8,</span> <span class="pre">9,</span> <span class="pre">10,</span> <span class="pre">11,</span> <span class="pre">12,</span> <span class="pre">13,</span> <span class="pre">14,</span> <span class="pre">15,</span> <span class="pre">16,</span> <span class="pre">17,</span> <span class="pre">18,</span> <span class="pre">19,</span> <span class="pre">20,</span> <span class="pre">21,</span> <span class="pre">22,</span> <span class="pre">23,</span> <span class="pre">24,</span> <span class="pre">25,</span> <span class="pre">26,</span> <span class="pre">27,</span> <span class="pre">28,</span> <span class="pre">29,</span> <span class="pre">30,</span> <span class="pre">31,</span> <span class="pre">32,</span> <span class="pre">33,</span> <span class="pre">34,</span> <span class="pre">35,</span> <span class="pre">36,</span> <span class="pre">37,</span> <span class="pre">38,</span> <span class="pre">39,</span> <span class="pre">40,</span> <span class="pre">41,</span> <span class="pre">42,</span> <span class="pre">43,</span> <span class="pre">44,</span> <span class="pre">45,</span> <span class="pre">46,</span> <span class="pre">47,</span> <span class="pre">48,</span> <span class="pre">49,</span> <span class="pre">50,</span> <span class="pre">51,</span> <span class="pre">52,</span> <span class="pre">53,</span> <span class="pre">54,</span> <span class="pre">55,</span> <span class="pre">56,</span> <span class="pre">57,</span> <span class="pre">58,</span> <span class="pre">59,</span> <span class="pre">60,</span> <span class="pre">61,</span> <span class="pre">62,</span> <span class="pre">63,</span> <span class="pre">64,</span> <span class="pre">65,</span> <span class="pre">66,</span> <span class="pre">67,</span> <span class="pre">68,</span> <span class="pre">69,</span> <span class="pre">70,</span> <span class="pre">71,</span> <span class="pre">72,</span> <span class="pre">73,</span> <span class="pre">74,</span> <span class="pre">75,</span> <span class="pre">76,</span> <span class="pre">77,</span> <span class="pre">78,</span> <span class="pre">79,</span> <span class="pre">80,</span> <span class="pre">81,</span> <span class="pre">82,</span> <span class="pre">83,</span> <span class="pre">84,</span> <span class="pre">85,</span> <span class="pre">86,</span> <span class="pre">87,</span> <span class="pre">88,</span> <span class="pre">89,</span> <span class="pre">90,</span> <span class="pre">91,</span> <span class="pre">1001,</span> <span class="pre">1002,</span> <span class="pre">1003,</span> <span class="pre">1004,</span> <span class="pre">1005,</span> <span class="pre">1006,</span> <span class="pre">1007,</span> <span class="pre">1008,</span> <span class="pre">1009,</span> <span class="pre">1010,</span> <span class="pre">1011,</span> <span class="pre">1012,</span> <span class="pre">1013,</span> <span class="pre">1014,</span> <span class="pre">1015,</span> <span class="pre">1016,</span> <span class="pre">1017,</span> <span class="pre">1018,</span> <span class="pre">1019,</span> <span class="pre">1020,</span> <span class="pre">1021,</span> <span class="pre">1022,</span> <span class="pre">1023,</span> <span class="pre">1024,</span> <span class="pre">1025,</span> <span class="pre">1026,</span> <span class="pre">1027,</span> <span class="pre">1028,</span> <span class="pre">1029,</span> <span class="pre">1030,</span> <span class="pre">1031,</span> <span class="pre">1032,</span> <span class="pre">1033,</span> <span class="pre">1034,</span> <span class="pre">1035,</span> <span class="pre">1036,</span> <span class="pre">1037,</span> <span class="pre">1038,</span> <span class="pre">1039,</span> <span class="pre">1040,</span> <span class="pre">1041,</span> <span class="pre">1042,</span> <span class="pre">1043,</span> <span class="pre">1044,</span> <span class="pre">1045,</span> <span class="pre">1046,</span> <span class="pre">1047,</span> <span class="pre">1048,</span> <span class="pre">1049,</span> <span class="pre">1050,</span> <span class="pre">1051,</span> <span class="pre">1052,</span> <span class="pre">1053,</span> <span class="pre">1054,</span> <span class="pre">1055,</span> <span class="pre">1056,</span> <span class="pre">1057,</span> <span class="pre">1058,</span> <span class="pre">1059,</span> <span class="pre">1060,</span> <span class="pre">1061,</span> <span class="pre">1062,</span> <span class="pre">1063,</span> <span class="pre">1064,</span> <span class="pre">1065,</span> <span class="pre">1066,</span> <span class="pre">1067,</span> <span class="pre">1068,</span> <span class="pre">1069,</span> <span class="pre">1070,</span> <span class="pre">1071,</span> <span class="pre">1072,</span> <span class="pre">1073,</span> <span class="pre">1074,</span> <span class="pre">1075,</span> <span class="pre">1076,</span> <span class="pre">1077,</span> <span class="pre">1078,</span> <span class="pre">1079,</span> <span class="pre">1080,</span> <span class="pre">1081,</span> <span class="pre">1082,</span> <span class="pre">1083,</span> <span class="pre">1084,</span> <span class="pre">1085,</span> <span class="pre">1086,</span> <span class="pre">1087,</span> <span class="pre">1088,</span> <span class="pre">1089,</span> <span class="pre">1090,</span> <span class="pre">1091}</span></span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.IMGT_MH1_ABD" title="Link to this definition"></a></dt>
+<dd><p>IMGT ranges of the antigen binding domain of MHC class I molecules.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.IMGT_MH2_ABD">
+<span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">IMGT_MH2_ABD</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{1,</span> <span class="pre">2,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6,</span> <span class="pre">7,</span> <span class="pre">8,</span> <span class="pre">9,</span> <span class="pre">10,</span> <span class="pre">11,</span> <span class="pre">12,</span> <span class="pre">13,</span> <span class="pre">14,</span> <span class="pre">15,</span> <span class="pre">16,</span> <span class="pre">17,</span> <span class="pre">18,</span> <span class="pre">19,</span> <span class="pre">20,</span> <span class="pre">21,</span> <span class="pre">22,</span> <span class="pre">23,</span> <span class="pre">24,</span> <span class="pre">25,</span> <span class="pre">26,</span> <span class="pre">27,</span> <span class="pre">28,</span> <span class="pre">29,</span> <span class="pre">30,</span> <span class="pre">31,</span> <span class="pre">32,</span> <span class="pre">33,</span> <span class="pre">34,</span> <span class="pre">35,</span> <span class="pre">36,</span> <span class="pre">37,</span> <span class="pre">38,</span> <span class="pre">39,</span> <span class="pre">40,</span> <span class="pre">41,</span> <span class="pre">42,</span> <span class="pre">43,</span> <span class="pre">44,</span> <span class="pre">45,</span> <span class="pre">46,</span> <span class="pre">47,</span> <span class="pre">48,</span> <span class="pre">49,</span> <span class="pre">50,</span> <span class="pre">51,</span> <span class="pre">52,</span> <span class="pre">53,</span> <span class="pre">54,</span> <span class="pre">55,</span> <span class="pre">56,</span> <span class="pre">57,</span> <span class="pre">58,</span> <span class="pre">59,</span> <span class="pre">60,</span> <span class="pre">61,</span> <span class="pre">62,</span> <span class="pre">63,</span> <span class="pre">64,</span> <span class="pre">65,</span> <span class="pre">66,</span> <span class="pre">67,</span> <span class="pre">68,</span> <span class="pre">69,</span> <span class="pre">70,</span> <span class="pre">71,</span> <span class="pre">72,</span> <span class="pre">73,</span> <span class="pre">74,</span> <span class="pre">75,</span> <span class="pre">76,</span> <span class="pre">77,</span> <span class="pre">78,</span> <span class="pre">79,</span> <span class="pre">80,</span> <span class="pre">81,</span> <span class="pre">82,</span> <span class="pre">83,</span> <span class="pre">84,</span> <span class="pre">85,</span> <span class="pre">86,</span> <span class="pre">87,</span> <span class="pre">88,</span> <span class="pre">89,</span> <span class="pre">90,</span> <span class="pre">91}</span></span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.IMGT_MH2_ABD" title="Link to this definition"></a></dt>
+<dd><p>IMGT ranges of the antigen binding domain of MHC class II molecules.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.IMGT_MHC_TCR_CONTACT_POSITIONS">
+<span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">IMGT_MHC_TCR_CONTACT_POSITIONS</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'alpha':</span> <span class="pre">['62',</span> <span class="pre">'63',</span> <span class="pre">'65',</span> <span class="pre">'66',</span> <span class="pre">'68',</span> <span class="pre">'69',</span> <span class="pre">'70',</span> <span class="pre">'72',</span> <span class="pre">'73',</span> <span class="pre">'75',</span> <span class="pre">'76',</span> <span class="pre">'79'],</span> <span class="pre">'beta':</span> <span class="pre">['58',</span> <span class="pre">'61A',</span> <span class="pre">'62',</span> <span class="pre">'63',</span> <span class="pre">'65',</span> <span class="pre">'66',</span> <span class="pre">'67',</span> <span class="pre">'69',</span> <span class="pre">'70',</span> <span class="pre">'72',</span> <span class="pre">'72A',</span> <span class="pre">'73',</span> <span class="pre">'76',</span> <span class="pre">'77']}</span></span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.IMGT_MHC_TCR_CONTACT_POSITIONS" title="Link to this definition"></a></dt>
+<dd><p>IMGT Residues contacted by TCRs on the surface of MHC molecules.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.IMGT_VARIABLE_DOMAIN">
+<span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">IMGT_VARIABLE_DOMAIN</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">set</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{1,</span> <span class="pre">2,</span> <span class="pre">3,</span> <span class="pre">4,</span> <span class="pre">5,</span> <span class="pre">6,</span> <span class="pre">7,</span> <span class="pre">8,</span> <span class="pre">9,</span> <span class="pre">10,</span> <span class="pre">11,</span> <span class="pre">12,</span> <span class="pre">13,</span> <span class="pre">14,</span> <span class="pre">15,</span> <span class="pre">16,</span> <span class="pre">17,</span> <span class="pre">18,</span> <span class="pre">19,</span> <span class="pre">20,</span> <span class="pre">21,</span> <span class="pre">22,</span> <span class="pre">23,</span> <span class="pre">24,</span> <span class="pre">25,</span> <span class="pre">26,</span> <span class="pre">27,</span> <span class="pre">28,</span> <span class="pre">29,</span> <span class="pre">30,</span> <span class="pre">31,</span> <span class="pre">32,</span> <span class="pre">33,</span> <span class="pre">34,</span> <span class="pre">35,</span> <span class="pre">36,</span> <span class="pre">37,</span> <span class="pre">38,</span> <span class="pre">39,</span> <span class="pre">40,</span> <span class="pre">41,</span> <span class="pre">42,</span> <span class="pre">43,</span> <span class="pre">44,</span> <span class="pre">45,</span> <span class="pre">46,</span> <span class="pre">47,</span> <span class="pre">48,</span> <span class="pre">49,</span> <span class="pre">50,</span> <span class="pre">51,</span> <span class="pre">52,</span> <span class="pre">53,</span> <span class="pre">54,</span> <span class="pre">55,</span> <span class="pre">56,</span> <span class="pre">57,</span> <span class="pre">58,</span> <span class="pre">59,</span> <span class="pre">60,</span> <span class="pre">61,</span> <span class="pre">62,</span> <span class="pre">63,</span> <span class="pre">64,</span> <span class="pre">65,</span> <span class="pre">66,</span> <span class="pre">67,</span> <span class="pre">68,</span> <span class="pre">69,</span> <span class="pre">70,</span> <span class="pre">71,</span> <span class="pre">72,</span> <span class="pre">73,</span> <span class="pre">74,</span> <span class="pre">75,</span> <span class="pre">76,</span> <span class="pre">77,</span> <span class="pre">78,</span> <span class="pre">79,</span> <span class="pre">80,</span> <span class="pre">81,</span> <span class="pre">82,</span> <span class="pre">83,</span> <span class="pre">84,</span> <span class="pre">85,</span> <span class="pre">86,</span> <span class="pre">87,</span> <span class="pre">88,</span> <span class="pre">89,</span> <span class="pre">90,</span> <span class="pre">91,</span> <span class="pre">92,</span> <span class="pre">93,</span> <span class="pre">94,</span> <span class="pre">95,</span> <span class="pre">96,</span> <span class="pre">97,</span> <span class="pre">98,</span> <span class="pre">99,</span> <span class="pre">100,</span> <span class="pre">101,</span> <span class="pre">102,</span> <span class="pre">103,</span> <span class="pre">104,</span> <span class="pre">105,</span> <span class="pre">106,</span> <span class="pre">107,</span> <span class="pre">108,</span> <span class="pre">109,</span> <span class="pre">110,</span> <span class="pre">111,</span> <span class="pre">112,</span> <span class="pre">113,</span> <span class="pre">114,</span> <span class="pre">115,</span> <span class="pre">116,</span> <span class="pre">117,</span> <span class="pre">118,</span> <span class="pre">119,</span> <span class="pre">120,</span> <span class="pre">121,</span> <span class="pre">122,</span> <span class="pre">123,</span> <span class="pre">124,</span> <span class="pre">125,</span> <span class="pre">126,</span> <span class="pre">127,</span> <span class="pre">128}</span></span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.IMGT_VARIABLE_DOMAIN" title="Link to this definition"></a></dt>
+<dd><p>Variable domain range for IMGT numbered TCR structures.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.MHC_I_IMGT_BETA_HELIX_START">
+<span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">MHC_I_IMGT_BETA_HELIX_START</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">int</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.MHC_I_IMGT_BETA_HELIX_START" title="Link to this definition"></a></dt>
+<dd><p>Start of the beta helix of class I molecules.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.NUMBERING_OFFSET">
+<span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">NUMBERING_OFFSET</span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.NUMBERING_OFFSET" title="Link to this definition"></a></dt>
+<dd><p>Offset needed to number things like scTCRs where two numberings are present and they may clash.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.assign_cdr_number">
+<span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">assign_cdr_number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">seq_id</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">int</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">int</span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><span class="pre">None</span></span></span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.assign_cdr_number" title="Link to this definition"></a></dt>
+<dd><p>Assign CDR number for a sequence ID or return None if the sequence ID if the ID is not in CDR range.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.number">
+<span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">number</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">sequence</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">str</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">allow_sequential_numbering</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">bool</span></span><span class="w"> </span><span class="o"><span class="pre">=</span></span><span class="w"> </span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">list</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">int</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.number" title="Link to this definition"></a></dt>
+<dd><p>Numbers sequence with IMGT convention using ANARCI.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>sequence</strong> – amino acid sequence to number</p></li>
+<li><p><strong>allow_sequential_numbering</strong> – if anarci cannot number the sequence, number it sequentially (Default: True)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>annotated sequence with the IMGT numbering for a given sequence</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – if anarci cannot number the sequence and sequential numbering is not allowed</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="tcr_pmhc_predicted_structures.imgt_numbering.renumber_chain">
+<span class="sig-prename descclassname"><span class="pre">tcr_pmhc_predicted_structures.imgt_numbering.</span></span><span class="sig-name descname"><span class="pre">renumber_chain</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">chain</span></span><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="n"><span class="pre">Chain</span></span></em><span class="sig-paren">)</span> <span class="sig-return"><span class="sig-return-icon">&#x2192;</span> <span class="sig-return-typehint"><span class="pre">tuple</span><span class="p"><span class="pre">[</span></span><span class="pre">Chain</span><span class="p"><span class="pre">,</span></span><span class="w"> </span><span class="pre">str</span><span class="p"><span class="pre">]</span></span></span></span><a class="headerlink" href="#tcr_pmhc_predicted_structures.imgt_numbering.renumber_chain" title="Link to this definition"></a></dt>
+<dd><p>Renumber a chain following IMGT conventions.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>chain</strong> – input chain</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>tuple with the new chain with imgt numbering and the type of chain identified by anarci</p>
+</dd>
+<dt class="field-odd">Raises<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>ValueError</strong> – if chain cannot be identified by ANARCI</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="tcr_pmhc_predicted_structures.confidence_scores.html" class="btn btn-neutral float-left" title="tcr_pmhc_predicted_structures.confidence_scores module" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="tcr_pmhc_predicted_structures.models.html" class="btn btn-neutral float-right" title="tcr_pmhc_predicted_structures.models module" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Benjamin McMaster, Ali El Moselhy, Ilija Ilievski, Christopher J. Thorpe, Jamie Rossjohn, Charlotte M. Deane, and Hashem Koohy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

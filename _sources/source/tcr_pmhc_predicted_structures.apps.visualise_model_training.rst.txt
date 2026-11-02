@@ -1,0 +1,28 @@
+tcr_pmhc_predicted_structures.apps.visualise_model_training
+===========================================================
+.. code-block:: text
+
+   usage: python -m tcr_pmhc_predicted_structures.apps.visualise_model_training
+          [-h] --output OUTPUT [--title TITLE]
+          [--log-level {debug,info,warning,error}] [--log-file LOG_FILE]
+          training_log
+   
+   Create visualisation of model training based on the training log.
+   
+   positional arguments:
+     training_log          path to the training log
+   
+   options:
+     -h, --help            show this help message and exit
+     --output OUTPUT, -o OUTPUT
+                           name of the output plot (the file extension determines
+                           the image type)
+     --title TITLE         title for the plot
+   
+   Logging:
+     Options for logging
+   
+     --log-level {debug,info,warning,error}
+                           Level to log messages at (Default: 'warning')
+     --log-file LOG_FILE   File to output logs (default is to write to stderr)
+   

@@ -1,0 +1,49 @@
+tcr_pmhc_predicted_structures.apps.convert_to_input
+===================================================
+.. code-block:: text
+
+   usage: python -m tcr_pmhc_predicted_structures.apps.convert_to_input
+          [-h] --output OUTPUT --format {alphafold3,boltz,chai}
+          [--alphafold3-model-seeds ALPHAFOLD3_MODEL_SEEDS [ALPHAFOLD3_MODEL_SEEDS ...]]
+          [--chai-restraints CHAI_RESTRAINTS] [--add-paths] [--relative-paths]
+          [--unpaired-msa-paths UNPAIRED_MSA_PATHS [UNPAIRED_MSA_PATHS ...]]
+          [--paired-msa-paths PAIRED_MSA_PATHS [PAIRED_MSA_PATHS ...]]
+          [--template-paths TEMPLATE_PATHS [TEMPLATE_PATHS ...]]
+          [--log-level {debug,info,warning,error}] [--log-file LOG_FILE]
+          inputs [inputs ...]
+   
+   Convert sequence data into different formats for structure prediction methods.
+   
+   positional arguments:
+     inputs                path to input json files
+   
+   options:
+     -h, --help            show this help message and exit
+     --output OUTPUT, -o OUTPUT
+     --format {alphafold3,boltz,chai}
+                           Model to generate input files for
+     --alphafold3-model-seeds ALPHAFOLD3_MODEL_SEEDS [ALPHAFOLD3_MODEL_SEEDS ...]
+                           Seeds for alphafold3 (Default: [1])
+     --chai-restraints CHAI_RESTRAINTS
+                           restraints file for chai restraints
+   
+   Paths:
+     --add-paths           add paths to pre-built MSAs and templates
+     --relative-paths      use relative path names for MSA and template paths
+                           instead of full path names
+     --unpaired-msa-paths UNPAIRED_MSA_PATHS [UNPAIRED_MSA_PATHS ...]
+                           Paths to the unpaired MSA files. If there is just one
+                           combined MSA being used (ie. for boltz) then just use
+                           this one.
+     --paired-msa-paths PAIRED_MSA_PATHS [PAIRED_MSA_PATHS ...]
+                           paths to the paired MSA files
+     --template-paths TEMPLATE_PATHS [TEMPLATE_PATHS ...]
+                           path to the templates
+   
+   Logging:
+     Options for logging
+   
+     --log-level {debug,info,warning,error}
+                           Level to log messages at (Default: 'warning')
+     --log-file LOG_FILE   File to output logs (default is to write to stderr)
+   

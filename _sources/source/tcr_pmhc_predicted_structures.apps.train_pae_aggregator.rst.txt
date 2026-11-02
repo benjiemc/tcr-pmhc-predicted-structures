@@ -1,0 +1,42 @@
+tcr_pmhc_predicted_structures.apps.train_pae_aggregator
+=======================================================
+.. code-block:: text
+
+   usage: python -m tcr_pmhc_predicted_structures.apps.train_pae_aggregator
+          [-h] -o OUTPUT [--seed SEED] [--label-name LABEL_NAME]
+          [--num-epochs NUM_EPOCHS] [--batch-size BATCH_SIZE]
+          [--learning-rate LEARNING_RATE] [--eval-batch-size EVAL_BATCH_SIZE]
+          [--eval-interval EVAL_INTERVAL]
+          [--log-level {debug,info,warning,error}] [--log-file LOG_FILE]
+          training_data
+   
+   Train the PAE aggregator to predict T cell antigen specificity from PAE matrices.
+   
+   positional arguments:
+     training_data         path to the training data (HDF5 file)
+   
+   options:
+     -h, --help            show this help message and exit
+     -o OUTPUT, --output OUTPUT
+                           path to output models to
+     --seed SEED           seed for random processes (Default: None)
+     --label-name LABEL_NAME
+                           name to use access label in dataset (Default: 'label')
+     --num-epochs NUM_EPOCHS
+                           number of epochs (Default: 5)
+     --batch-size BATCH_SIZE
+                           training batch size (Default: 32)
+     --learning-rate LEARNING_RATE
+                           optimizer learning rate (Default: 1e-3)
+     --eval-batch-size EVAL_BATCH_SIZE
+                           batch size for evaluating the model (Default: 300)
+     --eval-interval EVAL_INTERVAL
+                           Interval to evaluate model performance (Default: 50)
+   
+   Logging:
+     Options for logging
+   
+     --log-level {debug,info,warning,error}
+                           Level to log messages at (Default: 'warning')
+     --log-file LOG_FILE   File to output logs (default is to write to stderr)
+   

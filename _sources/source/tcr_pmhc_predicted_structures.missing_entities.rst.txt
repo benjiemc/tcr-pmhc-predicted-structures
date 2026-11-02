@@ -1,0 +1,18 @@
+tcr\_pmhc\_predicted\_structures.missing\_entities package
+==========================================================
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   tcr_pmhc_predicted_structures.missing_entities.fix
+
+Module contents
+---------------
+
+.. automodule:: tcr_pmhc_predicted_structures.missing_entities
+   :members:
+   :show-inheritance:
+   :undoc-members:

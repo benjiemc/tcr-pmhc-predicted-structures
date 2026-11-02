@@ -1,0 +1,22 @@
+Analysis Notebooks
+==================
+
+.. toctree::
+   :maxdepth: 1
+
+   ablations_of_alphafold3
+   benchmark_alphafold3_against_sequence_models
+   benchmark_structure_prediction_methods
+   c259_mutational_scanning
+   coeliac_antigen_specificity_with_alphafold3
+   coeliac_mutagenesis_analysis
+   compare_msa_generatio
+   compare_structural_features_to_confidence
+   dash_mutagenesis_analysis
+   evaluating_antigen_specificity_model
+   exploring_coeliac_tcrs
+   exploring_dash_dataset
+   exploring_specificity_prediction_normalisatio
+   investigate_specificity_information_in_af3_scores
+   visualise_sequence_data
+   visualise_structure_data

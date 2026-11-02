@@ -1,0 +1,36 @@
+tcr\_pmhc\_predicted\_structures package
+========================================
+
+Subpackages
+-----------
+
+.. toctree::
+   :maxdepth: 4
+
+   tcr_pmhc_predicted_structures.missing_entities
+
+Submodules
+----------
+
+.. toctree::
+   :maxdepth: 4
+
+   tcr_pmhc_predicted_structures.aligners
+   tcr_pmhc_predicted_structures.chemistry
+   tcr_pmhc_predicted_structures.clustering
+   tcr_pmhc_predicted_structures.comparisons
+   tcr_pmhc_predicted_structures.confidence_scores
+   tcr_pmhc_predicted_structures.imgt_numbering
+   tcr_pmhc_predicted_structures.models
+   tcr_pmhc_predicted_structures.padding
+   tcr_pmhc_predicted_structures.predictions
+   tcr_pmhc_predicted_structures.structure
+   tcr_pmhc_predicted_structures.utils
+
+Module contents
+---------------
+
+.. automodule:: tcr_pmhc_predicted_structures
+   :members:
+   :show-inheritance:
+   :undoc-members:

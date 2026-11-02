@@ -1,0 +1,7 @@
+tcr\_pmhc\_predicted\_structures.structure module
+=================================================
+
+.. automodule:: tcr_pmhc_predicted_structures.structure
+   :members:
+   :show-inheritance:
+   :undoc-members:

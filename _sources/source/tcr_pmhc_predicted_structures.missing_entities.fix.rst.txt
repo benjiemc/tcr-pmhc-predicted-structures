@@ -1,0 +1,7 @@
+tcr\_pmhc\_predicted\_structures.missing\_entities.fix module
+=============================================================
+
+.. automodule:: tcr_pmhc_predicted_structures.missing_entities.fix
+   :members:
+   :show-inheritance:
+   :undoc-members:

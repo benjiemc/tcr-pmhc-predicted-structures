@@ -1,0 +1,29 @@
+tcr_pmhc_predicted_structures.apps.create_full_length_sequences
+===============================================================
+.. code-block:: text
+
+   usage: python -m tcr_pmhc_predicted_structures.apps.create_full_length_sequences
+          [-h] --output OUTPUT --mhc-sequences MHC_SEQUENCES [MHC_SEQUENCES ...]
+          [--log-level {debug,info,warning,error}] [--log-file LOG_FILE]
+          input
+   
+   Create full length sequences from TCR and MHC gene annotations.
+   
+   positional arguments:
+     input                 path to input csv
+   
+   options:
+     -h, --help            show this help message and exit
+     --output OUTPUT, -o OUTPUT
+                           path to output csv
+     --mhc-sequences MHC_SEQUENCES [MHC_SEQUENCES ...]
+                           paths to mhc sequence information to create pseudo
+                           sequences.
+   
+   Logging:
+     Options for logging
+   
+     --log-level {debug,info,warning,error}
+                           Level to log messages at (Default: 'warning')
+     --log-file LOG_FILE   File to output logs (default is to write to stderr)
+   

@@ -1,0 +1,19 @@
+Command Line Applications
+=========================
+
+.. toctree::
+   :maxdepth: 1
+
+   tcr_pmhc_predicted_structures.apps.collate_sequence_data
+   tcr_pmhc_predicted_structures.apps.convert_index_mapping_from_sequence_to_structure
+   tcr_pmhc_predicted_structures.apps.convert_to_input
+   tcr_pmhc_predicted_structures.apps.create_contact_map
+   tcr_pmhc_predicted_structures.apps.create_data_splits
+   tcr_pmhc_predicted_structures.apps.create_full_length_sequences
+   tcr_pmhc_predicted_structures.apps.create_pae_dataset
+   tcr_pmhc_predicted_structures.apps.download_stcrdab
+   tcr_pmhc_predicted_structures.apps.extract_tcr_pmhc_confidence
+   tcr_pmhc_predicted_structures.apps.run_pae_aggregator
+   tcr_pmhc_predicted_structures.apps.select_stcrdab_tcr_pmhc_structures
+   tcr_pmhc_predicted_structures.apps.train_pae_aggregator
+   tcr_pmhc_predicted_structures.apps.visualise_model_training

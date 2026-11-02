@@ -1,0 +1,28 @@
+tcr_pmhc_predicted_structures.apps.convert_index_mapping_from_sequence_to_structure
+===================================================================================
+.. code-block:: text
+
+   usage: python -m tcr_pmhc_predicted_structures.apps.convert_index_mapping_from_sequence_to_structure
+          [-h] --output OUTPUT [--log-level {debug,info,warning,error}]
+          [--log-file LOG_FILE]
+          structure indices
+   
+   Convert the index mapping based on PDB Seqres records to atomic records.
+   
+   positional arguments:
+     structure             path to mmcif structure
+     indices               path to indices to convert in AF3 json format
+                           (conversion is done for template)
+   
+   options:
+     -h, --help            show this help message and exit
+     --output OUTPUT, -o OUTPUT
+                           path to output converted indices to (json format)
+   
+   Logging:
+     Options for logging
+   
+     --log-level {debug,info,warning,error}
+                           Level to log messages at (Default: 'warning')
+     --log-file LOG_FILE   File to output logs (default is to write to stderr)
+   

@@ -1,0 +1,592 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Data Summary &mdash; tcr_pmhc_predicted_structures  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Command Line Applications" href="apps.html" />
+    <link rel="prev" title="Sequence Data" href="visualise_sequence_data.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tcr_pmhc_predicted_structures
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Analysis Results</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="notebooks.html">Analysis Notebooks</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ablations_of_alphafold3.html">Ablations of AlphaFold3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmark_alphafold3_against_sequence_models.html">Benchmark AlphaFold3 against sequence models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmark_structure_prediction_methods.html">Benchmark Structure Prediction Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="c259_mutational_scanning.html">Correlation between affinity and binding scores for c259 TCR binding peptide mutants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coeliac_antigen_specificity_with_alphafold3.html">Coeliac antigen specificity with AlphaFold3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coeliac_mutagenesis_analysis.html">Coeliac mutagenesis analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compare_structural_features_to_confidence.html">Comparing structural features to confidence scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dash_mutagenesis_analysis.html">Dash et al mutagenesis analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evaluating_antigen_specificity_model.html">Evaluating antigen specificity model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exploring_coeliac_tcrs.html">Exploring Coeliac TCRs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exploring_dash_dataset.html">Exploring the Dash <em>et al</em> dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="investigate_specificity_information_in_af3_scores.html">Investigating specificity information in AF3 Scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualise_sequence_data.html">Sequence Data</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Data Summary</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#Summary-of-data-selection-workflow-for-TCR:pMHC-structures">Summary of data selection workflow for TCR:pMHC structures</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#Summary-of-dataset">Summary of dataset</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#TCR-V-gene-pairings">TCR V-gene pairings</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Similarity-of-peptides">Similarity of peptides</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#Proportion-of-MHC-types">Proportion of MHC types</a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Command Line Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="apps.html">Command Line Applications</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">tcr_pmhc_predicted_structures</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tcr_pmhc_predicted_structures</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="notebooks.html">Analysis Notebooks</a></li>
+      <li class="breadcrumb-item active">Data Summary</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/visualise_structure_data.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Data-Summary">
+<h1>Data Summary<a class="headerlink" href="#Data-Summary" title="Link to this heading"></a></h1>
+<p>Summary of the selected structure for this project and the similarity of the TCR:pMHCs across different folds of the dataset.</p>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">logomaker</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">networkx</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">nx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">openchord</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">plotly.graph_objects</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">go</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pyxdameraulevenshtein</span><span class="w"> </span><span class="kn">import</span> <span class="n">damerau_levenshtein_distance</span>
+</pre></div>
+</div>
+</div>
+<section id="Summary-of-data-selection-workflow-for-TCR:pMHC-structures">
+<h2>Summary of data selection workflow for TCR:pMHC structures<a class="headerlink" href="#Summary-of-data-selection-workflow-for-TCR:pMHC-structures" title="Link to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s1">'../data/logs/select_stcrdab_tcr_pmhc_structures.log'</span><span class="p">,</span> <span class="s1">'r'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+    <span class="n">log</span> <span class="o">=</span> <span class="n">fh</span><span class="o">.</span><span class="n">read</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">info_messages</span> <span class="o">=</span> <span class="p">[</span><span class="n">line</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">log</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'</span><span class="se">\n</span><span class="s1">'</span><span class="p">)</span> <span class="k">if</span> <span class="s1">'INFO:'</span> <span class="ow">in</span> <span class="n">line</span><span class="p">]</span>
+
+<span class="n">count_pattern</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">compile</span><span class="p">(</span><span class="sa">r</span><span class="s1">'Number of structures: (\d+)'</span><span class="p">)</span>
+<span class="n">structure_counts</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="nb">int</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">count_pattern</span><span class="p">,</span> <span class="n">line</span><span class="p">)</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span> <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">info_messages</span> <span class="k">if</span> <span class="s1">'Number of structures:'</span> <span class="ow">in</span> <span class="n">line</span>
+<span class="p">]</span>
+<span class="n">structure_count_line_numbers</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">line_number</span> <span class="k">for</span> <span class="n">line_number</span><span class="p">,</span> <span class="n">line</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">info_messages</span><span class="p">)</span> <span class="k">if</span> <span class="s1">'Number of structures:'</span> <span class="ow">in</span> <span class="n">line</span>
+<span class="p">]</span>
+<span class="n">count_contexts</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="n">info_messages</span><span class="p">[</span><span class="n">line_number</span> <span class="o">-</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">'INFO: '</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">line_number</span> <span class="ow">in</span> <span class="n">structure_count_line_numbers</span><span class="p">[</span><span class="mi">1</span><span class="p">:]</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">selection_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span>
+    <span class="p">{</span>
+        <span class="s1">'source'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'STCRDab'</span><span class="p">,</span> <span class="o">*</span><span class="n">count_contexts</span><span class="p">[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]],</span>
+        <span class="s1">'target'</span><span class="p">:</span> <span class="n">count_contexts</span><span class="p">,</span>
+        <span class="s1">'count'</span><span class="p">:</span> <span class="n">structure_counts</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span>
+    <span class="p">}</span>
+<span class="p">)</span>
+
+<span class="n">reject_df</span> <span class="o">=</span> <span class="n">selection_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+<span class="n">reject_df</span><span class="p">[</span><span class="s1">'target'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'Reject'</span>
+<span class="n">reject_df</span><span class="p">[</span><span class="s1">'count'</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">([</span><span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="n">structure_counts</span><span class="p">[</span><span class="mi">0</span><span class="p">]]),</span> <span class="n">selection_df</span><span class="p">[</span><span class="s1">'count'</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()[:</span><span class="o">-</span><span class="mi">1</span><span class="p">]])</span> <span class="o">-</span> <span class="n">selection_df</span><span class="p">[</span><span class="s1">'count'</span><span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">selection_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">selection_df</span><span class="p">,</span> <span class="n">reject_df</span><span class="p">])</span>
+
+<span class="n">selection_df</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>source</th>
+      <th>target</th>
+      <th>count</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>STCRDab</td>
+      <td>Selecting structures (TCRs: abTCR, MHCs: MH1, ...</td>
+      <td>429</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Selecting structures (TCRs: abTCR, MHCs: MH1, ...</td>
+      <td>Screening structures above 3.50 Å resolution</td>
+      <td>419</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Screening structures above 3.50 Å resolution</td>
+      <td>Removing structures missing residues</td>
+      <td>356</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Removing structures missing residues</td>
+      <td>Removing structures within 2.00 Å RMSD</td>
+      <td>251</td>
+    </tr>
+    <tr>
+      <th>0</th>
+      <td>STCRDab</td>
+      <td>Reject</td>
+      <td>529</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>Selecting structures (TCRs: abTCR, MHCs: MH1, ...</td>
+      <td>Reject</td>
+      <td>10</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>Screening structures above 3.50 Å resolution</td>
+      <td>Reject</td>
+      <td>63</td>
+    </tr>
+    <tr>
+      <th>3</th>
+      <td>Removing structures missing residues</td>
+      <td>Reject</td>
+      <td>105</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plot_df</span> <span class="o">=</span> <span class="n">selection_df</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+
+<span class="n">unique_source_target</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">unique</span><span class="p">(</span><span class="n">plot_df</span><span class="p">[[</span><span class="s1">'source'</span><span class="p">,</span> <span class="s1">'target'</span><span class="p">]]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span><span class="o">.</span><span class="n">flatten</span><span class="p">()))</span>
+
+<span class="n">mapping_dict</span> <span class="o">=</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">v</span><span class="p">,</span> <span class="n">k</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">unique_source_target</span><span class="p">)}</span>
+
+<span class="n">plot_df</span><span class="p">[</span><span class="s1">'source'</span><span class="p">]</span> <span class="o">=</span> <span class="n">plot_df</span><span class="p">[</span><span class="s1">'source'</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">mapping_dict</span><span class="p">)</span>
+<span class="n">plot_df</span><span class="p">[</span><span class="s1">'target'</span><span class="p">]</span> <span class="o">=</span> <span class="n">plot_df</span><span class="p">[</span><span class="s1">'target'</span><span class="p">]</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">mapping_dict</span><span class="p">)</span>
+
+<span class="n">fig</span> <span class="o">=</span> <span class="n">go</span><span class="o">.</span><span class="n">Figure</span><span class="p">(</span>
+    <span class="n">data</span><span class="o">=</span><span class="p">[</span>
+        <span class="n">go</span><span class="o">.</span><span class="n">Sankey</span><span class="p">(</span>
+            <span class="n">node</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">'pad'</span><span class="p">:</span> <span class="mi">15</span><span class="p">,</span>
+                <span class="s1">'thickness'</span><span class="p">:</span> <span class="mi">20</span><span class="p">,</span>
+                <span class="s1">'line'</span><span class="p">:</span> <span class="p">{</span><span class="s1">'color'</span><span class="p">:</span> <span class="s1">'black'</span><span class="p">,</span> <span class="s1">'width'</span><span class="p">:</span> <span class="mf">0.5</span><span class="p">},</span>
+                <span class="s1">'label'</span><span class="p">:</span> <span class="n">unique_source_target</span><span class="p">,</span>
+            <span class="p">},</span>
+            <span class="n">link</span><span class="o">=</span><span class="p">{</span>
+                <span class="s1">'source'</span><span class="p">:</span> <span class="n">plot_df</span><span class="p">[</span><span class="s1">'source'</span><span class="p">],</span>
+                <span class="s1">'target'</span><span class="p">:</span> <span class="n">plot_df</span><span class="p">[</span><span class="s1">'target'</span><span class="p">],</span>
+                <span class="s1">'value'</span><span class="p">:</span> <span class="n">plot_df</span><span class="p">[</span><span class="s1">'count'</span><span class="p">],</span>
+            <span class="p">},</span>
+        <span class="p">)</span>
+    <span class="p">]</span>
+<span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">update_layout</span><span class="p">(</span><span class="n">title_text</span><span class="o">=</span><span class="s1">'Selected Structures Sankey Diagram'</span><span class="p">,</span> <span class="n">font_size</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">1000</span><span class="p">,</span> <span class="n">height</span><span class="o">=</span><span class="mi">600</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="admonition warning">
+<p>Data type cannot be displayed: application/vnd.plotly.v1+json</p>
+</div>
+</div>
+</div>
+</section>
+<section id="Summary-of-dataset">
+<h2>Summary of dataset<a class="headerlink" href="#Summary-of-dataset" title="Link to this heading"></a></h2>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">summary_df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'../data/interim/structures_summary.csv'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">8</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+
+<span class="n">summary_df</span><span class="p">[</span><span class="s1">'species'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pie</span><span class="p">(</span><span class="n">textprops</span><span class="o">=</span><span class="p">{</span><span class="s1">'fontsize'</span><span class="p">:</span> <span class="mi">8</span><span class="p">})</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_visualise_structure_data_9_0.png" src="../_images/source_visualise_structure_data_9_0.png" />
+</div>
+</div>
+<section id="TCR-V-gene-pairings">
+<h3>TCR V-gene pairings<a class="headerlink" href="#TCR-V-gene-pairings" title="Link to this heading"></a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">counts</span> <span class="o">=</span> <span class="n">summary_df</span><span class="o">.</span><span class="n">value_counts</span><span class="p">([</span><span class="s1">'v_alpha'</span><span class="p">,</span> <span class="s1">'v_beta'</span><span class="p">])</span>
+<span class="n">labels</span> <span class="o">=</span> <span class="nb">sorted</span><span class="p">(</span>
+    <span class="n">np</span><span class="o">.</span><span class="n">concatenate</span><span class="p">(</span>
+        <span class="p">[</span>
+            <span class="n">summary_df</span><span class="p">[</span><span class="s1">'v_alpha'</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">unique</span><span class="p">(),</span>
+            <span class="n">summary_df</span><span class="p">[</span><span class="s1">'v_beta'</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">unique</span><span class="p">(),</span>
+        <span class="p">]</span>
+    <span class="p">)</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+<span class="p">)</span>
+
+<span class="n">num_labels</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">labels</span><span class="p">)</span>
+<span class="n">adjacency_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">num_labels</span><span class="p">,</span> <span class="n">num_labels</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">num_labels</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">num_labels</span><span class="p">):</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">adjacency_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">counts</span><span class="p">[</span><span class="n">labels</span><span class="p">[</span><span class="n">i</span><span class="p">]][</span><span class="n">labels</span><span class="p">[</span><span class="n">j</span><span class="p">]]</span>
+        <span class="k">except</span> <span class="ne">KeyError</span><span class="p">:</span>
+            <span class="n">adjacency_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="mi">0</span>
+
+<span class="n">adjacency_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">,</span> <span class="n">adjacency_matrix</span><span class="o">.</span><span class="n">transpose</span><span class="p">())</span>
+<span class="n">fig</span> <span class="o">=</span> <span class="n">openchord</span><span class="o">.</span><span class="n">Chord</span><span class="p">(</span><span class="n">adjacency_matrix</span><span class="p">,</span> <span class="n">labels</span><span class="p">)</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">colormap</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">plt</span><span class="o">.</span><span class="n">rcParams</span><span class="p">[</span><span class="s1">'axes.prop_cycle'</span><span class="p">]</span><span class="o">.</span><span class="n">by_key</span><span class="p">()[</span><span class="s1">'color'</span><span class="p">])</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">radius</span> <span class="o">=</span> <span class="mi">300</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">padding</span> <span class="o">=</span> <span class="mi">150</span>
+<span class="n">fig</span><span class="o">.</span><span class="n">font_size</span> <span class="o">=</span> <span class="mi">12</span>
+
+<span class="n">fig</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_visualise_structure_data_11_0.svg" src="../_images/source_visualise_structure_data_11_0.svg" />
+</div>
+</div>
+</section>
+<section id="Similarity-of-peptides">
+<h3>Similarity of peptides<a class="headerlink" href="#Similarity-of-peptides" title="Link to this heading"></a></h3>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">df_annotated_no_dup_peptides</span> <span class="o">=</span> <span class="n">summary_df</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">([</span><span class="s1">'peptide'</span><span class="p">])</span>
+<span class="n">peptide_sequences</span> <span class="o">=</span> <span class="n">df_annotated_no_dup_peptides</span><span class="p">[</span><span class="s1">'peptide'</span><span class="p">]</span><span class="o">.</span><span class="n">to_numpy</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">distance_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">peptide_sequences</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">peptide_sequences</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span> <span class="n">dtype</span><span class="o">=</span><span class="nb">int</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">peptide_sequences</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">peptide_sequences</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="n">distance_matrix</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="n">damerau_levenshtein_distance</span><span class="p">(</span><span class="n">peptide_sequences</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">peptide_sequences</span><span class="p">[</span><span class="n">j</span><span class="p">])</span>
+
+<span class="n">distance_matrix</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">,</span> <span class="n">distance_matrix</span><span class="o">.</span><span class="n">T</span><span class="p">)</span>
+
+<span class="nb">print</span><span class="p">(</span>
+    <span class="sa">f</span><span class="s1">'The average levenshtein distance between all peptide sequences is </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">average</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> edits'</span><span class="p">,</span>
+    <span class="sa">f</span><span class="s1">'with an standard deviation of </span><span class="si">{</span><span class="n">np</span><span class="o">.</span><span class="n">std</span><span class="p">(</span><span class="n">distance_matrix</span><span class="p">)</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1"> edits.'</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+The average levenshtein distance between all peptide sequences is 9.19 edits with an standard deviation of 2.10 edits.
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">CUTOFF_PERCENT</span> <span class="o">=</span> <span class="mi">70</span>
+
+<span class="n">sequence_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">([</span><span class="nb">len</span><span class="p">(</span><span class="n">seq</span><span class="p">)</span> <span class="k">for</span> <span class="n">seq</span> <span class="ow">in</span> <span class="n">peptide_sequences</span><span class="p">])</span>
+<span class="n">grid1</span><span class="p">,</span> <span class="n">grid2</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">meshgrid</span><span class="p">(</span><span class="n">sequence_lengths</span><span class="p">,</span> <span class="n">sequence_lengths</span><span class="p">)</span>
+
+<span class="n">max_lengths</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">maximum</span><span class="p">(</span><span class="n">grid1</span><span class="p">,</span> <span class="n">grid2</span><span class="p">)</span>
+<span class="n">sequence_percent_identities</span> <span class="o">=</span> <span class="p">((</span><span class="n">max_lengths</span> <span class="o">-</span> <span class="n">distance_matrix</span><span class="p">)</span> <span class="o">/</span> <span class="n">max_lengths</span><span class="p">)</span> <span class="o">*</span> <span class="mi">100</span>
+
+<span class="n">similar_peptides</span> <span class="o">=</span> <span class="n">sequence_percent_identities</span> <span class="o">&gt;</span> <span class="n">CUTOFF_PERCENT</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">G</span> <span class="o">=</span> <span class="n">nx</span><span class="o">.</span><span class="n">Graph</span><span class="p">()</span>
+<span class="n">G</span><span class="o">.</span><span class="n">add_nodes_from</span><span class="p">(</span><span class="nb">range</span><span class="p">(</span><span class="n">peptide_sequences</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]))</span>
+
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="n">peptide_sequences</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+    <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="n">peptide_sequences</span><span class="o">.</span><span class="n">shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]):</span>
+        <span class="k">if</span> <span class="n">similar_peptides</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]:</span>
+            <span class="n">G</span><span class="o">.</span><span class="n">add_edge</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">,</span> <span class="n">weight</span><span class="o">=</span><span class="n">sequence_percent_identities</span><span class="p">[</span><span class="n">i</span><span class="p">,</span> <span class="n">j</span><span class="p">]</span> <span class="o">/</span> <span class="mi">100</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">plt</span><span class="o">.</span><span class="n">figure</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="sa">f</span><span class="s1">'Peptide repertoire of the TCR:pMHCs grouped at </span><span class="si">{</span><span class="n">CUTOFF_PERCENT</span><span class="si">}</span><span class="s1">% identity'</span><span class="p">)</span>
+
+<span class="n">nx</span><span class="o">.</span><span class="n">draw</span><span class="p">(</span>
+    <span class="n">G</span><span class="p">,</span>
+    <span class="n">node_size</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">pos</span><span class="o">=</span><span class="n">nx</span><span class="o">.</span><span class="n">drawing</span><span class="o">.</span><span class="n">nx_agraph</span><span class="o">.</span><span class="n">graphviz_layout</span><span class="p">(</span><span class="n">G</span><span class="p">,</span> <span class="n">prog</span><span class="o">=</span><span class="s1">'neato'</span><span class="p">),</span>
+<span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_visualise_structure_data_17_0.png" src="../_images/source_visualise_structure_data_17_0.png" />
+</div>
+</div>
+</section>
+<section id="Proportion-of-MHC-types">
+<h3>Proportion of MHC types<a class="headerlink" href="#Proportion-of-MHC-types" title="Link to this heading"></a></h3>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">summary_df</span><span class="p">[</span><span class="s1">'mhc_type'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">pie</span><span class="p">()</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_visualise_structure_data_19_0.png" src="../_images/source_visualise_structure_data_19_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">summary_df</span><span class="p">[[</span><span class="s1">'mhc1'</span><span class="p">,</span> <span class="s1">'mhc2'</span><span class="p">]]</span> <span class="o">=</span> <span class="n">summary_df</span><span class="p">[[</span><span class="s1">'mhc1'</span><span class="p">,</span> <span class="s1">'mhc2'</span><span class="p">]]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="s1">'Unknown'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">summary_df</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">"mhc_type == 'MH1'"</span><span class="p">)[</span><span class="s1">'mhc1'</span><span class="p">]</span><span class="o">.</span><span class="n">value_counts</span><span class="p">()</span><span class="o">.</span><span class="n">plot</span><span class="o">.</span><span class="n">bar</span><span class="p">(</span><span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">12</span><span class="p">,</span> <span class="mi">4</span><span class="p">))</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Count'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xlabel</span><span class="p">(</span><span class="s1">'MHC Allele Name'</span><span class="p">,</span> <span class="n">fontsize</span><span class="o">=</span><span class="mi">18</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_visualise_structure_data_21_0.png" src="../_images/source_visualise_structure_data_21_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">probs</span> <span class="o">=</span> <span class="n">logomaker</span><span class="o">.</span><span class="n">alignment_to_matrix</span><span class="p">(</span><span class="n">summary_df</span><span class="p">[</span><span class="s1">'mhc_pseudo'</span><span class="p">],</span> <span class="n">to_type</span><span class="o">=</span><span class="s1">'information'</span><span class="p">)</span>
+<span class="n">logomaker</span><span class="o">.</span><span class="n">Logo</span><span class="p">(</span><span class="n">probs</span><span class="p">,</span> <span class="n">color_scheme</span><span class="o">=</span><span class="s1">'chemistry'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">title</span><span class="p">(</span><span class="s1">'MHC Pseudo Sequences'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">ylabel</span><span class="p">(</span><span class="s1">'Bits'</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">xticks</span><span class="p">([])</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_visualise_structure_data_22_0.png" src="../_images/source_visualise_structure_data_22_0.png" />
+</div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="visualise_sequence_data.html" class="btn btn-neutral float-left" title="Sequence Data" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="apps.html" class="btn btn-neutral float-right" title="Command Line Applications" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Benjamin McMaster, Ali El Moselhy, Ilija Ilievski, Christopher J. Thorpe, Jamie Rossjohn, Charlotte M. Deane, and Hashem Koohy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

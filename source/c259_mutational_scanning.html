@@ -1,0 +1,531 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Correlation between affinity and binding scores for c259 TCR binding peptide mutants &mdash; tcr_pmhc_predicted_structures  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Coeliac antigen specificity with AlphaFold3" href="coeliac_antigen_specificity_with_alphafold3.html" />
+    <link rel="prev" title="Benchmark Structure Prediction Methods" href="benchmark_structure_prediction_methods.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tcr_pmhc_predicted_structures
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Analysis Results</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="notebooks.html">Analysis Notebooks</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ablations_of_alphafold3.html">Ablations of AlphaFold3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmark_alphafold3_against_sequence_models.html">Benchmark AlphaFold3 against sequence models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmark_structure_prediction_methods.html">Benchmark Structure Prediction Methods</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Correlation between affinity and binding scores for c259 TCR binding peptide mutants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coeliac_antigen_specificity_with_alphafold3.html">Coeliac antigen specificity with AlphaFold3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coeliac_mutagenesis_analysis.html">Coeliac mutagenesis analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compare_structural_features_to_confidence.html">Comparing structural features to confidence scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dash_mutagenesis_analysis.html">Dash et al mutagenesis analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evaluating_antigen_specificity_model.html">Evaluating antigen specificity model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exploring_coeliac_tcrs.html">Exploring Coeliac TCRs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exploring_dash_dataset.html">Exploring the Dash <em>et al</em> dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="investigate_specificity_information_in_af3_scores.html">Investigating specificity information in AF3 Scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualise_sequence_data.html">Sequence Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualise_structure_data.html">Data Summary</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Command Line Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="apps.html">Command Line Applications</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">tcr_pmhc_predicted_structures</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tcr_pmhc_predicted_structures</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="notebooks.html">Analysis Notebooks</a></li>
+      <li class="breadcrumb-item active">Correlation between affinity and binding scores for c259 TCR binding peptide mutants</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/c259_mutational_scanning.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Correlation-between-affinity-and-binding-scores-for-c259-TCR-binding-peptide-mutants">
+<h1>Correlation between affinity and binding scores for c259 TCR binding peptide mutants<a class="headerlink" href="#Correlation-between-affinity-and-binding-scores-for-c259-TCR-binding-peptide-mutants" title="Link to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">subprocess</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">tempfile</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pingouin</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pg</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy.stats</span><span class="w"> </span><span class="kn">import</span> <span class="n">pearsonr</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[2]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">AFFINITY_CUTOFF</span> <span class="o">=</span> <span class="mi">100</span>  <span class="c1"># uM</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[3]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sequences</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'../data/interim/sequences_c259_mutational_scan_affinity.csv'</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">'id'</span><span class="p">)</span>
+<span class="n">sequences</span> <span class="o">=</span> <span class="n">sequences</span><span class="o">.</span><span class="n">drop_duplicates</span><span class="p">(</span><span class="s1">'peptide'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[4]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sequences</span><span class="p">[</span><span class="s1">'affinity_norm'</span><span class="p">]</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span>
+    <span class="p">(</span>
+        <span class="p">(</span><span class="n">AFFINITY_CUTOFF</span> <span class="o">-</span> <span class="n">sequences</span><span class="p">[</span><span class="s1">'geometric_mean'</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">AFFINITY_CUTOFF</span><span class="p">))</span>
+        <span class="o">/</span> <span class="p">(</span><span class="n">AFFINITY_CUTOFF</span> <span class="o">-</span> <span class="n">sequences</span><span class="p">[</span><span class="s1">'geometric_mean'</span><span class="p">]</span><span class="o">.</span><span class="n">min</span><span class="p">())</span>
+    <span class="p">),</span>
+    <span class="n">a_min</span><span class="o">=</span><span class="mi">0</span><span class="p">,</span>
+    <span class="n">a_max</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">sequences</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">'affinity_norm'</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_c259_mutational_scanning_5_0.png" src="../_images/source_c259_mutational_scanning_5_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">NETMHCPAN_BINDER_CUTOFF</span> <span class="o">=</span> <span class="mf">2.0</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">with</span> <span class="n">tempfile</span><span class="o">.</span><span class="n">TemporaryDirectory</span><span class="p">()</span> <span class="k">as</span> <span class="n">temp_dir</span><span class="p">:</span>
+    <span class="n">input_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="s1">'peptides.fasta'</span><span class="p">)</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="n">input_name</span><span class="p">,</span> <span class="s1">'w'</span><span class="p">)</span> <span class="k">as</span> <span class="n">fh</span><span class="p">:</span>
+        <span class="n">fh</span><span class="o">.</span><span class="n">writelines</span><span class="p">(</span><span class="sa">f</span><span class="s1">'&gt;</span><span class="si">{</span><span class="n">id_</span><span class="si">}</span><span class="se">\n</span><span class="si">{</span><span class="n">sequence</span><span class="si">}</span><span class="se">\n</span><span class="s1">'</span> <span class="k">for</span> <span class="n">id_</span><span class="p">,</span> <span class="n">sequence</span> <span class="ow">in</span> <span class="n">sequences</span><span class="p">[</span><span class="s1">'peptide'</span><span class="p">]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span><span class="o">.</span><span class="n">items</span><span class="p">())</span>
+
+    <span class="n">output_name</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">temp_dir</span><span class="p">,</span> <span class="s1">'out.tsv'</span><span class="p">)</span>
+    <span class="n">subprocess</span><span class="o">.</span><span class="n">run</span><span class="p">(</span>  <span class="c1"># noqa: S603</span>
+        <span class="p">[</span><span class="s1">'/usr/bin/env'</span><span class="p">,</span> <span class="s1">'netMHCpan'</span><span class="p">,</span> <span class="s1">'-xls'</span><span class="p">,</span> <span class="s1">'-xlsfile'</span><span class="p">,</span> <span class="n">output_name</span><span class="p">,</span> <span class="s1">'-a'</span><span class="p">,</span> <span class="s1">'HLA-A02:01'</span><span class="p">,</span> <span class="n">input_name</span><span class="p">],</span>
+        <span class="n">check</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+        <span class="n">stdout</span><span class="o">=</span><span class="n">subprocess</span><span class="o">.</span><span class="n">DEVNULL</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">netmhcpan_predictions</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="n">output_name</span><span class="p">,</span> <span class="n">delimiter</span><span class="o">=</span><span class="s1">'</span><span class="se">\t</span><span class="s1">'</span><span class="p">,</span> <span class="n">comment</span><span class="o">=</span><span class="s1">'#'</span><span class="p">,</span> <span class="n">header</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">netmhcpan_predictions</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">column_name</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span> <span class="k">for</span> <span class="n">column_name</span> <span class="ow">in</span> <span class="n">netmhcpan_predictions</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+<span class="n">netmhcpan_predictions</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span> <span class="o">=</span> <span class="n">netmhcpan_predictions</span><span class="p">[</span><span class="s1">'id'</span><span class="p">]</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'c259_original_9'</span><span class="p">,</span> <span class="s1">'c259_original_9V'</span><span class="p">)</span>
+<span class="n">netmhcpan_predictions</span> <span class="o">=</span> <span class="n">netmhcpan_predictions</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'id'</span><span class="p">)</span>
+
+<span class="n">sequences</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">sequences</span><span class="p">,</span> <span class="n">netmhcpan_predictions</span><span class="p">[[</span><span class="s1">'el_rank'</span><span class="p">]]],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">to_be_screened</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span>
+    <span class="n">sequences</span><span class="p">[</span><span class="n">sequences</span><span class="p">[</span><span class="s1">'geometric_mean'</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span> <span class="o">&amp;</span> <span class="p">(</span><span class="n">sequences</span><span class="p">[</span><span class="s1">'el_rank'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">NETMHCPAN_BINDER_CUTOFF</span><span class="p">)]</span><span class="o">.</span><span class="n">index</span>
+<span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span>
+    <span class="s1">'IDs to be remove as they have no affinity and are not reported binders by NetMHCpan:</span><span class="se">\n\n\t</span><span class="s1">-'</span><span class="p">,</span>
+    <span class="s1">'</span><span class="se">\n\t</span><span class="s1">- '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">to_be_screened</span><span class="p">),</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+IDs to be remove as they have no affinity and are not reported binders by NetMHCpan:
+
+        - c259_2A
+        - c259_9N
+        - c259_2E
+        - c259_2D
+        - c259_1P
+        - c259_9R
+        - c259_9T
+        - c259_2N
+        - c259_9Y
+        - c259_9E
+        - c259_2K
+        - c259_9P
+        - c259_2G
+        - c259_2H
+        - c259_9G
+        - c259_9K
+        - c259_2R
+        - c259_2S
+        - c259_9S
+        - c259_2F
+        - c259_9H
+        - c259_9D
+        - c259_2P
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">non_binders</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sequences</span><span class="p">[</span><span class="n">sequences</span><span class="p">[</span><span class="s1">'el_rank'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="n">NETMHCPAN_BINDER_CUTOFF</span><span class="p">]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s1">'IDs not reported to bind from NetMHCpan but have affinity data:'</span><span class="p">,</span> <span class="s1">', '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">non_binders</span> <span class="o">-</span> <span class="n">to_be_screened</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+IDs not reported to bind from NetMHCpan but have affinity data: c259_2W, c259_2Y, c259_9Q, c259_9F, c259_9W, c259_1D, c259_6W
+</pre></div></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">no_affinity</span> <span class="o">=</span> <span class="nb">set</span><span class="p">(</span><span class="n">sequences</span><span class="p">[</span><span class="n">sequences</span><span class="p">[</span><span class="s1">'geometric_mean'</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()]</span><span class="o">.</span><span class="n">index</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="s2">"IDs that don't have affinity data but are pMHC binders:</span><span class="se">\n\n\t</span><span class="s2">-"</span><span class="p">,</span> <span class="s1">'</span><span class="se">\n\t</span><span class="s1">- '</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">no_affinity</span> <span class="o">-</span> <span class="n">to_be_screened</span><span class="p">))</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+IDs that don&#39;t have affinity data but are pMHC binders:
+
+        - c259_2T
+        - c259_3D
+        - c259_3K
+        - c259_5P
+        - c259_1M
+        - c259_8N
+        - c259_3E
+        - c259_3G
+        - c259_3P
+        - c259_8P
+        - c259_1E
+        - c259_3R
+        - c259_9M
+</pre></div></div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[11]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sequences_remove_non_binders</span> <span class="o">=</span> <span class="n">sequences</span><span class="p">[</span><span class="o">~</span><span class="n">sequences</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">to_be_screened</span><span class="p">)]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[12]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">binding_scores</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span>
+    <span class="s1">'../data/processed/af3_af3_tcrmodel2_c259_mutational_scan_affinity_pae_aggregator_predictions.csv'</span>
+<span class="p">)</span>
+<span class="n">binding_scores</span><span class="p">[</span><span class="s1">'prediction'</span><span class="p">]</span> <span class="o">=</span> <span class="n">binding_scores</span><span class="p">[</span>
+    <span class="p">[</span><span class="s1">'prediction_1'</span><span class="p">,</span> <span class="s1">'prediction_2'</span><span class="p">,</span> <span class="s1">'prediction_3'</span><span class="p">,</span> <span class="s1">'prediction_4'</span><span class="p">,</span> <span class="s1">'prediction_5'</span><span class="p">]</span>
+<span class="p">]</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="s1">'median'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">binding_scores</span> <span class="o">=</span> <span class="n">binding_scores</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span><span class="n">sequences_remove_non_binders</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">'inner'</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">'name'</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">(</span><span class="n">binding_scores</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">'prediction'</span><span class="p">,</span> <span class="n">bins</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_c259_mutational_scanning_13_0.png" src="../_images/source_c259_mutational_scanning_13_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[14]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">binding_scores</span><span class="p">[</span><span class="n">binding_scores</span><span class="p">[</span><span class="s1">'affinity_norm'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.00</span><span class="p">],</span> <span class="n">x</span><span class="o">=</span><span class="s1">'affinity_norm'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">'prediction'</span><span class="p">)</span>
+
+<span class="n">r</span><span class="p">,</span> <span class="n">p_val</span> <span class="o">=</span> <span class="n">pearsonr</span><span class="p">(</span>
+    <span class="n">binding_scores</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">binding_scores</span><span class="p">[</span><span class="s1">'affinity_norm'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.00</span><span class="p">,</span> <span class="s1">'affinity_norm'</span><span class="p">],</span>
+    <span class="n">binding_scores</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">binding_scores</span><span class="p">[</span><span class="s1">'affinity_norm'</span><span class="p">]</span> <span class="o">&gt;</span> <span class="mf">0.00</span><span class="p">,</span> <span class="s1">'prediction'</span><span class="p">],</span>
+    <span class="n">alternative</span><span class="o">=</span><span class="s1">'greater'</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.66</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'$R=</span><span class="si">{</span><span class="n">r</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">$, $R^2=</span><span class="si">{</span><span class="n">r</span><span class="o">**</span><span class="mi">2</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">$</span><span class="se">\n</span><span class="s1">(p-value=</span><span class="si">{</span><span class="n">p_val</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">)'</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">'right'</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Binding Score'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Affinity (Normalised)'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_c259_mutational_scanning_14_0.png" src="../_images/source_c259_mutational_scanning_14_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">regplot</span><span class="p">(</span><span class="n">binding_scores</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">'affinity_norm'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">'prediction'</span><span class="p">)</span>
+
+<span class="n">r</span><span class="p">,</span> <span class="n">p_val</span> <span class="o">=</span> <span class="n">pearsonr</span><span class="p">(</span><span class="n">binding_scores</span><span class="p">[</span><span class="s1">'affinity_norm'</span><span class="p">],</span> <span class="n">binding_scores</span><span class="p">[</span><span class="s1">'prediction'</span><span class="p">],</span> <span class="n">alternative</span><span class="o">=</span><span class="s1">'greater'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">text</span><span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">0.2</span><span class="p">,</span> <span class="sa">f</span><span class="s1">'$R=</span><span class="si">{</span><span class="n">r</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">$, $R^2=</span><span class="si">{</span><span class="n">r</span><span class="o">**</span><span class="mi">2</span><span class="si">:</span><span class="s1">.2f</span><span class="si">}</span><span class="s1">$</span><span class="se">\n</span><span class="s1">(p-value=</span><span class="si">{</span><span class="n">p_val</span><span class="si">:</span><span class="s1">.2e</span><span class="si">}</span><span class="s1">)'</span><span class="p">,</span> <span class="n">ha</span><span class="o">=</span><span class="s1">'right'</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Binding Score'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">'Affinity (Normalised)'</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="s1">'Interpolated NaNs'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_c259_mutational_scanning_15_0.png" src="../_images/source_c259_mutational_scanning_15_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[16]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">binding_scores</span><span class="p">[</span><span class="s1">'status'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'Binder'</span>
+<span class="n">binding_scores</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">binding_scores</span><span class="p">[</span><span class="s1">'geometric_mean'</span><span class="p">]</span><span class="o">.</span><span class="n">fillna</span><span class="p">(</span><span class="n">AFFINITY_CUTOFF</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="n">AFFINITY_CUTOFF</span><span class="p">,</span> <span class="s1">'status'</span><span class="p">]</span> <span class="o">=</span> <span class="s1">'Non-Binder'</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[17]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">binding_scores</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="s1">'prediction'</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">'status'</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)</span>
+
+<span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span>
+<span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s1">'Binding Score'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_c259_mutational_scanning_17_0.png" src="../_images/source_c259_mutational_scanning_17_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[18]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">grid</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span><span class="n">binding_scores</span><span class="p">,</span> <span class="n">col</span><span class="o">=</span><span class="s1">'status'</span><span class="p">,</span> <span class="n">sharex</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">grid</span><span class="o">.</span><span class="n">map_dataframe</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">'prediction'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_c259_mutational_scanning_18_0.png" src="../_images/source_c259_mutational_scanning_18_0.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">pg</span><span class="o">.</span><span class="n">ttest</span><span class="p">(</span>
+    <span class="n">binding_scores</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">"status == 'Binder'"</span><span class="p">)[</span><span class="s1">'prediction'</span><span class="p">],</span>
+    <span class="n">binding_scores</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s2">"status == 'Non-Binder'"</span><span class="p">)[</span><span class="s1">'prediction'</span><span class="p">],</span>
+    <span class="n">alternative</span><span class="o">=</span><span class="s1">'greater'</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[19]:
+</pre></div>
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>T</th>
+      <th>dof</th>
+      <th>alternative</th>
+      <th>p-val</th>
+      <th>CI95%</th>
+      <th>cohen-d</th>
+      <th>BF10</th>
+      <th>power</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>T-test</th>
+      <td>7.363817</td>
+      <td>346.049597</td>
+      <td>greater</td>
+      <td>6.587952e-13</td>
+      <td>[0.03, inf]</td>
+      <td>0.564682</td>
+      <td>2.4e+10</td>
+      <td>1.0</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="benchmark_structure_prediction_methods.html" class="btn btn-neutral float-left" title="Benchmark Structure Prediction Methods" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="coeliac_antigen_specificity_with_alphafold3.html" class="btn btn-neutral float-right" title="Coeliac antigen specificity with AlphaFold3" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Benjamin McMaster, Ali El Moselhy, Ilija Ilievski, Christopher J. Thorpe, Jamie Rossjohn, Charlotte M. Deane, and Hashem Koohy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,7 @@
+tcr\_pmhc\_predicted\_structures.aligners module
+================================================
+
+.. automodule:: tcr_pmhc_predicted_structures.aligners
+   :members:
+   :show-inheritance:
+   :undoc-members:

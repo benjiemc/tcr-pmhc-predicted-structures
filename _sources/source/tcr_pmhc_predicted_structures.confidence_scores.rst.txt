@@ -1,0 +1,7 @@
+tcr\_pmhc\_predicted\_structures.confidence\_scores module
+==========================================================
+
+.. automodule:: tcr_pmhc_predicted_structures.confidence_scores
+   :members:
+   :show-inheritance:
+   :undoc-members:

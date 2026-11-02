@@ -1,0 +1,7 @@
+tcr\_pmhc\_predicted\_structures.comparisons module
+===================================================
+
+.. automodule:: tcr_pmhc_predicted_structures.comparisons
+   :members:
+   :show-inheritance:
+   :undoc-members:

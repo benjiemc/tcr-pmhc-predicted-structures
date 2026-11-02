@@ -1,0 +1,867 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Benchmark AlphaFold3 against sequence models &mdash; tcr_pmhc_predicted_structures  documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/nbsphinx-code-cells.css?v=2aa19091" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=5929fcd5"></script>
+      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script crossorigin="anonymous" integrity="sha256-Ae2Vz/4ePdIu6ZyI/5ZGsYnb+m0JlOmKPjt6XZ9JJkA=" src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.4/require.min.js"></script>
+      <script>window.MathJax = {"tex": {"inlineMath": [["$", "$"], ["\\(", "\\)"]], "processEscapes": true}, "options": {"ignoreHtmlClass": "tex2jax_ignore|mathjax_ignore|document", "processHtmlClass": "tex2jax_process|mathjax_process|math|output_area"}}</script>
+      <script defer="defer" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-mml-chtml.js"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Benchmark Structure Prediction Methods" href="benchmark_structure_prediction_methods.html" />
+    <link rel="prev" title="Ablations of AlphaFold3" href="ablations_of_alphafold3.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            tcr_pmhc_predicted_structures
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Analysis Results</span></p>
+<ul class="current">
+<li class="toctree-l1 current"><a class="reference internal" href="notebooks.html">Analysis Notebooks</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="ablations_of_alphafold3.html">Ablations of AlphaFold3</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Benchmark AlphaFold3 against sequence models</a></li>
+<li class="toctree-l2"><a class="reference internal" href="benchmark_structure_prediction_methods.html">Benchmark Structure Prediction Methods</a></li>
+<li class="toctree-l2"><a class="reference internal" href="c259_mutational_scanning.html">Correlation between affinity and binding scores for c259 TCR binding peptide mutants</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coeliac_antigen_specificity_with_alphafold3.html">Coeliac antigen specificity with AlphaFold3</a></li>
+<li class="toctree-l2"><a class="reference internal" href="coeliac_mutagenesis_analysis.html">Coeliac mutagenesis analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="compare_structural_features_to_confidence.html">Comparing structural features to confidence scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="dash_mutagenesis_analysis.html">Dash et al mutagenesis analysis</a></li>
+<li class="toctree-l2"><a class="reference internal" href="evaluating_antigen_specificity_model.html">Evaluating antigen specificity model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exploring_coeliac_tcrs.html">Exploring Coeliac TCRs</a></li>
+<li class="toctree-l2"><a class="reference internal" href="exploring_dash_dataset.html">Exploring the Dash <em>et al</em> dataset</a></li>
+<li class="toctree-l2"><a class="reference internal" href="investigate_specificity_information_in_af3_scores.html">Investigating specificity information in AF3 Scores</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualise_sequence_data.html">Sequence Data</a></li>
+<li class="toctree-l2"><a class="reference internal" href="visualise_structure_data.html">Data Summary</a></li>
+</ul>
+</li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Command Line Applications</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="apps.html">Command Line Applications</a></li>
+</ul>
+<p class="caption" role="heading"><span class="caption-text">Python API</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="modules.html">tcr_pmhc_predicted_structures</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">tcr_pmhc_predicted_structures</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="notebooks.html">Analysis Notebooks</a></li>
+      <li class="breadcrumb-item active">Benchmark AlphaFold3 against sequence models</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/source/benchmark_alphafold3_against_sequence_models.ipynb.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="Benchmark-AlphaFold3-against-sequence-models">
+<h1>Benchmark AlphaFold3 against sequence models<a class="headerlink" href="#Benchmark-AlphaFold3-against-sequence-models" title="Link to this heading"></a></h1>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[1]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">collections</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">itertools</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">IPython.display</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ipy_display</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pingouin</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pg</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">seaborn</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">sns</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">scipy</span><span class="w"> </span><span class="kn">import</span> <span class="n">stats</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">sklearn.metrics</span><span class="w"> </span><span class="kn">import</span> <span class="n">auc</span><span class="p">,</span> <span class="n">precision_recall_curve</span><span class="p">,</span> <span class="n">roc_auc_score</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sequences_100_unbalanced</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'../data/interim/sequences_sample_100_unbalanced.csv'</span><span class="p">,</span> <span class="n">index_col</span><span class="o">=</span><span class="s1">'index'</span><span class="p">)</span>
+<span class="n">sequences_100_unbalanced</span><span class="o">.</span><span class="n">index</span> <span class="o">=</span> <span class="n">sequences_100_unbalanced</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">confidences_100_unbalanced</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'../data/processed/confidence_scores_af3_af3_tcrmodel2_100_unbalanced.csv'</span><span class="p">)</span>
+<span class="n">confidences_100_unbalanced</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span> <span class="o">=</span> <span class="n">confidences_100_unbalanced</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+
+<span class="n">confidences_100_unbalanced</span> <span class="o">=</span> <span class="n">confidences_100_unbalanced</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span>
+    <span class="n">confidences_100_unbalanced</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'name'</span><span class="p">)[</span><span class="s1">'ranking_score'</span><span class="p">]</span><span class="o">.</span><span class="n">idxmax</span><span class="p">()</span>
+<span class="p">]</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">confidences_100_unbalanced</span> <span class="o">=</span> <span class="n">confidences_100_unbalanced</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+    <span class="n">sequences_100_unbalanced</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">'left'</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">'name'</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[5]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tcr_struct_map_predictions</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'../data/external/TCRStructMap_predictions_on_sequences_pMHC_split.csv'</span><span class="p">)</span>
+<span class="n">tcr_struct_map_predictions</span><span class="p">[</span><span class="s1">'index'</span><span class="p">]</span> <span class="o">=</span> <span class="n">tcr_struct_map_predictions</span><span class="p">[</span><span class="s1">'index'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[6]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">tcr_struct_map_predictions_100_unbalanced</span> <span class="o">=</span> <span class="n">tcr_struct_map_predictions</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+    <span class="n">sequences_100_unbalanced</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">'right'</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">'index'</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'sub_model_number == fold'</span><span class="p">)</span>
+<span class="n">tcr_struct_map_predictions_100_unbalanced</span> <span class="o">=</span> <span class="n">tcr_struct_map_predictions_100_unbalanced</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'index'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[7]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nettcr_predictions</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="s1">'../data/external/NetTCR_predictions_on_sequences_pMHC_split.csv'</span><span class="p">)</span>
+<span class="n">nettcr_predictions</span><span class="p">[</span><span class="s1">'index'</span><span class="p">]</span> <span class="o">=</span> <span class="n">nettcr_predictions</span><span class="p">[</span><span class="s1">'index'</span><span class="p">]</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="nb">str</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[8]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">nettcr_predictions_100_unbalanced</span> <span class="o">=</span> <span class="n">nettcr_predictions</span><span class="o">.</span><span class="n">merge</span><span class="p">(</span>
+    <span class="n">sequences_100_unbalanced</span><span class="p">,</span> <span class="n">how</span><span class="o">=</span><span class="s1">'right'</span><span class="p">,</span> <span class="n">left_on</span><span class="o">=</span><span class="s1">'index'</span><span class="p">,</span> <span class="n">right_index</span><span class="o">=</span><span class="kc">True</span>
+<span class="p">)</span><span class="o">.</span><span class="n">query</span><span class="p">(</span><span class="s1">'sub_model_number == fold'</span><span class="p">)</span>
+<span class="n">nettcr_predictions_100_unbalanced</span> <span class="o">=</span> <span class="n">nettcr_predictions_100_unbalanced</span><span class="o">.</span><span class="n">set_index</span><span class="p">(</span><span class="s1">'index'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[9]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">calculate_performance</span><span class="p">(</span><span class="n">predictions</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">labels</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">:</span>
+    <span class="n">roc_auc</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+    <span class="n">roc_auc01</span> <span class="o">=</span> <span class="n">roc_auc_score</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">predictions</span><span class="p">,</span> <span class="n">max_fpr</span><span class="o">=</span><span class="mf">0.1</span><span class="p">)</span>
+
+    <span class="n">precision</span><span class="p">,</span> <span class="n">recall</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="n">precision_recall_curve</span><span class="p">(</span><span class="n">labels</span><span class="p">,</span> <span class="n">predictions</span><span class="p">)</span>
+    <span class="n">pr_auc</span> <span class="o">=</span> <span class="n">auc</span><span class="p">(</span><span class="n">recall</span><span class="p">,</span> <span class="n">precision</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="p">{</span><span class="s1">'roc_auc'</span><span class="p">:</span> <span class="n">roc_auc</span><span class="p">,</span> <span class="s1">'roc_auc_01'</span><span class="p">:</span> <span class="n">roc_auc01</span><span class="p">,</span> <span class="s1">'pr_auc'</span><span class="p">:</span> <span class="n">pr_auc</span><span class="p">}</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">format_metric_name</span><span class="p">(</span><span class="n">metric_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+    <span class="k">return</span> <span class="n">metric_name</span><span class="o">.</span><span class="n">upper</span><span class="p">()</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'_01'</span><span class="p">,</span> <span class="s1">' 0.1'</span><span class="p">)</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s1">'_'</span><span class="p">,</span> <span class="s1">'-'</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[10]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">NUM_SAMPLES</span> <span class="o">=</span> <span class="mi">20</span>
+<span class="n">SAMPLE_SIZE</span> <span class="o">=</span> <span class="mi">50</span>
+
+<span class="n">rng</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">random</span><span class="o">.</span><span class="n">default_rng</span><span class="p">(</span><span class="mi">123</span><span class="p">)</span>
+
+<span class="n">boot_strap_scores</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="s1">'sample_num'</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s1">'model'</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s1">'roc_auc'</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s1">'roc_auc_01'</span><span class="p">:</span> <span class="p">[],</span>
+    <span class="s1">'pr_auc'</span><span class="p">:</span> <span class="p">[],</span>
+<span class="p">}</span>
+<span class="k">for</span> <span class="n">sample_num</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">NUM_SAMPLES</span><span class="p">):</span>
+    <span class="n">indices</span> <span class="o">=</span> <span class="n">sequences_100_unbalanced</span><span class="o">.</span><span class="n">sample</span><span class="p">(</span><span class="n">SAMPLE_SIZE</span><span class="p">,</span> <span class="n">random_state</span><span class="o">=</span><span class="n">rng</span><span class="p">)</span><span class="o">.</span><span class="n">index</span>
+
+    <span class="c1"># AlphaFold3</span>
+    <span class="n">boot_strap_scores</span><span class="p">[</span><span class="s1">'sample_num'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample_num</span><span class="p">)</span>
+    <span class="n">boot_strap_scores</span><span class="p">[</span><span class="s1">'model'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'AlphaFold3'</span><span class="p">)</span>
+
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">calculate_performance</span><span class="p">(</span>
+        <span class="n">confidences_100_unbalanced</span><span class="p">[</span><span class="n">confidences_100_unbalanced</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">indices</span><span class="p">)][</span><span class="s1">'cdr_pmhc_pae_score'</span><span class="p">],</span>
+        <span class="n">confidences_100_unbalanced</span><span class="p">[</span><span class="n">confidences_100_unbalanced</span><span class="p">[</span><span class="s1">'name'</span><span class="p">]</span><span class="o">.</span><span class="n">isin</span><span class="p">(</span><span class="n">indices</span><span class="p">)][</span><span class="s1">'label'</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">boot_strap_scores</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="mi">1</span> <span class="o">-</span> <span class="n">score</span><span class="p">)</span>
+
+    <span class="c1"># NetTCR</span>
+    <span class="n">boot_strap_scores</span><span class="p">[</span><span class="s1">'sample_num'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample_num</span><span class="p">)</span>
+    <span class="n">boot_strap_scores</span><span class="p">[</span><span class="s1">'model'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'NetTCR'</span><span class="p">)</span>
+
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">calculate_performance</span><span class="p">(</span>
+        <span class="n">nettcr_predictions_100_unbalanced</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">indices</span><span class="p">][</span><span class="s1">'prediction'</span><span class="p">],</span>
+        <span class="n">nettcr_predictions_100_unbalanced</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">indices</span><span class="p">][</span><span class="s1">'label'</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">boot_strap_scores</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+
+    <span class="c1"># TCRStructMap</span>
+    <span class="n">boot_strap_scores</span><span class="p">[</span><span class="s1">'sample_num'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">sample_num</span><span class="p">)</span>
+    <span class="n">boot_strap_scores</span><span class="p">[</span><span class="s1">'model'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s1">'TCRStructMap'</span><span class="p">)</span>
+
+    <span class="n">scores</span> <span class="o">=</span> <span class="n">calculate_performance</span><span class="p">(</span>
+        <span class="n">tcr_struct_map_predictions_100_unbalanced</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">indices</span><span class="p">][</span><span class="s1">'prediction'</span><span class="p">],</span>
+        <span class="n">tcr_struct_map_predictions_100_unbalanced</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">indices</span><span class="p">][</span><span class="s1">'label'</span><span class="p">],</span>
+    <span class="p">)</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">score</span> <span class="ow">in</span> <span class="n">scores</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">boot_strap_scores</span><span class="p">[</span><span class="n">name</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">score</span><span class="p">)</span>
+
+<span class="n">boot_strap_scores</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">boot_strap_scores</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">metric_name</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'roc_auc'</span><span class="p">,</span> <span class="s1">'roc_auc_01'</span><span class="p">,</span> <span class="s1">'pr_auc'</span><span class="p">):</span>
+    <span class="n">ax</span> <span class="o">=</span> <span class="n">sns</span><span class="o">.</span><span class="n">stripplot</span><span class="p">(</span>
+        <span class="n">boot_strap_scores</span><span class="p">,</span>
+        <span class="n">x</span><span class="o">=</span><span class="s1">'model'</span><span class="p">,</span>
+        <span class="n">y</span><span class="o">=</span><span class="n">metric_name</span><span class="p">,</span>
+        <span class="n">color</span><span class="o">=</span><span class="s1">'grey'</span><span class="p">,</span>
+        <span class="n">zorder</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">marker</span><span class="o">=</span><span class="s1">'o'</span><span class="p">,</span>
+        <span class="n">size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+        <span class="n">edgecolor</span><span class="o">=</span><span class="s1">'black'</span><span class="p">,</span>
+        <span class="n">linewidth</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+        <span class="n">alpha</span><span class="o">=</span><span class="mf">0.70</span><span class="p">,</span>
+    <span class="p">)</span>
+
+    <span class="n">sns</span><span class="o">.</span><span class="n">boxplot</span><span class="p">(</span><span class="n">boot_strap_scores</span><span class="p">,</span> <span class="n">x</span><span class="o">=</span><span class="s1">'model'</span><span class="p">,</span> <span class="n">y</span><span class="o">=</span><span class="n">metric_name</span><span class="p">,</span> <span class="n">boxprops</span><span class="o">=</span><span class="p">{</span><span class="s1">'alpha'</span><span class="p">:</span> <span class="mf">0.85</span><span class="p">},</span> <span class="n">showfliers</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">axhline</span><span class="p">(</span><span class="mf">0.5</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s1">'r'</span><span class="p">,</span> <span class="n">linestyle</span><span class="o">=</span><span class="s1">'dashed'</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticks</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticks</span><span class="p">())</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xticklabels</span><span class="p">(</span><span class="n">ax</span><span class="o">.</span><span class="n">get_xticklabels</span><span class="p">(),</span> <span class="n">rotation</span><span class="o">=-</span><span class="mi">45</span><span class="p">,</span> <span class="n">horizontalalignment</span><span class="o">=</span><span class="s1">'left'</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s1">''</span><span class="p">)</span>
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylim</span><span class="p">(</span><span class="mf">0.25</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">)</span>
+
+    <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="n">format_metric_name</span><span class="p">(</span><span class="n">metric_name</span><span class="p">))</span>
+
+    <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_benchmark_alphafold3_against_sequence_models_11_0.png" src="../_images/source_benchmark_alphafold3_against_sequence_models_11_0.png" />
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_benchmark_alphafold3_against_sequence_models_11_1.png" src="../_images/source_benchmark_alphafold3_against_sequence_models_11_1.png" />
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_benchmark_alphafold3_against_sequence_models_11_2.png" src="../_images/source_benchmark_alphafold3_against_sequence_models_11_2.png" />
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">boot_strap_scores_agg</span> <span class="o">=</span> <span class="n">boot_strap_scores</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'model'</span><span class="p">)</span><span class="o">.</span><span class="n">agg</span><span class="p">(</span>
+    <span class="p">{</span><span class="s1">'roc_auc'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'mean'</span><span class="p">,</span> <span class="s1">'std'</span><span class="p">,</span> <span class="s1">'count'</span><span class="p">],</span> <span class="s1">'roc_auc_01'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'mean'</span><span class="p">,</span> <span class="s1">'std'</span><span class="p">,</span> <span class="s1">'count'</span><span class="p">],</span> <span class="s1">'pr_auc'</span><span class="p">:</span> <span class="p">[</span><span class="s1">'mean'</span><span class="p">,</span> <span class="s1">'std'</span><span class="p">,</span> <span class="s1">'count'</span><span class="p">]}</span>
+<span class="p">)</span>
+
+<span class="n">std_df</span> <span class="o">=</span> <span class="n">boot_strap_scores_agg</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="s1">'std'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">count_df</span> <span class="o">=</span> <span class="n">boot_strap_scores_agg</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="s1">'count'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">stderr_df</span> <span class="o">=</span> <span class="n">std_df</span> <span class="o">/</span> <span class="n">np</span><span class="o">.</span><span class="n">sqrt</span><span class="p">(</span><span class="n">count_df</span><span class="p">)</span>
+<span class="n">stderr_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">MultiIndex</span><span class="o">.</span><span class="n">from_product</span><span class="p">([</span><span class="n">stderr_df</span><span class="o">.</span><span class="n">columns</span><span class="p">,</span> <span class="p">[</span><span class="s1">'stderr'</span><span class="p">]])</span>
+
+<span class="n">boot_strap_scores_agg</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">concat</span><span class="p">([</span><span class="n">boot_strap_scores_agg</span><span class="p">,</span> <span class="n">stderr_df</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span><span class="o">.</span><span class="n">sort_index</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">boot_strap_scores_agg</span> <span class="o">=</span> <span class="n">boot_strap_scores_agg</span><span class="o">.</span><span class="n">loc</span><span class="p">[:,</span> <span class="n">boot_strap_scores_agg</span><span class="o">.</span><span class="n">columns</span><span class="o">.</span><span class="n">get_level_values</span><span class="p">(</span><span class="mi">1</span><span class="p">)</span> <span class="o">!=</span> <span class="s1">'count'</span><span class="p">]</span>
+
+<span class="n">boot_strap_scores_agg_means</span> <span class="o">=</span> <span class="n">boot_strap_scores_agg</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="s1">'mean'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+<span class="n">boot_strap_scores_agg_stderrs</span> <span class="o">=</span> <span class="n">boot_strap_scores_agg</span><span class="o">.</span><span class="n">xs</span><span class="p">(</span><span class="s1">'stderr'</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span> <span class="n">level</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">boot_strap_scores_agg</span> <span class="o">=</span> <span class="n">boot_strap_scores_agg_means</span><span class="o">.</span><span class="n">combine</span><span class="p">(</span>
+    <span class="n">boot_strap_scores_agg_stderrs</span><span class="p">,</span> <span class="k">lambda</span> <span class="n">mean</span><span class="p">,</span> <span class="n">se</span><span class="p">:</span> <span class="n">mean</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="s1">'</span><span class="si">{:.2f}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">)</span> <span class="o">+</span> <span class="s1">' ± '</span> <span class="o">+</span> <span class="n">se</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="s1">'</span><span class="si">{:.2e}</span><span class="s1">'</span><span class="o">.</span><span class="n">format</span><span class="p">)</span>
+<span class="p">)</span>
+
+<span class="n">max_mask</span> <span class="o">=</span> <span class="n">boot_strap_scores_agg_means</span><span class="o">.</span><span class="n">eq</span><span class="p">(</span><span class="n">boot_strap_scores_agg_means</span><span class="o">.</span><span class="n">max</span><span class="p">())</span>
+
+<span class="n">boot_strap_scores_agg</span><span class="o">.</span><span class="n">index</span><span class="o">.</span><span class="n">name</span> <span class="o">=</span> <span class="kc">None</span>
+
+<span class="n">boot_strap_scores_agg</span> <span class="o">=</span> <span class="n">boot_strap_scores_agg</span><span class="p">[[</span><span class="s1">'roc_auc'</span><span class="p">,</span> <span class="s1">'roc_auc_01'</span><span class="p">,</span> <span class="s1">'pr_auc'</span><span class="p">]]</span>
+<span class="n">max_mask</span> <span class="o">=</span> <span class="n">max_mask</span><span class="p">[[</span><span class="s1">'roc_auc'</span><span class="p">,</span> <span class="s1">'roc_auc_01'</span><span class="p">,</span> <span class="s1">'pr_auc'</span><span class="p">]]</span>
+
+<span class="n">boot_strap_scores_agg</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">format_metric_name</span><span class="p">(</span><span class="n">col_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">boot_strap_scores_agg</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+<span class="n">max_mask</span><span class="o">.</span><span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">format_metric_name</span><span class="p">(</span><span class="n">col_name</span><span class="p">)</span> <span class="k">for</span> <span class="n">col_name</span> <span class="ow">in</span> <span class="n">max_mask</span><span class="o">.</span><span class="n">columns</span><span class="p">]</span>
+
+
+<span class="c1"># Preview in notebook</span>
+<span class="k">def</span><span class="w"> </span><span class="nf">_bold_max_row</span><span class="p">(</span><span class="n">row</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">list</span><span class="p">[</span><span class="nb">str</span><span class="p">]:</span>
+    <span class="n">idx</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">name</span>  <span class="c1"># row index label</span>
+    <span class="k">return</span> <span class="p">[</span><span class="s1">'font-weight: bold'</span> <span class="k">if</span> <span class="n">max_mask</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">idx</span><span class="p">,</span> <span class="n">col</span><span class="p">]</span> <span class="k">else</span> <span class="s1">''</span> <span class="k">for</span> <span class="n">col</span> <span class="ow">in</span> <span class="n">row</span><span class="o">.</span><span class="n">index</span><span class="p">]</span>
+
+
+<span class="n">styled</span> <span class="o">=</span> <span class="n">boot_strap_scores_agg</span><span class="o">.</span><span class="n">style</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span><span class="n">_bold_max_row</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">)</span>
+
+<span class="n">styled</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<style type="text/css">
+#T_e7558_row0_col0, #T_e7558_row0_col1, #T_e7558_row0_col2 {
+  font-weight: bold;
+}
+</style>
+<table id="T_e7558">
+  <thead>
+    <tr>
+      <th class="blank level0" >&nbsp;</th>
+      <th id="T_e7558_level0_col0" class="col_heading level0 col0" >ROC-AUC</th>
+      <th id="T_e7558_level0_col1" class="col_heading level0 col1" >ROC-AUC 0.1</th>
+      <th id="T_e7558_level0_col2" class="col_heading level0 col2" >PR-AUC</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th id="T_e7558_level0_row0" class="row_heading level0 row0" >AlphaFold3</th>
+      <td id="T_e7558_row0_col0" class="data row0 col0" >0.65 ± 1.34e-02</td>
+      <td id="T_e7558_row0_col1" class="data row0 col1" >0.50 ± 3.51e-03</td>
+      <td id="T_e7558_row0_col2" class="data row0 col2" >0.54 ± 1.36e-02</td>
+    </tr>
+    <tr>
+      <th id="T_e7558_level0_row1" class="row_heading level0 row1" >NetTCR</th>
+      <td id="T_e7558_row1_col0" class="data row1 col0" >0.46 ± 1.15e-02</td>
+      <td id="T_e7558_row1_col1" class="data row1 col1" >0.49 ± 2.41e-03</td>
+      <td id="T_e7558_row1_col2" class="data row1 col2" >0.48 ± 1.14e-02</td>
+    </tr>
+    <tr>
+      <th id="T_e7558_level0_row2" class="row_heading level0 row2" >TCRStructMap</th>
+      <td id="T_e7558_row2_col0" class="data row2 col0" >0.45 ± 1.30e-02</td>
+      <td id="T_e7558_row2_col1" class="data row2 col1" >0.49 ± 3.27e-03</td>
+      <td id="T_e7558_row2_col2" class="data row2 col2" >0.48 ± 1.55e-02</td>
+    </tr>
+  </tbody>
+</table></div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[13]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="n">sns</span><span class="o">.</span><span class="n">FacetGrid</span><span class="p">(</span>
+    <span class="n">boot_strap_scores</span><span class="o">.</span><span class="n">melt</span><span class="p">(</span>
+        <span class="n">id_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">'model'</span><span class="p">,</span> <span class="s1">'sample_num'</span><span class="p">],</span>
+        <span class="n">value_vars</span><span class="o">=</span><span class="p">[</span><span class="s1">'roc_auc'</span><span class="p">,</span> <span class="s1">'roc_auc_01'</span><span class="p">,</span> <span class="s1">'pr_auc'</span><span class="p">],</span>
+        <span class="n">var_name</span><span class="o">=</span><span class="s1">'metric_name'</span><span class="p">,</span>
+        <span class="n">value_name</span><span class="o">=</span><span class="s1">'score'</span><span class="p">,</span>
+    <span class="p">),</span>
+    <span class="n">col</span><span class="o">=</span><span class="s1">'model'</span><span class="p">,</span>
+    <span class="n">row</span><span class="o">=</span><span class="s1">'metric_name'</span><span class="p">,</span>
+    <span class="n">sharex</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="p">)</span><span class="o">.</span><span class="n">map</span><span class="p">(</span><span class="n">sns</span><span class="o">.</span><span class="n">histplot</span><span class="p">,</span> <span class="s1">'score'</span><span class="p">)</span>
+
+<span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<img alt="../_images/source_benchmark_alphafold3_against_sequence_models_13_0.png" src="../_images/source_benchmark_alphafold3_against_sequence_models_13_0.png" />
+</div>
+</div>
+<div class="nbinput nblast docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[ ]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">statistics_normal</span><span class="p">(</span><span class="n">data</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">metric_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">tuple</span><span class="p">[</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">]:</span>
+    <span class="n">overall</span> <span class="o">=</span> <span class="n">pg</span><span class="o">.</span><span class="n">rm_anova</span><span class="p">(</span><span class="n">data</span><span class="p">,</span> <span class="n">dv</span><span class="o">=</span><span class="n">metric_name</span><span class="p">,</span> <span class="n">within</span><span class="o">=</span><span class="s1">'model'</span><span class="p">,</span> <span class="n">subject</span><span class="o">=</span><span class="s1">'sample_num'</span><span class="p">)</span>
+
+    <span class="n">groups</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">data</span><span class="o">.</span><span class="n">groupby</span><span class="p">(</span><span class="s1">'model'</span><span class="p">,</span> <span class="n">dropna</span><span class="o">=</span><span class="kc">False</span><span class="p">)[</span><span class="n">metric_name</span><span class="p">])</span>
+
+    <span class="n">significance_level</span> <span class="o">=</span> <span class="mf">0.05</span> <span class="o">/</span> <span class="nb">len</span><span class="p">(</span><span class="n">groups</span><span class="p">)</span>
+
+    <span class="n">post_hoc</span> <span class="o">=</span> <span class="n">collections</span><span class="o">.</span><span class="n">defaultdict</span><span class="p">(</span><span class="nb">list</span><span class="p">)</span>
+    <span class="k">for</span> <span class="p">(</span><span class="n">group1_name</span><span class="p">,</span> <span class="n">group1</span><span class="p">),</span> <span class="p">(</span><span class="n">group2_name</span><span class="p">,</span> <span class="n">group2</span><span class="p">)</span> <span class="ow">in</span> <span class="n">itertools</span><span class="o">.</span><span class="n">combinations</span><span class="p">(</span><span class="n">groups</span><span class="p">,</span> <span class="mi">2</span><span class="p">):</span>
+        <span class="n">stat</span><span class="p">,</span> <span class="n">p_val</span> <span class="o">=</span> <span class="n">stats</span><span class="o">.</span><span class="n">ttest_rel</span><span class="p">(</span><span class="n">group1</span><span class="p">,</span> <span class="n">group2</span><span class="p">,</span> <span class="n">alternative</span><span class="o">=</span><span class="s1">'two-sided'</span><span class="p">)</span>
+
+        <span class="n">post_hoc</span><span class="p">[</span><span class="s1">'group1'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group1_name</span><span class="p">)</span>
+        <span class="n">post_hoc</span><span class="p">[</span><span class="s1">'group2'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">group2_name</span><span class="p">)</span>
+        <span class="n">post_hoc</span><span class="p">[</span><span class="s1">'stat'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">stat</span><span class="p">)</span>
+        <span class="n">post_hoc</span><span class="p">[</span><span class="s1">'p_val'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_val</span><span class="p">)</span>
+        <span class="n">post_hoc</span><span class="p">[</span><span class="s1">'signficant'</span><span class="p">]</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">p_val</span> <span class="o">&lt;</span> <span class="n">significance_level</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">overall</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">(</span><span class="n">post_hoc</span><span class="p">)</span>
+</pre></div>
+</div>
+</div>
+<div class="nbinput docutils container">
+<div class="prompt highlight-none notranslate"><div class="highlight"><pre><span></span>[15]:
+</pre></div>
+</div>
+<div class="input_area highlight-ipython3 notranslate"><div class="highlight"><pre><span></span><span class="k">for</span> <span class="n">metric_name</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">'roc_auc'</span><span class="p">,</span> <span class="s1">'roc_auc_01'</span><span class="p">,</span> <span class="s1">'pr_auc'</span><span class="p">):</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">format_metric_name</span><span class="p">(</span><span class="n">metric_name</span><span class="p">))</span>
+
+    <span class="n">overall</span><span class="p">,</span> <span class="n">post_hoc</span> <span class="o">=</span> <span class="n">statistics_normal</span><span class="p">(</span><span class="n">boot_strap_scores</span><span class="p">,</span> <span class="n">metric_name</span><span class="p">)</span>
+
+    <span class="n">ipy_display</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">overall</span><span class="p">)</span>
+    <span class="n">ipy_display</span><span class="o">.</span><span class="n">display</span><span class="p">(</span><span class="n">post_hoc</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">()</span>
+</pre></div>
+</div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+ROC-AUC
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Source</th>
+      <th>ddof1</th>
+      <th>ddof2</th>
+      <th>F</th>
+      <th>p-unc</th>
+      <th>ng2</th>
+      <th>eps</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>model</td>
+      <td>2</td>
+      <td>38</td>
+      <td>86.3368</td>
+      <td>7.367093e-15</td>
+      <td>0.730481</td>
+      <td>0.573694</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>group1</th>
+      <th>group2</th>
+      <th>stat</th>
+      <th>p_val</th>
+      <th>signficant</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>AlphaFold3</td>
+      <td>NetTCR</td>
+      <td>10.492115</td>
+      <td>2.414214e-09</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>AlphaFold3</td>
+      <td>TCRStructMap</td>
+      <td>8.984077</td>
+      <td>2.870748e-08</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>NetTCR</td>
+      <td>TCRStructMap</td>
+      <td>1.233643</td>
+      <td>2.323796e-01</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+ROC-AUC 0.1
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area stderr docutils container">
+<div class="highlight"><pre>
+/ceph/project/koohylab/bmcmaste/projects/tcr-pmhc-predicted-structures/.venv/lib/python3.11/site-packages/pingouin/distribution.py:1004: RuntimeWarning: divide by zero encountered in scalar divide
+  W = np.prod(eig) / (eig.sum() / d) ** d
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Source</th>
+      <th>ddof1</th>
+      <th>ddof2</th>
+      <th>F</th>
+      <th>p-unc</th>
+      <th>ng2</th>
+      <th>eps</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>model</td>
+      <td>2</td>
+      <td>38</td>
+      <td>3.509605</td>
+      <td>0.039933</td>
+      <td>0.114351</td>
+      <td>0.956672</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>group1</th>
+      <th>group2</th>
+      <th>stat</th>
+      <th>p_val</th>
+      <th>signficant</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>AlphaFold3</td>
+      <td>NetTCR</td>
+      <td>2.212537</td>
+      <td>0.039372</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>AlphaFold3</td>
+      <td>TCRStructMap</td>
+      <td>2.147360</td>
+      <td>0.044881</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>NetTCR</td>
+      <td>TCRStructMap</td>
+      <td>-0.165533</td>
+      <td>0.870273</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+PR-AUC
+</pre></div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>Source</th>
+      <th>ddof1</th>
+      <th>ddof2</th>
+      <th>F</th>
+      <th>p-unc</th>
+      <th>ng2</th>
+      <th>eps</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>model</td>
+      <td>2</td>
+      <td>38</td>
+      <td>6.157832</td>
+      <td>0.004825</td>
+      <td>0.200401</td>
+      <td>0.57522</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area rendered_html docutils container">
+<div>
+<style scoped>
+    .dataframe tbody tr th:only-of-type {
+        vertical-align: middle;
+    }
+
+    .dataframe tbody tr th {
+        vertical-align: top;
+    }
+
+    .dataframe thead th {
+        text-align: right;
+    }
+</style>
+<table border="1" class="dataframe">
+  <thead>
+    <tr style="text-align: right;">
+      <th></th>
+      <th>group1</th>
+      <th>group2</th>
+      <th>stat</th>
+      <th>p_val</th>
+      <th>signficant</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <th>0</th>
+      <td>AlphaFold3</td>
+      <td>NetTCR</td>
+      <td>2.861613</td>
+      <td>0.009985</td>
+      <td>True</td>
+    </tr>
+    <tr>
+      <th>1</th>
+      <td>AlphaFold3</td>
+      <td>TCRStructMap</td>
+      <td>2.312492</td>
+      <td>0.032119</td>
+      <td>False</td>
+    </tr>
+    <tr>
+      <th>2</th>
+      <td>NetTCR</td>
+      <td>TCRStructMap</td>
+      <td>-0.378493</td>
+      <td>0.709260</td>
+      <td>False</td>
+    </tr>
+  </tbody>
+</table>
+</div></div>
+</div>
+<div class="nboutput nblast docutils container">
+<div class="prompt empty docutils container">
+</div>
+<div class="output_area docutils container">
+<div class="highlight"><pre>
+
+</pre></div></div>
+</div>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="ablations_of_alphafold3.html" class="btn btn-neutral float-left" title="Ablations of AlphaFold3" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="benchmark_structure_prediction_methods.html" class="btn btn-neutral float-right" title="Benchmark Structure Prediction Methods" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Benjamin McMaster, Ali El Moselhy, Ilija Ilievski, Christopher J. Thorpe, Jamie Rossjohn, Charlotte M. Deane, and Hashem Koohy.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,65 @@
+tcr_pmhc_predicted_structures.apps.select_stcrdab_tcr_pmhc_structures
+=====================================================================
+.. code-block:: text
+
+   usage: python -m tcr_pmhc_predicted_structures.apps.select_stcrdab_tcr_pmhc_structures
+          [-h] --output OUTPUT --output-summary-csv OUTPUT_SUMMARY_CSV
+          [--tcr-types TCR_TYPES [TCR_TYPES ...]]
+          [--mhc-types MHC_TYPES [MHC_TYPES ...]]
+          [--antigen-types ANTIGEN_TYPES [ANTIGEN_TYPES ...]] [--crop-structures]
+          [--remove-het-atoms] [--resolution-cutoff RESOLUTION_CUTOFF]
+          [--remove-structures-missing-residues]
+          [--fix-structures-missing-residues]
+          [--structural-similarity-cutoff STRUCTURAL_SIMILARITY_CUTOFF]
+          [--log-level {debug,info,warning,error}] [--log-file LOG_FILE]
+          stcrdab
+   
+   Select TCR-pMHC structures from STCRDab.
+   
+   positional arguments:
+     stcrdab               path to the STCRDab
+   
+   options:
+     -h, --help            show this help message and exit
+     --output OUTPUT, -o OUTPUT
+                           directory to output selected structures
+     --output-summary-csv OUTPUT_SUMMARY_CSV
+                           path to output summary csv file of structures
+   
+   Structure Types:
+     --tcr-types TCR_TYPES [TCR_TYPES ...]
+                           TCR types allowed in dataset (abTCR and/or gdTCR)
+                           (Default: abTCR)
+     --mhc-types MHC_TYPES [MHC_TYPES ...]
+                           MHC types allowed in dataset (CD1, GA, GB, MH1, MH2,
+                           MR1) (Default: MH1)
+     --antigen-types ANTIGEN_TYPES [ANTIGEN_TYPES ...]
+                           MHC types allowed in dataset (carbohydrate, Hapten,
+                           peptide, protein, etc) (Default: peptide)
+     --crop-structures     Crop TCR:pMHC structures to the TCR variable domain
+                           and MHC antigen binding domain.
+     --remove-het-atoms    Remove heteroatoms from structures
+   
+   Quality Selection:
+     --resolution-cutoff RESOLUTION_CUTOFF
+                           maximum resolution allowed (Default: 3.50)
+     --remove-structures-missing-residues
+                           Remove TCR:pMHC structures with missing residues in
+                           the TCR variable region or pMHC antigen binding domain
+                           (including peptide)
+     --fix-structures-missing-residues
+                           Fix TCR:pMHC structures with missing residues in the
+                           TCR Fw region or MHC antigen binding domain rather
+                           than discarding (to be used with `--remove-structures-
+                           missing-residues)
+     --structural-similarity-cutoff STRUCTURAL_SIMILARITY_CUTOFF
+                           RMSD threshold for structures with the same CDR and
+                           peptide sequences (Default: None)
+   
+   Logging:
+     Options for logging
+   
+     --log-level {debug,info,warning,error}
+                           Level to log messages at (Default: 'warning')
+     --log-file LOG_FILE   File to output logs (default is to write to stderr)
+   

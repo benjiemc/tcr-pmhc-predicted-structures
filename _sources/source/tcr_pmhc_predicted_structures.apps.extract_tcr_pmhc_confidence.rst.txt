@@ -1,0 +1,67 @@
+tcr_pmhc_predicted_structures.apps.extract_tcr_pmhc_confidence
+==============================================================
+.. code-block:: text
+
+   usage: python -m tcr_pmhc_predicted_structures.apps.extract_tcr_pmhc_confidence
+          [-h] --output OUTPUT --score {atom_plddt,plddt,pae,pde}
+          [--aggregate-atom-level-confidence] [--portion {all,cropped,binding}]
+          [--pad] [--cdr1-alpha-length CDR1_ALPHA_LENGTH]
+          [--cdr2-alpha-length CDR2_ALPHA_LENGTH]
+          [--cdr3-alpha-length CDR3_ALPHA_LENGTH]
+          [--cdr1-beta-length CDR1_BETA_LENGTH]
+          [--cdr2-beta-length CDR2_BETA_LENGTH]
+          [--cdr3-beta-length CDR3_BETA_LENGTH] [--peptide-length PEPTIDE_LENGTH]
+          [--pad-direction {centre,left,right}]
+          [--log-level {debug,info,warning,error}] [--log-file LOG_FILE]
+          confidence_path sequence_path
+   
+   Extract TCR:pMHC relevant portion from the confidence metrics of a structure prediction.
+   
+   positional arguments:
+     confidence_path       paths to the confidence in numpy txt format
+     sequence_path         path to the input sequence jsons
+   
+   options:
+     -h, --help            show this help message and exit
+     --output OUTPUT, -o OUTPUT
+                           path to the output numpy array (txt format)
+     --score {atom_plddt,plddt,pae,pde}
+                           score to extract from the input data
+     --aggregate-atom-level-confidence
+                           aggregate atom level confidence by averaging per
+                           residue
+     --portion {all,cropped,binding}
+                           Extract the confidence scores for a portion of the
+                           complex. 'cropped' refers to the TCR-variable domain,
+                           peptide, and antigen binding domain. 'binding' is
+                           isolated to the binding interface (CDRs, peptide, and
+                           MHC-TCR contact positions) rather than the full TCR
+                           and MHC chains. (Default: 'all')
+   
+   Padding:
+     --pad                 option to add padding to confidence scores being
+                           extract
+     --cdr1-alpha-length CDR1_ALPHA_LENGTH
+                           Length to pad CDR 1as to (Default: 8)
+     --cdr2-alpha-length CDR2_ALPHA_LENGTH
+                           Length to pad CDR 2as to (Default: 8)
+     --cdr3-alpha-length CDR3_ALPHA_LENGTH
+                           Length to pad CDR 3as to (Default: 24)
+     --cdr1-beta-length CDR1_BETA_LENGTH
+                           Length to pad CDR 1bs to (Default: 8)
+     --cdr2-beta-length CDR2_BETA_LENGTH
+                           Length to pad CDR 2bs to (Default: 8)
+     --cdr3-beta-length CDR3_BETA_LENGTH
+                           Length to pad CDR 3bs to (Default: 24)
+     --peptide-length PEPTIDE_LENGTH
+                           Length to pad peptides to (Default: 12)
+     --pad-direction {centre,left,right}
+                           Direction to pad sequences (Default: 'centre')
+   
+   Logging:
+     Options for logging
+   
+     --log-level {debug,info,warning,error}
+                           Level to log messages at (Default: 'warning')
+     --log-file LOG_FILE   File to output logs (default is to write to stderr)
+   
