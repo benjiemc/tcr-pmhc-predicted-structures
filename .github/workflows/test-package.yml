@@ -20,6 +20,12 @@ jobs:
           chmod 600 ~/.ssh/anarci_mhc
           ssh-add ~/.ssh/anarci_mhc
           ssh-add -L
+          cat > "$HOME/conda_init.sh" <<'EOF'
+          eval "$(conda shell.bash hook)"
+          eval "$(mamba shell hook --shell bash)"
+          EOF
+          echo "BASH_ENV=$HOME/conda_init.sh" >> "$GITHUB_ENV"
+          export BASH_ENV="$HOME/conda_init.sh"
           conda install -c conda-forge -c nodefaults mamba -y
           pip install snakemake
           export ALPHAFOLD3_WEIGHTS_DIR=''
